@@ -412,7 +412,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					CAEDCE34417A91D973F68377 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 72CJ2BAQ9A;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -576,7 +576,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 72CJ2BAQ9A;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Drift;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add events to your calendar";
@@ -590,7 +590,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drift.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cleancollective.drift;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -667,7 +667,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 72CJ2BAQ9A;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Drift;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Add events to your calendar";
@@ -681,7 +681,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.drift.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cleancollective.drift;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
