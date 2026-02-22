@@ -1,0 +1,621 @@
+import Foundation
+
+/// 20 real DFW wellness events for development and demo purposes
+enum SeedData {
+
+    // MARK: - Organizers
+
+    static let organizers: [Organizer] = [
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000001")!,
+                  profileId: nil, name: "214 Run Club", slug: "214-run-club",
+                  description: "Dallas' original social run club. We run, we vibe, we build community.",
+                  logoUrl: nil, instagramHandle: "214runclub", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000002")!,
+                  profileId: nil, name: "Run It Up Dallas", slug: "run-it-up-dallas",
+                  description: "Running club for all levels. No one gets left behind.",
+                  logoUrl: nil, instagramHandle: "runitup.dallas", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000003")!,
+                  profileId: nil, name: "Social Running Club", slug: "social-running-club",
+                  description: "Run. Socialize. Repeat. Weekly runs across DFW.",
+                  logoUrl: nil, instagramHandle: "socialrunningclub", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000004")!,
+                  profileId: nil, name: "ZFT Run Club", slug: "zft-run-club",
+                  description: "Zero Finish Time. Every pace, every place.",
+                  logoUrl: nil, instagramHandle: "zftrunclub", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000005")!,
+                  profileId: nil, name: "Alive and Well", slug: "alive-and-well",
+                  description: "Austin & Dallas wellness collective. Sound baths, breathwork, cold plunge.",
+                  logoUrl: nil, instagramHandle: "aliveandwell_", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000006")!,
+                  profileId: nil, name: "Breathe Meditation", slug: "breathe-meditation",
+                  description: "Modern meditation studio in Uptown Dallas.",
+                  logoUrl: nil, instagramHandle: "breathemeditation", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000007")!,
+                  profileId: nil, name: "Breathe Degrees", slug: "breathe-degrees",
+                  description: "Cold plunge & sauna studio. Contrast therapy for recovery and wellness.",
+                  logoUrl: nil, instagramHandle: "breathedegrees", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                  profileId: nil, name: "SHIFT Wellness Club", slug: "shift-wellness-club",
+                  description: "Community-driven wellness events in Dallas. Yoga, breathwork, sound healing.",
+                  logoUrl: nil, instagramHandle: "shiftwellnessclub", isVerified: true),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000009")!,
+                  profileId: nil, name: "Katy Trail Run Crew", slug: "katy-trail-run-crew",
+                  description: "Weekly runs on the Katy Trail. All paces welcome.",
+                  logoUrl: nil, instagramHandle: "katytrailruncrew", isVerified: false),
+
+        Organizer(id: UUID(uuidString: "00000001-0000-0000-0000-000000000010")!,
+                  profileId: nil, name: "Deep Ellum Yoga", slug: "deep-ellum-yoga",
+                  description: "Outdoor yoga sessions in the heart of Deep Ellum.",
+                  logoUrl: nil, instagramHandle: "deepellumyoga", isVerified: false),
+    ]
+
+    // MARK: - Events
+
+    static var events: [Event] {
+        let calendar = Calendar.current
+        let now = Date.now
+
+        func futureDate(daysFromNow days: Int, hour: Int, minute: Int = 0) -> Date {
+            var components = calendar.dateComponents([.year, .month, .day], from: now)
+            components.day! += days
+            components.hour = hour
+            components.minute = minute
+            return calendar.date(from: components) ?? now
+        }
+
+        return [
+            // 1 — 214 Run Club Tuesday
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000001")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000001")!,
+                title: "214 Run Club — Tuesday Night Run",
+                description: "Join us for our weekly Tuesday night run through Uptown Dallas! All paces welcome. We meet at the Katy Trail ice house patio, run 3-5 miles on the Katy Trail, then hang post-run. No sign up needed — just show up.\n\nBring water, wear reflective gear, and come ready to meet your new running fam.",
+                shortDescription: "Weekly social run on Katy Trail. All paces. Free.",
+                coverImageUrl: nil,
+                category: "run-club",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free"],
+                startTime: futureDate(daysFromNow: 1, hour: 18, minute: 30),
+                endTime: futureDate(daysFromNow: 1, hour: 20, minute: 0),
+                recurrenceRule: "weekly-tuesday",
+                locationName: "Katy Trail Ice House",
+                locationAddress: "3127 Routh St, Dallas, TX 75201",
+                locationLat: 32.8021,
+                locationLng: -96.7986,
+                neighborhood: "Uptown",
+                maxCapacity: nil,
+                priceCents: 0,
+                externalUrl: "https://instagram.com/214runclub",
+                isFeatured: true,
+                rsvpCount: 47,
+                status: "upcoming"
+            ),
+
+            // 2 — Run It Up Saturday
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000002")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000002")!,
+                title: "Run It Up Dallas — Saturday Morning Run",
+                description: "Saturday morning runs through Deep Ellum and downtown Dallas. 3-6 mile options. We run together, nobody gets left behind. Post-run coffee at a local spot.\n\nMeet at the mural wall on Main St.",
+                shortDescription: "Saturday morning community run through Deep Ellum.",
+                coverImageUrl: nil,
+                category: "run-club",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free", "early-morning"],
+                startTime: futureDate(daysFromNow: 3, hour: 7, minute: 0),
+                endTime: futureDate(daysFromNow: 3, hour: 8, minute: 30),
+                recurrenceRule: "weekly-saturday",
+                locationName: "Deep Ellum Mural Wall",
+                locationAddress: "2800 Main St, Dallas, TX 75226",
+                locationLat: 32.7842,
+                locationLng: -96.7834,
+                neighborhood: "Deep Ellum",
+                maxCapacity: nil,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: true,
+                rsvpCount: 32,
+                status: "upcoming"
+            ),
+
+            // 3 — Social Running Club Wednesday
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000003")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000003")!,
+                title: "Social Running Club — Wednesday Run",
+                description: "Midweek run through Knox/Henderson. 3-4 mile loop, all paces. We finish at a local spot for socializing (non-alcoholic options always available).",
+                shortDescription: "Midweek social run through Knox/Henderson.",
+                coverImageUrl: nil,
+                category: "run-club",
+                tags: ["beginner-friendly", "outdoor", "free"],
+                startTime: futureDate(daysFromNow: 2, hour: 18, minute: 0),
+                endTime: futureDate(daysFromNow: 2, hour: 19, minute: 30),
+                recurrenceRule: "weekly-wednesday",
+                locationName: "Knox Street",
+                locationAddress: "3230 Knox St, Dallas, TX 75205",
+                locationLat: 32.8179,
+                locationLng: -96.7953,
+                neighborhood: "Knox/Henderson",
+                maxCapacity: nil,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 24,
+                status: "upcoming"
+            ),
+
+            // 4 — ZFT Run Club
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000004")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000004")!,
+                title: "ZFT Run Club — Thursday Evening",
+                description: "Zero Finish Time means every pace is the right pace. 5K route through White Rock Lake trail. Beautiful sunset views. Post-run stretch circle.",
+                shortDescription: "Sunset run at White Rock Lake. Every pace welcome.",
+                coverImageUrl: nil,
+                category: "run-club",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free", "dog-friendly"],
+                startTime: futureDate(daysFromNow: 4, hour: 18, minute: 0),
+                endTime: futureDate(daysFromNow: 4, hour: 19, minute: 30),
+                recurrenceRule: "weekly-thursday",
+                locationName: "White Rock Lake",
+                locationAddress: "8300 Garland Rd, Dallas, TX 75218",
+                locationLat: 32.8364,
+                locationLng: -96.7225,
+                neighborhood: "Lakewood",
+                maxCapacity: nil,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 18,
+                status: "upcoming"
+            ),
+
+            // 5 — Alive and Well Sound Bath
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000005")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000005")!,
+                title: "Full Moon Sound Bath",
+                description: "Immerse yourself in the healing vibrations of crystal singing bowls, gongs, and chimes during this full moon sound bath ceremony. Bring a yoga mat, blanket, and pillow. Eye masks provided.\n\nThis is a deeply restorative experience — perfect for releasing stress and setting intentions for the lunar cycle ahead.",
+                shortDescription: "Crystal bowl sound bath ceremony under the full moon.",
+                coverImageUrl: nil,
+                category: "sound-bath",
+                tags: ["alcohol-free", "beginner-friendly", "evening"],
+                startTime: futureDate(daysFromNow: 5, hour: 19, minute: 30),
+                endTime: futureDate(daysFromNow: 5, hour: 21, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Alive and Well Studio",
+                locationAddress: "2618 Elm St, Dallas, TX 75226",
+                locationLat: 32.7831,
+                locationLng: -96.7858,
+                neighborhood: "Deep Ellum",
+                maxCapacity: 30,
+                priceCents: 3500,
+                externalUrl: "https://aliveandwell.com",
+                isFeatured: true,
+                rsvpCount: 26,
+                status: "upcoming"
+            ),
+
+            // 6 — Breathwork Session
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000006")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000005")!,
+                title: "Breathwork + Ice Bath Experience",
+                description: "Guided breathwork session followed by a cold plunge experience. Learn Wim Hof-inspired breathing techniques, then test your practice in the ice bath. First-timers welcome — we guide you through every step.\n\nIncludes: guided breathwork, cold plunge access, herbal tea, integration circle.",
+                shortDescription: "Guided breathwork + cold plunge. First-timers welcome.",
+                coverImageUrl: nil,
+                category: "breathwork",
+                tags: ["alcohol-free", "beginner-friendly"],
+                startTime: futureDate(daysFromNow: 6, hour: 10, minute: 0),
+                endTime: futureDate(daysFromNow: 6, hour: 12, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Alive and Well Studio",
+                locationAddress: "2618 Elm St, Dallas, TX 75226",
+                locationLat: 32.7831,
+                locationLng: -96.7858,
+                neighborhood: "Deep Ellum",
+                maxCapacity: 20,
+                priceCents: 4500,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 15,
+                status: "upcoming"
+            ),
+
+            // 7 — Breathe Meditation Morning
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000007")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000006")!,
+                title: "Morning Meditation — Start Your Day Right",
+                description: "30-minute guided morning meditation to set your intention for the day. Suitable for all experience levels. Cushions and blankets provided. Arrive 5 minutes early to settle in.",
+                shortDescription: "30-min guided morning meditation. All levels.",
+                coverImageUrl: nil,
+                category: "meditation",
+                tags: ["alcohol-free", "beginner-friendly", "early-morning", "free"],
+                startTime: futureDate(daysFromNow: 1, hour: 7, minute: 0),
+                endTime: futureDate(daysFromNow: 1, hour: 7, minute: 30),
+                recurrenceRule: "weekly-weekdays",
+                locationName: "Breathe Meditation Studio",
+                locationAddress: "3699 McKinney Ave #204, Dallas, TX 75204",
+                locationLat: 32.8057,
+                locationLng: -96.7969,
+                neighborhood: "Uptown",
+                maxCapacity: 15,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 10,
+                status: "upcoming"
+            ),
+
+            // 8 — Cold Plunge at Breathe Degrees
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000008")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000007")!,
+                title: "Community Cold Plunge Session",
+                description: "Open community cold plunge session at Breathe Degrees. Experience contrast therapy with alternating cold plunge (39°F) and infrared sauna. Staff guides you through the process. Towels and robes provided.\n\nPerfect for recovery, mental clarity, and meeting fellow wellness enthusiasts.",
+                shortDescription: "Community cold plunge + sauna contrast therapy.",
+                coverImageUrl: nil,
+                category: "cold-plunge",
+                tags: ["alcohol-free", "beginner-friendly"],
+                startTime: futureDate(daysFromNow: 2, hour: 11, minute: 0),
+                endTime: futureDate(daysFromNow: 2, hour: 13, minute: 0),
+                recurrenceRule: "weekly-saturday",
+                locationName: "Breathe Degrees",
+                locationAddress: "4100 Maple Ave #110, Dallas, TX 75219",
+                locationLat: 32.8089,
+                locationLng: -96.8109,
+                neighborhood: "Oak Lawn",
+                maxCapacity: 12,
+                priceCents: 2500,
+                externalUrl: "https://breathedegrees.com",
+                isFeatured: false,
+                rsvpCount: 11,
+                status: "upcoming"
+            ),
+
+            // 9 — SHIFT Wellness Yoga
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000009")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                title: "Sunset Yoga in the Park",
+                description: "Outdoor vinyasa flow as the sun sets over Klyde Warren Park. Bring your own mat. All levels welcome — modifications offered for every pose. Stay for community hangout after class.\n\nWeather-dependent. Check our Instagram story day-of for updates.",
+                shortDescription: "Outdoor sunset yoga at Klyde Warren Park. All levels.",
+                coverImageUrl: nil,
+                category: "yoga",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free"],
+                startTime: futureDate(daysFromNow: 3, hour: 18, minute: 30),
+                endTime: futureDate(daysFromNow: 3, hour: 19, minute: 30),
+                recurrenceRule: "weekly-saturday",
+                locationName: "Klyde Warren Park",
+                locationAddress: "2012 Woodall Rodgers Fwy, Dallas, TX 75201",
+                locationLat: 32.7893,
+                locationLng: -96.8017,
+                neighborhood: "Uptown",
+                maxCapacity: 40,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: true,
+                rsvpCount: 35,
+                status: "upcoming"
+            ),
+
+            // 10 — SHIFT Sound Healing
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000010")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                title: "Sound Healing Journey",
+                description: "An immersive sound healing experience featuring Tibetan singing bowls, crystal bowls, and guided meditation. Lie back, close your eyes, and let the vibrations wash over you.\n\nWhat to bring: yoga mat, blanket, pillow, water. What to leave: stress, expectations.",
+                shortDescription: "Immersive Tibetan & crystal bowl sound healing.",
+                coverImageUrl: nil,
+                category: "sound-bath",
+                tags: ["alcohol-free", "beginner-friendly", "evening"],
+                startTime: futureDate(daysFromNow: 7, hour: 19, minute: 0),
+                endTime: futureDate(daysFromNow: 7, hour: 20, minute: 30),
+                recurrenceRule: nil,
+                locationName: "SHIFT Wellness Studio",
+                locationAddress: "1530 Main St #100, Dallas, TX 75201",
+                locationLat: 32.7815,
+                locationLng: -96.7978,
+                neighborhood: "Deep Ellum",
+                maxCapacity: 25,
+                priceCents: 3000,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 19,
+                status: "upcoming"
+            ),
+
+            // 11 — Sober Social Mixer
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000011")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                title: "Sober Social — Friday Night Hangout",
+                description: "Prove you don't need alcohol to have a great Friday night. Music, mocktails, lawn games, and good conversation at Trinity Groves. DJ sets, craft NA beverages, and a vibe that hits different.\n\nThis is a 100% alcohol-free event.",
+                shortDescription: "Alcohol-free Friday night with music & mocktails.",
+                coverImageUrl: nil,
+                category: "social",
+                tags: ["alcohol-free", "evening", "live-music"],
+                startTime: futureDate(daysFromNow: 5, hour: 19, minute: 0),
+                endTime: futureDate(daysFromNow: 5, hour: 22, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Trinity Groves",
+                locationAddress: "3011 Gulden Ln, Dallas, TX 75212",
+                locationLat: 32.7824,
+                locationLng: -96.8342,
+                neighborhood: "Trinity Groves",
+                maxCapacity: 100,
+                priceCents: 1500,
+                externalUrl: nil,
+                isFeatured: true,
+                rsvpCount: 52,
+                status: "upcoming"
+            ),
+
+            // 12 — Morning Bootcamp
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000012")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000009")!,
+                title: "Katy Trail Morning Bootcamp",
+                description: "High-intensity outdoor bootcamp on the Katy Trail. 45 minutes of bodyweight exercises, partner drills, and trail running. Bring water and a towel. All fitness levels — we scale everything.",
+                shortDescription: "45-min outdoor HIIT bootcamp on Katy Trail.",
+                coverImageUrl: nil,
+                category: "fitness",
+                tags: ["alcohol-free", "outdoor", "early-morning", "free"],
+                startTime: futureDate(daysFromNow: 1, hour: 6, minute: 0),
+                endTime: futureDate(daysFromNow: 1, hour: 6, minute: 45),
+                recurrenceRule: "weekly-tuesday",
+                locationName: "Katy Trail — Reverchon Park",
+                locationAddress: "3505 Maple Ave, Dallas, TX 75219",
+                locationLat: 32.8037,
+                locationLng: -96.8076,
+                neighborhood: "Oak Lawn",
+                maxCapacity: 30,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 14,
+                status: "upcoming"
+            ),
+
+            // 13 — Deep Ellum Outdoor Yoga
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000013")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000010")!,
+                title: "Rooftop Yoga — Deep Ellum",
+                description: "Sunrise yoga on a Deep Ellum rooftop. Vinyasa flow with views of the Dallas skyline. Mats available or bring your own. Herbal tea served after class.",
+                shortDescription: "Sunrise rooftop yoga with Dallas skyline views.",
+                coverImageUrl: nil,
+                category: "yoga",
+                tags: ["alcohol-free", "outdoor", "early-morning", "beginner-friendly"],
+                startTime: futureDate(daysFromNow: 4, hour: 6, minute: 30),
+                endTime: futureDate(daysFromNow: 4, hour: 7, minute: 30),
+                recurrenceRule: "weekly-thursday",
+                locationName: "Deep Ellum Rooftop",
+                locationAddress: "2636 Main St, Dallas, TX 75226",
+                locationLat: 32.7838,
+                locationLng: -96.7849,
+                neighborhood: "Deep Ellum",
+                maxCapacity: 20,
+                priceCents: 2000,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 16,
+                status: "upcoming"
+            ),
+
+            // 14 — Breathwork Workshop
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000014")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000006")!,
+                title: "Intro to Breathwork Workshop",
+                description: "New to breathwork? This 90-minute workshop covers the science behind conscious breathing, teaches 3 foundational techniques (box breathing, 4-7-8, and holotropic), and includes a guided breathwork journey.\n\nLeave with a personal breathwork practice you can use daily.",
+                shortDescription: "Learn 3 breathwork techniques in this beginner workshop.",
+                coverImageUrl: nil,
+                category: "workshop",
+                tags: ["alcohol-free", "beginner-friendly"],
+                startTime: futureDate(daysFromNow: 6, hour: 14, minute: 0),
+                endTime: futureDate(daysFromNow: 6, hour: 15, minute: 30),
+                recurrenceRule: nil,
+                locationName: "Breathe Meditation Studio",
+                locationAddress: "3699 McKinney Ave #204, Dallas, TX 75204",
+                locationLat: 32.8057,
+                locationLng: -96.7969,
+                neighborhood: "Uptown",
+                maxCapacity: 15,
+                priceCents: 4000,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 12,
+                status: "upcoming"
+            ),
+
+            // 15 — Women's Circle
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000015")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                title: "Women's Wellness Circle",
+                description: "A safe, supportive space for women to connect, share, and heal. This evening includes guided meditation, journaling prompts, sharing circle, and sound healing.\n\nAll are welcome. What's shared in circle stays in circle.",
+                shortDescription: "Women's meditation, journaling & sound healing circle.",
+                coverImageUrl: nil,
+                category: "meditation",
+                tags: ["alcohol-free", "women-only", "evening"],
+                startTime: futureDate(daysFromNow: 8, hour: 19, minute: 0),
+                endTime: futureDate(daysFromNow: 8, hour: 21, minute: 0),
+                recurrenceRule: nil,
+                locationName: "SHIFT Wellness Studio",
+                locationAddress: "1530 Main St #100, Dallas, TX 75201",
+                locationLat: 32.7815,
+                locationLng: -96.7978,
+                neighborhood: "Deep Ellum",
+                maxCapacity: 20,
+                priceCents: 2500,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 14,
+                status: "upcoming"
+            ),
+
+            // 16 — Fort Worth Run
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000016")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000003")!,
+                title: "Fort Worth Trinity Trail Run",
+                description: "Exploring Fort Worth! Join us for a scenic run along the Trinity Trail. 4-mile out-and-back. Beautiful river views. Post-run hangout at Clearfork.",
+                shortDescription: "Scenic run along Fort Worth's Trinity Trail.",
+                coverImageUrl: nil,
+                category: "run-club",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free", "dog-friendly"],
+                startTime: futureDate(daysFromNow: 9, hour: 8, minute: 0),
+                endTime: futureDate(daysFromNow: 9, hour: 9, minute: 30),
+                recurrenceRule: nil,
+                locationName: "Trinity Trail — Clearfork",
+                locationAddress: "4801 Edwards Ranch Rd, Fort Worth, TX 76109",
+                locationLat: 32.7175,
+                locationLng: -97.3738,
+                neighborhood: "Fort Worth",
+                maxCapacity: nil,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 22,
+                status: "upcoming"
+            ),
+
+            // 17 — Cold Plunge + Sauna
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000017")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000007")!,
+                title: "Contrast Therapy Open House",
+                description: "Try contrast therapy for free during our monthly open house! Alternate between our 39°F cold plunge and 170°F infrared sauna. Staff on hand to guide first-timers. Towels and robes included.\n\nLimit: 2 rounds per person. First come, first served.",
+                shortDescription: "Free cold plunge + sauna open house. First-timers welcome.",
+                coverImageUrl: nil,
+                category: "cold-plunge",
+                tags: ["alcohol-free", "beginner-friendly", "free"],
+                startTime: futureDate(daysFromNow: 10, hour: 10, minute: 0),
+                endTime: futureDate(daysFromNow: 10, hour: 14, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Breathe Degrees",
+                locationAddress: "4100 Maple Ave #110, Dallas, TX 75219",
+                locationLat: 32.8089,
+                locationLng: -96.8109,
+                neighborhood: "Oak Lawn",
+                maxCapacity: 40,
+                priceCents: 0,
+                externalUrl: "https://breathedegrees.com",
+                isFeatured: true,
+                rsvpCount: 38,
+                status: "upcoming"
+            ),
+
+            // 18 — Frisco Yoga
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000018")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000008")!,
+                title: "Yoga in the Plaza — Frisco",
+                description: "Free outdoor yoga at The Star in Frisco! Suitable for all levels. Bring your own mat. Great way to start the weekend.",
+                shortDescription: "Free outdoor yoga at The Star in Frisco.",
+                coverImageUrl: nil,
+                category: "yoga",
+                tags: ["alcohol-free", "beginner-friendly", "outdoor", "free", "family-friendly"],
+                startTime: futureDate(daysFromNow: 4, hour: 9, minute: 0),
+                endTime: futureDate(daysFromNow: 4, hour: 10, minute: 0),
+                recurrenceRule: nil,
+                locationName: "The Star — Frisco",
+                locationAddress: "1 Cowboys Way, Frisco, TX 75034",
+                locationLat: 33.0955,
+                locationLng: -96.8174,
+                neighborhood: "Frisco",
+                maxCapacity: 50,
+                priceCents: 0,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 28,
+                status: "upcoming"
+            ),
+
+            // 19 — Bishop Arts Social
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000019")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000005")!,
+                title: "Mocktail Night — Bishop Arts",
+                description: "Alcohol-free cocktail night in Bishop Arts! Craft NA cocktails, DJ spinning house music, and a chill vibe. Great way to meet people without the hangover.\n\nFeaturing drinks by local NA beverage brands. 21+ event (just because of the venue, not the drinks).",
+                shortDescription: "Craft mocktail night with DJ in Bishop Arts.",
+                coverImageUrl: nil,
+                category: "social",
+                tags: ["alcohol-free", "evening", "live-music"],
+                startTime: futureDate(daysFromNow: 7, hour: 20, minute: 0),
+                endTime: futureDate(daysFromNow: 7, hour: 23, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Bishop Arts District",
+                locationAddress: "419 N Bishop Ave, Dallas, TX 75208",
+                locationLat: 32.7474,
+                locationLng: -96.8268,
+                neighborhood: "Bishop Arts",
+                maxCapacity: 75,
+                priceCents: 2000,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 41,
+                status: "upcoming"
+            ),
+
+            // 20 — Wellness Workshop
+            Event(
+                id: UUID(uuidString: "10000001-0000-0000-0000-000000000020")!,
+                organizerId: UUID(uuidString: "00000001-0000-0000-0000-000000000006")!,
+                title: "Stress Less: Nervous System Reset Workshop",
+                description: "Learn practical tools to regulate your nervous system in this hands-on workshop. Topics: vagus nerve activation, somatic exercises, breathwork for anxiety, and building a daily resilience practice.\n\nPerfect for anyone dealing with burnout, anxiety, or chronic stress. Take-home workbook included.",
+                shortDescription: "Practical nervous system regulation tools workshop.",
+                coverImageUrl: nil,
+                category: "workshop",
+                tags: ["alcohol-free", "beginner-friendly", "weekend"],
+                startTime: futureDate(daysFromNow: 11, hour: 13, minute: 0),
+                endTime: futureDate(daysFromNow: 11, hour: 15, minute: 0),
+                recurrenceRule: nil,
+                locationName: "Breathe Meditation Studio",
+                locationAddress: "3699 McKinney Ave #204, Dallas, TX 75204",
+                locationLat: 32.8057,
+                locationLng: -96.7969,
+                neighborhood: "Uptown",
+                maxCapacity: 20,
+                priceCents: 5500,
+                externalUrl: nil,
+                isFeatured: false,
+                rsvpCount: 9,
+                status: "upcoming"
+            ),
+        ]
+    }
+
+    // MARK: - Sample Profiles (for preview/testing)
+
+    static let sampleProfiles: [Profile] = [
+        Profile(id: UUID(uuidString: "20000001-0000-0000-0000-000000000001")!,
+                username: "sarah_runs", displayName: "Sarah Chen",
+                bio: "Running through DFW one trail at a time", avatarUrl: nil,
+                interests: ["run-club", "yoga", "social"],
+                locationLat: 32.8021, locationLng: -96.7986,
+                neighborhood: "Uptown", streakCount: 8, eventsAttended: 23, createdAt: .now),
+
+        Profile(id: UUID(uuidString: "20000001-0000-0000-0000-000000000002")!,
+                username: "marcus_flow", displayName: "Marcus Johnson",
+                bio: "Sound bath enthusiast. Cold plunge convert.", avatarUrl: nil,
+                interests: ["sound-bath", "cold-plunge", "breathwork", "meditation"],
+                locationLat: 32.7842, locationLng: -96.7834,
+                neighborhood: "Deep Ellum", streakCount: 12, eventsAttended: 45, createdAt: .now),
+
+        Profile(id: UUID(uuidString: "20000001-0000-0000-0000-000000000003")!,
+                username: "wellness_jess", displayName: "Jessica Park",
+                bio: "Yoga teacher & breathwork facilitator", avatarUrl: nil,
+                interests: ["yoga", "breathwork", "meditation", "workshop"],
+                locationLat: 32.8179, locationLng: -96.7953,
+                neighborhood: "Knox/Henderson", streakCount: 20, eventsAttended: 67, createdAt: .now),
+    ]
+}
