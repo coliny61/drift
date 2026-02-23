@@ -89,9 +89,32 @@ struct EditProfileView: View {
                         .foregroundStyle(Color(hex: "9CA3AF"))
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") { dismiss() }
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color(hex: "FF6B35"))
+                    Button("Save") {
+                        Task {
+                            guard let existing = authViewModel.currentProfile else { return }
+                            isSaving = true
+                            let updated = Profile(
+                                id: existing.id,
+                                username: username,
+                                displayName: displayName,
+                                bio: bio.isEmpty ? nil : bio,
+                                avatarUrl: existing.avatarUrl,
+                                interests: selectedInterests.map(\.slug),
+                                locationLat: existing.locationLat,
+                                locationLng: existing.locationLng,
+                                neighborhood: existing.neighborhood,
+                                streakCount: existing.streakCount,
+                                eventsAttended: existing.eventsAttended,
+                                createdAt: existing.createdAt
+                            )
+                            try? await authViewModel.updateProfile(updated)
+                            isSaving = false
+                            dismiss()
+                        }
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(hex: "FF6B35"))
+                    .disabled(isSaving)
                 }
             }
             .onAppear {

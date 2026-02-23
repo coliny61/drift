@@ -30,6 +30,23 @@ final class EventDetailViewModel {
         isLoading = false
     }
 
+    func loadUserRSVP(userId: UUID) async {
+        guard let event else { return }
+        userRSVP = await rsvpService.getUserRSVP(eventId: event.id, userId: userId)
+        // Fallback to locally stored RSVP
+        if userRSVP == nil, let localStatus = Self.localRSVPs()[event.id.uuidString] {
+            userRSVP = RSVP(id: UUID(), eventId: event.id, userId: userId, status: localStatus, createdAt: .now)
+        }
+    }
+
+    func loadAttendees() async {
+        guard let event else { return }
+        attendees = await rsvpService.getEventAttendees(eventId: event.id)
+        if !attendees.isEmpty {
+            attendeeCount = attendees.count
+        }
+    }
+
     func toggleRSVP(userId: UUID, status: RSVP.RSVPStatus) async {
         guard let event else { return }
 
@@ -38,6 +55,7 @@ final class EventDetailViewModel {
             try? await rsvpService.removeRSVP(eventId: event.id, userId: userId)
             userRSVP = nil
             attendeeCount = max(0, attendeeCount - 1)
+            Self.removeLocalRSVP(eventId: event.id)
         } else {
             // Add/update RSVP
             try? await rsvpService.rsvp(eventId: event.id, userId: userId, status: status)
@@ -49,9 +67,31 @@ final class EventDetailViewModel {
                 status: status.rawValue,
                 createdAt: .now
             )
+            Self.saveLocalRSVP(eventId: event.id, status: status)
         }
 
         HapticManager.impact(.medium)
+    }
+
+    // MARK: - Local RSVP storage (for browse-without-account mode)
+
+    private static let localRSVPKey = "drift_local_rsvps"
+
+    /// Returns locally stored RSVPs as [eventId: status] dictionary
+    static func localRSVPs() -> [String: String] {
+        UserDefaults.standard.dictionary(forKey: localRSVPKey) as? [String: String] ?? [:]
+    }
+
+    static func saveLocalRSVP(eventId: UUID, status: RSVP.RSVPStatus) {
+        var rsvps = localRSVPs()
+        rsvps[eventId.uuidString] = status.rawValue
+        UserDefaults.standard.set(rsvps, forKey: localRSVPKey)
+    }
+
+    static func removeLocalRSVP(eventId: UUID) {
+        var rsvps = localRSVPs()
+        rsvps.removeValue(forKey: eventId.uuidString)
+        UserDefaults.standard.set(rsvps, forKey: localRSVPKey)
     }
 
     func addToCalendar() async {

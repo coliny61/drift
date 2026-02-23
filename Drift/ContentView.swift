@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @State private var selectedTab: Tab = .discover
+    @State private var showOnboarding = false
 
     enum Tab: String {
         case discover, map, search, activity, profile
@@ -50,6 +51,17 @@ struct ContentView: View {
         }
         .tint(Color(hex: "FF6B35"))
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView(onDismiss: {
+                showOnboarding = false
+            })
+        }
+        .onAppear {
+            let hasOnboarded = UserDefaults.standard.bool(forKey: "drift_has_onboarded")
+            if !authViewModel.isAuthenticated && !hasOnboarded {
+                showOnboarding = true
+            }
+        }
     }
 }
 

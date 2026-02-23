@@ -42,16 +42,33 @@ final class RSVPService {
         }
     }
 
+    private struct RSVPWithProfile: Decodable {
+        let id: UUID
+        let eventId: UUID
+        let userId: UUID
+        let status: String
+        let createdAt: Date
+        let profiles: Profile
+
+        enum CodingKeys: String, CodingKey {
+            case id
+            case eventId = "event_id"
+            case userId = "user_id"
+            case status
+            case createdAt = "created_at"
+            case profiles
+        }
+    }
+
     func getEventAttendees(eventId: UUID) async -> [Profile] {
         do {
-            let rsvps: [RSVP] = try await client.from("rsvps")
+            let rsvps: [RSVPWithProfile] = try await client.from("rsvps")
                 .select("*, profiles(*)")
                 .eq("event_id", value: eventId.uuidString)
                 .eq("status", value: "going")
                 .execute()
                 .value
-            // In production, this would use a joined query
-            return []
+            return rsvps.map(\.profiles)
         } catch {
             return []
         }

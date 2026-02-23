@@ -138,6 +138,7 @@
 		FB047C526B3FB5AC344957E5 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		FD78C67766D84D3C872D6373 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		FDB9B1872BE1C9C20FAD4D43 /* RSVPButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSVPButtonView.swift; sourceTree = "<group>"; };
+		FF0DB0809C7110E3644208F2 /* Drift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Drift.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -350,6 +351,7 @@
 				3A14444424F2FA5FA56661DB /* ViewModels */,
 				4A7204948841850DFF3D940D /* Views */,
 				F78E3B6C1497F6A200DF8095 /* ContentView.swift */,
+				FF0DB0809C7110E3644208F2 /* Drift.entitlements */,
 				DC6712FB46945A6FE1AAB0E0 /* DriftApp.swift */,
 			);
 			name = Drift;

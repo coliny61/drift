@@ -4,18 +4,21 @@ import Foundation
 final class ProfileViewModel {
     private let profileService: ProfileService
     private let rsvpService: RSVPService
+    private let eventService: EventService
 
     var profile: Profile?
     var upcomingRSVPs: [RSVP] = []
+    var upcomingEvents: [Event] = []
     var followerCount = 0
     var followingCount = 0
     var isFollowing = false
     var isLoading = false
     var isOwnProfile = false
 
-    init(profileService: ProfileService, rsvpService: RSVPService) {
+    init(profileService: ProfileService, rsvpService: RSVPService, eventService: EventService) {
         self.profileService = profileService
         self.rsvpService = rsvpService
+        self.eventService = eventService
     }
 
     func loadProfile(userId: UUID, currentUserId: UUID?) async {
@@ -31,6 +34,27 @@ final class ProfileViewModel {
         followerCount = await followers
         followingCount = await following
         upcomingRSVPs = await rsvps
+
+        // Resolve RSVP event IDs to Event objects
+        var events: [Event] = []
+        for rsvp in upcomingRSVPs {
+            if let event = await eventService.fetchEvent(id: rsvp.eventId) {
+                events.append(event)
+            }
+        }
+
+        // Also include locally stored RSVPs (browse-without-account mode)
+        let localRSVPs = EventDetailViewModel.localRSVPs()
+        for (eventIdString, _) in localRSVPs {
+            if let eventId = UUID(uuidString: eventIdString),
+               !events.contains(where: { $0.id == eventId }) {
+                if let event = await eventService.fetchEvent(id: eventId) {
+                    events.append(event)
+                }
+            }
+        }
+
+        upcomingEvents = events.sorted { $0.startTime < $1.startTime }
 
         if let currentUserId, !isOwnProfile {
             isFollowing = await profileService.isFollowing(followerId: currentUserId, followingId: userId)

@@ -1,8 +1,8 @@
 import Foundation
 
 enum SupabaseConfig {
-    static let url = URL(string: "https://YOUR_PROJECT.supabase.co")!
-    static let anonKey = "YOUR_ANON_KEY"
+    static let url = URL(string: "https://xzxhnpukbeicggxxuymp.supabase.co")!
+    static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6eGhucHVrYmVpY2dneHh1eW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MTAyOTUsImV4cCI6MjA4NzM4NjI5NX0.4rGykh28aOzHfmgzGpPt4NPYU5-2oNReMa1HjR9wDXI"
 
     // Table names
     static let eventsTable = "events"

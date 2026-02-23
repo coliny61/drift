@@ -101,14 +101,14 @@ struct ProfileView: View {
                         }
                     }
 
-                    // Upcoming RSVPs placeholder
+                    // Upcoming Events
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Upcoming Events")
                             .font(.headline)
                             .foregroundStyle(.white)
                             .padding(.horizontal)
 
-                        if profileViewModel.upcomingRSVPs.isEmpty {
+                        if profileViewModel.upcomingEvents.isEmpty {
                             VStack(spacing: 8) {
                                 Image(systemName: "calendar")
                                     .font(.title2)
@@ -122,6 +122,46 @@ struct ProfileView: View {
                             .background(Color(hex: "1A1A1A"))
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .padding(.horizontal)
+                        } else {
+                            ForEach(profileViewModel.upcomingEvents) { event in
+                                NavigationLink(value: event.id) {
+                                    HStack(spacing: 12) {
+                                        VStack(alignment: .center, spacing: 2) {
+                                            Text(event.startTime.formatted(.dateTime.month(.abbreviated)).uppercased())
+                                                .font(.caption2)
+                                                .fontWeight(.semibold)
+                                                .foregroundStyle(Color(hex: "FF6B35"))
+                                            Text(event.startTime.formatted(.dateTime.day()))
+                                                .font(.title2)
+                                                .fontWeight(.bold)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .frame(width: 48)
+
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(event.title)
+                                                .font(.subheadline)
+                                                .fontWeight(.semibold)
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1)
+                                            Text(event.locationName)
+                                                .font(.caption)
+                                                .foregroundStyle(Color(hex: "9CA3AF"))
+                                                .lineLimit(1)
+                                        }
+
+                                        Spacer()
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(Color(hex: "9CA3AF"))
+                                    }
+                                    .padding(12)
+                                    .background(Color(hex: "1A1A1A"))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                .padding(.horizontal)
+                            }
                         }
                     }
                 }
@@ -140,6 +180,9 @@ struct ProfileView: View {
                     }
                 }
             }
+            .navigationDestination(for: UUID.self) { eventId in
+                EventDetailView(eventId: eventId)
+            }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
@@ -147,9 +190,8 @@ struct ProfileView: View {
                 EditProfileView()
             }
             .task {
-                if let userId = authViewModel.currentProfile?.id {
-                    await profileViewModel.loadProfile(userId: userId, currentUserId: userId)
-                }
+                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                await profileViewModel.loadProfile(userId: userId, currentUserId: userId)
             }
         }
     }

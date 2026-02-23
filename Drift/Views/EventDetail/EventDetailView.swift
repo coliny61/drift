@@ -4,6 +4,7 @@ import MapKit
 struct EventDetailView: View {
     let eventId: UUID
     @Environment(EventDetailViewModel.self) private var viewModel
+    @Environment(AuthViewModel.self) private var authViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -201,6 +202,21 @@ struct EventDetailView: View {
                             .background(Color(hex: "2A2A2A"))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
+
+                        // RSVP
+                        RSVPButtonView(
+                            isGoing: viewModel.userRSVP?.status == RSVP.RSVPStatus.going.rawValue,
+                            isInterested: viewModel.userRSVP?.status == RSVP.RSVPStatus.interested.rawValue,
+                            attendeeCount: viewModel.attendeeCount,
+                            onGoing: {
+                                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                                Task { await viewModel.toggleRSVP(userId: userId, status: .going) }
+                            },
+                            onInterested: {
+                                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                                Task { await viewModel.toggleRSVP(userId: userId, status: .interested) }
+                            }
+                        )
                     }
                     .padding(20)
                 }
@@ -216,6 +232,9 @@ struct EventDetailView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
             await viewModel.loadEvent(id: eventId)
+            let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+            await viewModel.loadUserRSVP(userId: userId)
+            await viewModel.loadAttendees()
         }
     }
 

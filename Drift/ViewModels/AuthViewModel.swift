@@ -7,7 +7,6 @@ final class AuthViewModel {
     private let authService: AuthService
 
     var isAuthenticated: Bool { authService.isAuthenticated }
-    var currentProfile: Profile? { authService.currentProfile }
     var isLoading = false
     var error: String?
 
@@ -24,8 +23,52 @@ final class AuthViewModel {
         case welcome, interests, neighborhood, permissions, signIn
     }
 
+    /// Returns the authenticated profile, or a local anonymous profile for browse-mode users
+    var currentProfile: Profile? {
+        if let profile = authService.currentProfile {
+            return profile
+        }
+        return localProfile
+    }
+
+    /// Stable anonymous user ID persisted across launches
+    var localUserId: UUID {
+        let key = "drift_local_user_id"
+        if let stored = UserDefaults.standard.string(forKey: key), let id = UUID(uuidString: stored) {
+            return id
+        }
+        let newId = UUID()
+        UserDefaults.standard.set(newId.uuidString, forKey: key)
+        return newId
+    }
+
+    /// Local profile for non-authenticated users built from onboarding selections
+    private var localProfile: Profile? {
+        let hasOnboarded = UserDefaults.standard.bool(forKey: "drift_has_onboarded")
+        guard hasOnboarded else { return nil }
+        return Profile(
+            id: localUserId,
+            username: "drifter",
+            displayName: "Drifter",
+            bio: nil,
+            avatarUrl: nil,
+            interests: selectedInterests.map(\.slug),
+            locationLat: nil,
+            locationLng: nil,
+            neighborhood: selectedNeighborhood,
+            streakCount: 0,
+            eventsAttended: 0,
+            createdAt: .now
+        )
+    }
+
     init(authService: AuthService) {
         self.authService = authService
+        // Restore interests from onboarding
+        if let saved = UserDefaults.standard.array(forKey: "drift_selected_interests") as? [String] {
+            selectedInterests = Set(saved.compactMap { slug in Category.allCases.first { $0.slug == slug } })
+        }
+        selectedNeighborhood = UserDefaults.standard.string(forKey: "drift_selected_neighborhood")
     }
 
     func initialize() async {
@@ -77,9 +120,14 @@ final class AuthViewModel {
 
     func prepareSignInRequest(_ request: ASAuthorizationAppleIDRequest) {
         let nonce = randomNonceString()
-        currentNonce = sha256(nonce)
+        let hashedNonce = sha256(nonce)
+        currentNonce = nonce
         request.requestedScopes = [.fullName, .email]
-        request.nonce = sha256(nonce)
+        request.nonce = hashedNonce
+    }
+
+    func updateProfile(_ profile: Profile) async throws {
+        try await authService.updateProfile(profile)
     }
 
     func signOut() async {

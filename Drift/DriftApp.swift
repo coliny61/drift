@@ -3,12 +3,6 @@ import Supabase
 
 @main
 struct DriftApp: App {
-    // MARK: - Supabase Client
-    private let supabaseClient = SupabaseClient(
-        supabaseURL: SupabaseConfig.url,
-        supabaseKey: SupabaseConfig.anonKey
-    )
-
     // MARK: - Core Utilities
     @State private var locationManager = LocationManager()
 
@@ -64,7 +58,7 @@ struct DriftApp: App {
         _eventDetailViewModel = State(initialValue: EventDetailViewModel(eventService: events, rsvpService: rsvps))
         _mapViewModel = State(initialValue: MapViewModel(eventService: events))
         _searchViewModel = State(initialValue: SearchViewModel(eventService: events))
-        _profileViewModel = State(initialValue: ProfileViewModel(profileService: profiles, rsvpService: rsvps))
+        _profileViewModel = State(initialValue: ProfileViewModel(profileService: profiles, rsvpService: rsvps, eventService: events))
         _chatViewModel = State(initialValue: ChatViewModel(chatService: chat))
         _activityFeedViewModel = State(initialValue: ActivityFeedViewModel(activityService: activity))
     }

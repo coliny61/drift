@@ -3,290 +3,472 @@ import AuthenticationServices
 
 struct OnboardingView: View {
     @Environment(AuthViewModel.self) private var viewModel
+    var onDismiss: () -> Void
+
+    private let totalSteps = AuthViewModel.OnboardingStep.allCases.count
 
     var body: some View {
         ZStack {
-            Color(hex: "0A0A0A").ignoresSafeArea()
+            // Background with subtle gradient
+            AppConstants.Colors.background.ignoresSafeArea()
 
-            TabView(selection: Bindable(viewModel).onboardingStep) {
-                welcomeStep.tag(AuthViewModel.OnboardingStep.welcome)
-                interestsStep.tag(AuthViewModel.OnboardingStep.interests)
-                neighborhoodStep.tag(AuthViewModel.OnboardingStep.neighborhood)
-                permissionsStep.tag(AuthViewModel.OnboardingStep.permissions)
-                signInStep.tag(AuthViewModel.OnboardingStep.signIn)
+            VStack(spacing: 0) {
+                // Step indicator dots (hidden on welcome)
+                if viewModel.onboardingStep != .welcome {
+                    stepIndicator
+                        .padding(.top, 16)
+                        .padding(.bottom, 8)
+                }
+
+                TabView(selection: Bindable(viewModel).onboardingStep) {
+                    welcomeStep.tag(AuthViewModel.OnboardingStep.welcome)
+                    interestsStep.tag(AuthViewModel.OnboardingStep.interests)
+                    neighborhoodStep.tag(AuthViewModel.OnboardingStep.neighborhood)
+                    permissionsStep.tag(AuthViewModel.OnboardingStep.permissions)
+                    signInStep.tag(AuthViewModel.OnboardingStep.signIn)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .animation(.easeInOut(duration: 0.3), value: viewModel.onboardingStep)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .animation(.easeInOut, value: viewModel.onboardingStep)
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    // MARK: - Step Indicator
+
+    private var stepIndicator: some View {
+        HStack(spacing: 8) {
+            ForEach(AuthViewModel.OnboardingStep.allCases, id: \.rawValue) { step in
+                Capsule()
+                    .fill(step == viewModel.onboardingStep
+                          ? AppConstants.Colors.accent
+                          : AppConstants.Colors.secondaryBackground)
+                    .frame(width: step == viewModel.onboardingStep ? 24 : 8, height: 4)
+                    .animation(.spring(duration: 0.3), value: viewModel.onboardingStep)
+            }
         }
     }
 
     // MARK: - Welcome
+
     private var welcomeStep: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             Spacer()
 
-            Image(systemName: "wind")
-                .font(.system(size: 60))
-                .foregroundStyle(Color(hex: "FF6B35"))
+            // Hero area with gradient backdrop
+            ZStack {
+                // Ambient glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [AppConstants.Colors.accent.opacity(0.15), .clear],
+                            center: .center,
+                            startRadius: 40,
+                            endRadius: 180
+                        )
+                    )
+                    .frame(width: 360, height: 360)
 
-            Text("Drift")
-                .font(.system(size: 48, weight: .bold))
-                .foregroundStyle(.white)
+                VStack(spacing: 20) {
+                    // App icon
+                    Image(systemName: "wind")
+                        .font(.system(size: 56, weight: .light))
+                        .foregroundStyle(AppConstants.Colors.accent)
+                        .symbolEffect(.pulse, options: .repeating)
 
-            Text("Discover your flow")
-                .font(.title3)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                    Text("Drift")
+                        .font(.system(size: 52, weight: .bold, design: .default))
+                        .foregroundStyle(.white)
 
-            Text("Find wellness events, run clubs, sound baths, and your people across DFW")
-                .font(.body)
-                .foregroundStyle(Color(hex: "9CA3AF"))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                    Text("Discover your flow")
+                        .font(.title3)
+                        .fontWeight(.medium)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                }
+            }
 
             Spacer()
 
-            Button {
+            // Feature highlights
+            VStack(spacing: 16) {
+                featureRow(icon: "figure.run", text: "Run clubs, yoga, sound baths & more", color: AppConstants.Colors.accent)
+                featureRow(icon: "mappin.circle.fill", text: "Events across DFW, near you", color: Color(hex: "60A5FA"))
+                featureRow(icon: "person.2.fill", text: "Find your people, build your streak", color: Color(hex: "81C784"))
+            }
+            .padding(.horizontal, 32)
+
+            Spacer()
+
+            // CTA
+            primaryButton("Get Started") {
                 viewModel.nextOnboardingStep()
-            } label: {
-                Text("Get Started")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color(hex: "FF6B35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 40)
+            .padding(.bottom, 48)
+        }
+    }
+
+    private func featureRow(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.body)
+                .foregroundStyle(color)
+                .frame(width: 36, height: 36)
+                .background(color.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(AppConstants.Colors.textSecondary)
+
+            Spacer()
         }
     }
 
     // MARK: - Interests
+
     private var interestsStep: some View {
-        VStack(spacing: 24) {
-            Text("What are you into?")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .padding(.top, 60)
-
-            Text("Pick 3 or more")
-                .font(.subheadline)
-                .foregroundStyle(Color(hex: "9CA3AF"))
-
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12) {
-                ForEach(Category.allCases, id: \.self) { category in
-                    let isSelected = viewModel.selectedInterests.contains(category)
-                    Button {
-                        if isSelected { viewModel.selectedInterests.remove(category) }
-                        else { viewModel.selectedInterests.insert(category) }
-                        HapticManager.selection()
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: category.icon)
-                                .font(.title2)
-                            Text(category.displayName)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(isSelected ? Color(hex: category.color).opacity(0.2) : Color(hex: "1A1A1A"))
-                        .foregroundStyle(isSelected ? Color(hex: category.color) : Color(hex: "9CA3AF"))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(isSelected ? Color(hex: category.color) : .clear, lineWidth: 2)
-                        )
-                    }
-                }
-            }
-            .padding(.horizontal)
-
-            Spacer()
-
-            Button {
-                viewModel.nextOnboardingStep()
-            } label: {
-                Text("Continue")
-                    .font(.headline)
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                Text("What are you into?")
+                    .font(.title2)
+                    .fontWeight(.bold)
                     .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(viewModel.selectedInterests.count >= 3 ? Color(hex: "FF6B35") : Color(hex: "2A2A2A"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                Text("Pick 3 or more to personalize your feed")
+                    .font(.subheadline)
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
             }
-            .disabled(viewModel.selectedInterests.count < 3)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 40)
-        }
-    }
+            .padding(.top, 32)
 
-    // MARK: - Neighborhood
-    private var neighborhoodStep: some View {
-        VStack(spacing: 24) {
-            Text("Where in DFW?")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .padding(.top, 60)
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
+                    ForEach(Category.allCases, id: \.self) { category in
+                        let isSelected = viewModel.selectedInterests.contains(category)
+                        let catColor = Color(hex: category.color)
 
-            Text("We'll show events near you")
-                .font(.subheadline)
-                .foregroundStyle(Color(hex: "9CA3AF"))
-
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 130))], spacing: 8) {
-                    ForEach(AppConstants.neighborhoods, id: \.self) { hood in
                         Button {
-                            viewModel.selectedNeighborhood = hood
+                            withAnimation(.spring(duration: 0.2)) {
+                                if isSelected { viewModel.selectedInterests.remove(category) }
+                                else { viewModel.selectedInterests.insert(category) }
+                            }
                             HapticManager.selection()
                         } label: {
-                            Text(hood)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(viewModel.selectedNeighborhood == hood ? Color(hex: "FF6B35").opacity(0.2) : Color(hex: "1A1A1A"))
-                                .foregroundStyle(viewModel.selectedNeighborhood == hood ? Color(hex: "FF6B35") : Color(hex: "9CA3AF"))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .strokeBorder(viewModel.selectedNeighborhood == hood ? Color(hex: "FF6B35") : .clear, lineWidth: 1)
-                                )
+                            VStack(spacing: 10) {
+                                Image(systemName: category.icon)
+                                    .font(.title3)
+                                    .symbolEffect(.bounce, value: isSelected)
+
+                                Text(category.displayName)
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                            .background(isSelected ? catColor.opacity(0.15) : AppConstants.Colors.cardBackground)
+                            .foregroundStyle(isSelected ? catColor : AppConstants.Colors.textSecondary)
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
+                                    .strokeBorder(isSelected ? catColor.opacity(0.5) : .clear, lineWidth: 1.5)
+                            )
                         }
                     }
                 }
                 .padding(.horizontal)
+                .padding(.top, 24)
+                .padding(.bottom, 16)
             }
 
-            Button {
-                viewModel.nextOnboardingStep()
-            } label: {
-                Text("Continue")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color(hex: "FF6B35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            // Selection count + CTA
+            VStack(spacing: 12) {
+                if !viewModel.selectedInterests.isEmpty {
+                    Text("\(viewModel.selectedInterests.count) selected")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.selectedInterests.count >= 3
+                                         ? AppConstants.Colors.accent
+                                         : AppConstants.Colors.textTertiary)
+                }
+
+                primaryButton("Continue") {
+                    UserDefaults.standard.set(viewModel.selectedInterests.map(\.slug), forKey: "drift_selected_interests")
+                    viewModel.nextOnboardingStep()
+                }
+                .opacity(viewModel.selectedInterests.count >= 3 ? 1 : 0.4)
+                .disabled(viewModel.selectedInterests.count < 3)
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 40)
+            .padding(.bottom, 48)
+        }
+    }
+
+    // MARK: - Neighborhood
+
+    private var neighborhoodStep: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            // Location hero
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color(hex: "60A5FA").opacity(0.12), .clear],
+                            center: .center,
+                            startRadius: 30,
+                            endRadius: 140
+                        )
+                    )
+                    .frame(width: 280, height: 280)
+
+                VStack(spacing: 20) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 52, weight: .light))
+                        .foregroundStyle(Color(hex: "60A5FA"))
+                        .symbolEffect(.pulse, options: .repeating)
+
+                    Text("Dallas Fort Worth")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+
+                    Text("Events from Deep Ellum to Fort Worth,\nUptown to Frisco — we've got DFW covered")
+                        .font(.subheadline)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
+            }
+
+            Spacer()
+
+            // DFW neighborhood chips preview
+            VStack(spacing: 12) {
+                Text("Neighborhoods we cover")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(AppConstants.Colors.textTertiary)
+
+                flowLayout(items: ["Deep Ellum", "Uptown", "Bishop Arts", "Oak Lawn", "Knox", "Frisco", "Fort Worth", "Lakewood"])
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
+
+            primaryButton("Continue") {
+                viewModel.selectedNeighborhood = "Dallas Fort Worth"
+                UserDefaults.standard.set("Dallas Fort Worth", forKey: "drift_selected_neighborhood")
+                viewModel.nextOnboardingStep()
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 48)
+        }
+    }
+
+    private func flowLayout(items: [String]) -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                ForEach(items.prefix(4), id: \.self) { item in
+                    Text(item)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(AppConstants.Colors.cardBackground)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .clipShape(Capsule())
+                }
+            }
+            HStack(spacing: 8) {
+                ForEach(items.suffix(4), id: \.self) { item in
+                    Text(item)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(AppConstants.Colors.cardBackground)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .clipShape(Capsule())
+                }
+            }
         }
     }
 
     // MARK: - Permissions
+
     private var permissionsStep: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                Text("Stay in the loop")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+
+                Text("Enable to get the full Drift experience")
+                    .font(.subheadline)
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
+            }
+            .padding(.top, 32)
+
             Spacer()
 
-            VStack(spacing: 24) {
-                permissionItem(
+            VStack(spacing: 16) {
+                permissionCard(
                     icon: "location.fill",
                     title: "Location",
-                    description: "Find events near you",
+                    description: "Find events near you and get directions",
                     color: Color(hex: "60A5FA")
                 )
-                permissionItem(
-                    icon: "bell.fill",
+                permissionCard(
+                    icon: "bell.badge.fill",
                     title: "Notifications",
-                    description: "Get reminders for events",
-                    color: Color(hex: "FF6B35")
+                    description: "Reminders before events you RSVP to",
+                    color: AppConstants.Colors.accent
                 )
             }
-            .padding(.horizontal, 30)
+            .padding(.horizontal, 24)
 
             Spacer()
 
             VStack(spacing: 12) {
-                Button {
+                primaryButton("Enable & Continue") {
                     viewModel.nextOnboardingStep()
-                } label: {
-                    Text("Enable & Continue")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color(hex: "FF6B35"))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
 
                 Button {
                     viewModel.nextOnboardingStep()
                 } label: {
-                    Text("Maybe Later")
+                    Text("Maybe later")
                         .font(.subheadline)
-                        .foregroundStyle(Color(hex: "9CA3AF"))
+                        .foregroundStyle(AppConstants.Colors.textTertiary)
                 }
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 40)
+            .padding(.bottom, 48)
         }
     }
 
-    private func permissionItem(icon: String, title: String, description: String, color: Color) -> some View {
+    private func permissionCard(icon: String, title: String, description: String, color: Color) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title2)
+                .font(.title3)
                 .foregroundStyle(color)
-                .frame(width: 44, height: 44)
-                .background(color.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .frame(width: 48, height: 48)
+                .background(color.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
                     .foregroundStyle(.white)
                 Text(description)
                     .font(.subheadline)
-                    .foregroundStyle(Color(hex: "9CA3AF"))
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
+                    .lineLimit(2)
             }
 
             Spacer()
         }
+        .padding(16)
+        .background(AppConstants.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius))
     }
 
     // MARK: - Sign In
+
     private var signInStep: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             Spacer()
 
-            Image(systemName: "wind")
-                .font(.system(size: 40))
-                .foregroundStyle(Color(hex: "FF6B35"))
+            // Hero
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [AppConstants.Colors.accent.opacity(0.12), .clear],
+                            center: .center,
+                            startRadius: 30,
+                            endRadius: 140
+                        )
+                    )
+                    .frame(width: 280, height: 280)
 
-            Text("Join Drift")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
+                VStack(spacing: 16) {
+                    Image(systemName: "wind")
+                        .font(.system(size: 44, weight: .light))
+                        .foregroundStyle(AppConstants.Colors.accent)
+                        .symbolEffect(.pulse, options: .repeating)
 
-            Text("Sign in to RSVP, follow friends, and join event chats")
-                .font(.body)
-                .foregroundStyle(Color(hex: "9CA3AF"))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                    Text("Join Drift")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
 
-            Spacer()
-
-            SignInWithAppleButton(.signIn) { request in
-                viewModel.prepareSignInRequest(request)
-            } onCompletion: { result in
-                Task { await viewModel.handleSignInWithApple(result) }
+                    Text("Sign in to RSVP, follow friends,\nand join event chats")
+                        .font(.subheadline)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
             }
-            .signInWithAppleButtonStyle(.white)
-            .frame(height: 52)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            Spacer()
+
+            // Social proof
+            HStack(spacing: 6) {
+                Image(systemName: "person.2.fill")
+                    .font(.caption)
+                Text("Wellness community in DFW")
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(AppConstants.Colors.textTertiary)
+            .padding(.bottom, 24)
+
+            // Sign in + browse
+            VStack(spacing: 16) {
+                SignInWithAppleButton(.signIn) { request in
+                    viewModel.prepareSignInRequest(request)
+                } onCompletion: { result in
+                    Task {
+                        await viewModel.handleSignInWithApple(result)
+                        if viewModel.isAuthenticated {
+                            UserDefaults.standard.set(true, forKey: "drift_has_onboarded")
+                            onDismiss()
+                        }
+                    }
+                }
+                .signInWithAppleButtonStyle(.white)
+                .frame(height: 52)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                Button {
+                    UserDefaults.standard.set(true, forKey: "drift_has_onboarded")
+                    onDismiss()
+                } label: {
+                    Text("Browse without account")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                }
+            }
             .padding(.horizontal, 24)
+            .padding(.bottom, 48)
+        }
+    }
 
-            Button {
-                // Skip sign in for browsing
-            } label: {
-                Text("Browse without account")
-                    .font(.subheadline)
-                    .foregroundStyle(Color(hex: "9CA3AF"))
-            }
-            .padding(.bottom, 40)
+    // MARK: - Shared Components
+
+    private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(AppConstants.Colors.accent)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
         }
     }
 }

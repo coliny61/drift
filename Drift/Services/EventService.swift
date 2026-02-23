@@ -16,7 +16,7 @@ final class EventService {
 
     /// Set to `true` to use local seed data instead of Supabase.
     /// Flip to `false` once your Supabase project is configured.
-    static let useSeedData = true
+    static let useSeedData = false
 
     func fetchEvents() async {
         isLoading = true
@@ -41,6 +41,9 @@ final class EventService {
         } catch let fetchError {
             error = fetchError
             print("Error fetching events: \(fetchError)")
+            // Fallback to seed data
+            events = SeedData.events
+            featuredEvents = events.filter { $0.isFeatured }
         }
         isLoading = false
     }
@@ -59,7 +62,7 @@ final class EventService {
             return event
         } catch {
             print("Error fetching event: \(error)")
-            return nil
+            return SeedData.events.first { $0.id == id }
         }
     }
 
@@ -117,7 +120,12 @@ final class EventService {
             return response
         } catch {
             print("Error searching events: \(error)")
-            return []
+            let q = query.lowercased()
+            return SeedData.events.filter {
+                $0.title.lowercased().contains(q) ||
+                $0.description.lowercased().contains(q) ||
+                $0.locationName.lowercased().contains(q)
+            }
         }
     }
 }
