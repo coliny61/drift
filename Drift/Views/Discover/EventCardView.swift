@@ -7,21 +7,38 @@ struct EventCardView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Cover image
             ZStack(alignment: .topLeading) {
-                // Image placeholder with gradient
-                Rectangle()
-                    .fill(
+                if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 180)
+                                .clipped()
+                        case .failure:
+                            gradientPlaceholder
+                        case .empty:
+                            gradientPlaceholder
+                                .overlay {
+                                    ProgressView()
+                                        .tint(.white.opacity(0.5))
+                                }
+                        @unknown default:
+                            gradientPlaceholder
+                        }
+                    }
+                    .frame(height: 180)
+                    .overlay(
                         LinearGradient(
-                            colors: [categoryColor.opacity(0.6), categoryColor.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                            colors: [.clear, .clear, Color.black.opacity(0.3)],
+                            startPoint: .top,
+                            endPoint: .bottom
                         )
                     )
-                    .frame(height: 180)
-                    .overlay(alignment: .center) {
-                        Image(systemName: categoryIcon)
-                            .font(.system(size: 40))
-                            .foregroundStyle(.white.opacity(0.3))
-                    }
+                } else {
+                    gradientPlaceholder
+                }
 
                 // Tags overlay
                 HStack(spacing: 6) {
@@ -124,6 +141,23 @@ struct EventCardView: View {
         }
         .background(Color(hex: "1A1A1A"))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var gradientPlaceholder: some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [categoryColor.opacity(0.6), categoryColor.opacity(0.2)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(height: 180)
+            .overlay(alignment: .center) {
+                Image(systemName: categoryIcon)
+                    .font(.system(size: 40))
+                    .foregroundStyle(.white.opacity(0.3))
+            }
     }
 
     private var categoryColor: Color {

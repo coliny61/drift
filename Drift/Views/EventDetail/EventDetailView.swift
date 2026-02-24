@@ -13,20 +13,38 @@ struct EventDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Hero image
                     ZStack(alignment: .topLeading) {
-                        Rectangle()
-                            .fill(
+                        if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 260)
+                                        .clipped()
+                                case .failure:
+                                    heroGradientPlaceholder(event: event)
+                                case .empty:
+                                    heroGradientPlaceholder(event: event)
+                                        .overlay {
+                                            ProgressView()
+                                                .tint(.white.opacity(0.5))
+                                        }
+                                @unknown default:
+                                    heroGradientPlaceholder(event: event)
+                                }
+                            }
+                            .frame(height: 260)
+                            .overlay(
                                 LinearGradient(
-                                    colors: [categoryColor.opacity(0.7), categoryColor.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                                    colors: [.black.opacity(0.3), .clear, .black.opacity(0.4)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
                                 )
                             )
-                            .frame(height: 260)
-                            .overlay {
-                                Image(systemName: event.categoryEnum?.icon ?? "star")
-                                    .font(.system(size: 60))
-                                    .foregroundStyle(.white.opacity(0.2))
-                            }
+                        } else {
+                            heroGradientPlaceholder(event: event)
+                        }
 
                         // Tags
                         HStack(spacing: 6) {
@@ -236,6 +254,23 @@ struct EventDetailView: View {
             await viewModel.loadUserRSVP(userId: userId)
             await viewModel.loadAttendees()
         }
+    }
+
+    private func heroGradientPlaceholder(event: Event) -> some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [categoryColor.opacity(0.7), categoryColor.opacity(0.2)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(height: 260)
+            .overlay {
+                Image(systemName: event.categoryEnum?.icon ?? "star")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.white.opacity(0.2))
+            }
     }
 
     private func infoRow(icon: String, title: String) -> some View {
