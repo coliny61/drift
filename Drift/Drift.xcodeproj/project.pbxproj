@@ -71,6 +71,8 @@
 		F9DBE1A657FE03849F9B95A4 /* ActivityFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E6CCE1E61A54F658818CED /* ActivityFeedViewModel.swift */; };
 		FA11DFC3877FBA496C7D2531 /* AttendeeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3867CB8F598CC0C86AE69EA1 /* AttendeeListView.swift */; };
 		FC9E0567E5AEF50EA6EA1B5E /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6974831C13A332C889A3EC /* ViewExtension.swift */; };
+		AA0001110001000100010001 /* OrganizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000100010001 /* OrganizerService.swift */; };
+		AA0001110001000200010001 /* OrganizerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000200010001 /* OrganizerDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +141,8 @@
 		FD78C67766D84D3C872D6373 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		FDB9B1872BE1C9C20FAD4D43 /* RSVPButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSVPButtonView.swift; sourceTree = "<group>"; };
 		FF0DB0809C7110E3644208F2 /* Drift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Drift.entitlements; sourceTree = "<group>"; };
+		AA0001110002000100010001 /* OrganizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerService.swift; sourceTree = "<group>"; };
+		AA0001110002000200010001 /* OrganizerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,12 +234,21 @@
 				32CFFE8376C996223F7BD34A /* EventDetail */,
 				7327D66620324DE852E5549F /* Launch */,
 				84EDFE723A025741E05A8ABC /* Map */,
+				AA0001110003000100010001 /* Organizer */,
 				1146D4ED8E06C68A78FBCC1F /* Profile */,
 				7BA9B12011A121769BCC7F2B /* Search */,
 				EC70F8F8DC436EB14CAB3F97 /* Settings */,
 				AA4657ACA20FFA6DAF598F2D /* Social */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		AA0001110003000100010001 /* Organizer */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001110002000200010001 /* OrganizerDetailView.swift */,
+			);
+			path = Organizer;
 			sourceTree = "<group>";
 		};
 		6F59F3AFBDEFC2575F9BEDBA /* Discover */ = {
@@ -365,6 +378,7 @@
 				8D9D26356703C407477DBAE0 /* AuthService.swift */,
 				E08674FE101E328DB9021169 /* ChatService.swift */,
 				BF7F11A39BA623CB8AE606CE /* EventService.swift */,
+				AA0001110002000100010001 /* OrganizerService.swift */,
 				4CCEFA489F211387E2F2B39B /* PhotoService.swift */,
 				21BFDC6224C4E6C74A0635AA /* ProfileService.swift */,
 				E66AFECF666D8835278D3BCD /* RSVPService.swift */,
@@ -490,6 +504,8 @@
 				AB5643CD9F3B050E49E6C0C6 /* NotificationPrefsView.swift in Sources */,
 				6842D913F1933FDC08C28B92 /* OnboardingView.swift in Sources */,
 				224C9E5AA6E9B245BADBD4D9 /* Organizer.swift in Sources */,
+				AA0001110001000200010001 /* OrganizerDetailView.swift in Sources */,
+				AA0001110001000100010001 /* OrganizerService.swift in Sources */,
 				549CA94B5EA7D07662335C40 /* OtherProfileView.swift in Sources */,
 				814579EB801A8E52B61C3586 /* PhotoService.swift in Sources */,
 				3253E954D70E7E0DDC209F94 /* Profile.swift in Sources */,

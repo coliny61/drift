@@ -5,7 +5,9 @@ struct EventDetailView: View {
     let eventId: UUID
     @Environment(EventDetailViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(OrganizerService.self) private var organizerService
     @Environment(\.dismiss) private var dismiss
+    @State private var organizer: Organizer?
 
     var body: some View {
         ScrollView {
@@ -173,6 +175,60 @@ struct EventDetailView: View {
                             }
                         }
 
+                        // Organizer
+                        if let organizer {
+                            Divider()
+                                .background(Color(hex: "2A2A2A"))
+
+                            NavigationLink(value: organizer.id) {
+                                HStack(spacing: 12) {
+                                    if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 44, height: 44)
+                                                    .clipShape(Circle())
+                                            default:
+                                                organizerLogoPlaceholder(organizer)
+                                            }
+                                        }
+                                    } else {
+                                        organizerLogoPlaceholder(organizer)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        HStack(spacing: 4) {
+                                            Text(organizer.name)
+                                                .font(.subheadline)
+                                                .fontWeight(.semibold)
+                                                .foregroundStyle(.white)
+                                            if organizer.isVerifiedOrganizer {
+                                                Image(systemName: "checkmark.seal.fill")
+                                                    .font(.caption)
+                                                    .foregroundStyle(Color(hex: "60A5FA"))
+                                            }
+                                        }
+                                        Text("Organizer")
+                                            .font(.caption)
+                                            .foregroundStyle(Color(hex: "9CA3AF"))
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundStyle(Color(hex: "9CA3AF"))
+                                }
+                                .padding(14)
+                                .background(Color(hex: "1A1A1A"))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         Divider()
                             .background(Color(hex: "2A2A2A"))
 
@@ -248,11 +304,17 @@ struct EventDetailView: View {
         .background(Color(hex: "0A0A0A"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationDestination(for: UUID.self) { id in
+            OrganizerDetailView(organizerId: id)
+        }
         .task {
             await viewModel.loadEvent(id: eventId)
             let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
             await viewModel.loadUserRSVP(userId: userId)
             await viewModel.loadAttendees()
+            if let event = viewModel.event {
+                organizer = await organizerService.fetchOrganizer(id: event.organizerId)
+            }
         }
     }
 
@@ -292,6 +354,18 @@ struct EventDetailView: View {
         let mapItem = MKMapItem(placemark: placemark)
         mapItem.name = event.locationName
         mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving])
+    }
+
+    private func organizerLogoPlaceholder(_ organizer: Organizer) -> some View {
+        Circle()
+            .fill(AppConstants.Colors.accent.opacity(0.2))
+            .frame(width: 44, height: 44)
+            .overlay {
+                Text(String(organizer.name.prefix(1)))
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(AppConstants.Colors.accent)
+            }
     }
 
     private var categoryColor: Color {

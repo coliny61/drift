@@ -14,6 +14,7 @@ struct DriftApp: App {
     @State private var chatService: ChatService
     @State private var activityService: ActivityService
     @State private var photoService: PhotoService
+    @State private var organizerService: OrganizerService
 
     // MARK: - ViewModels
     @State private var authViewModel: AuthViewModel
@@ -42,6 +43,7 @@ struct DriftApp: App {
         let chat = ChatService(client: client)
         let activity = ActivityService(client: client)
         let photos = PhotoService(client: client)
+        let organizers = OrganizerService(client: client)
 
         _authService = State(initialValue: auth)
         _eventService = State(initialValue: events)
@@ -50,6 +52,7 @@ struct DriftApp: App {
         _chatService = State(initialValue: chat)
         _activityService = State(initialValue: activity)
         _photoService = State(initialValue: photos)
+        _organizerService = State(initialValue: organizers)
         _locationManager = State(initialValue: location)
 
         // ViewModels
@@ -77,6 +80,7 @@ struct DriftApp: App {
                 .environment(activityFeedViewModel)
                 .environment(settingsViewModel)
                 .environment(photoService)
+                .environment(organizerService)
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()
