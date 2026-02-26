@@ -16,6 +16,12 @@ enum SupabaseConfig {
     static let photoReactionsTable = "photo_reactions"
     static let activityFeedTable = "activity_feed"
 
+    // Phase 2 tables
+    static let checkInsTable = "check_ins"
+    static let boostRequestsTable = "boost_requests"
+    static let deviceTokensTable = "device_tokens"
+    static let notificationPreferencesTable = "notification_preferences"
+
     // Storage buckets
     static let avatarsBucket = "avatars"
     static let eventPhotosBucket = "event-photos"

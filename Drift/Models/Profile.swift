@@ -14,6 +14,9 @@ struct Profile: Codable, Identifiable, Hashable {
     let eventsAttended: Int
     let createdAt: Date
 
+    // Phase 2 fields
+    var city: String? = nil
+
     // MARK: - CodingKeys
 
     enum CodingKeys: String, CodingKey {
@@ -29,5 +32,6 @@ struct Profile: Codable, Identifiable, Hashable {
         case streakCount = "streak_count"
         case eventsAttended = "events_attended"
         case createdAt = "created_at"
+        case city
     }
 }

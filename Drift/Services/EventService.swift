@@ -24,7 +24,7 @@ final class EventService {
 
         if Self.useSeedData {
             events = SeedData.events
-            featuredEvents = events.filter { $0.isFeatured }
+            featuredEvents = events.filter { $0.isCurrentlyFeatured }
             isLoading = false
             return
         }
@@ -33,17 +33,18 @@ final class EventService {
             let response: [Event] = try await client.from("events")
                 .select()
                 .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
                 .order("start_time", ascending: true)
                 .execute()
                 .value
             events = response
-            featuredEvents = response.filter { $0.isFeatured }
+            featuredEvents = response.filter { $0.isCurrentlyFeatured }
         } catch let fetchError {
             error = fetchError
             print("Error fetching events: \(fetchError)")
             // Fallback to seed data
             events = SeedData.events
-            featuredEvents = events.filter { $0.isFeatured }
+            featuredEvents = events.filter { $0.isCurrentlyFeatured }
         }
         isLoading = false
     }

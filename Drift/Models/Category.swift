@@ -1,6 +1,7 @@
 import Foundation
 
 enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
+    // Wellness core
     case runClub = "run_club"
     case soundBath = "sound_bath"
     case breathwork
@@ -10,6 +11,12 @@ enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
     case meditation
     case fitness
     case workshop
+
+    // Adjacent wellness
+    case hiking
+    case cycling
+    case outdoorFitness = "outdoor_fitness"
+    case recovery
 
     var id: String { rawValue }
 
@@ -24,6 +31,10 @@ enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
         case .meditation: return "Meditation"
         case .fitness: return "Fitness"
         case .workshop: return "Workshop"
+        case .hiking: return "Hiking"
+        case .cycling: return "Cycling"
+        case .outdoorFitness: return "Outdoor Fitness"
+        case .recovery: return "Recovery"
         }
     }
 
@@ -38,6 +49,10 @@ enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
         case .meditation: return "brain.head.profile"
         case .fitness: return "dumbbell.fill"
         case .workshop: return "lightbulb.fill"
+        case .hiking: return "figure.hiking"
+        case .cycling: return "figure.outdoor.cycle"
+        case .outdoorFitness: return "figure.strengthtraining.functional"
+        case .recovery: return "heart.circle.fill"
         }
     }
 
@@ -52,6 +67,10 @@ enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
         case .meditation: return "#81C784"
         case .fitness: return "#EF5350"
         case .workshop: return "#BA68C8"
+        case .hiking: return "#66BB6A"
+        case .cycling: return "#42A5F5"
+        case .outdoorFitness: return "#FFA726"
+        case .recovery: return "#EC407A"
         }
     }
 
@@ -66,6 +85,10 @@ enum Category: String, Codable, CaseIterable, Identifiable, Hashable {
         case .meditation: return "meditation"
         case .fitness: return "fitness"
         case .workshop: return "workshop"
+        case .hiking: return "hiking"
+        case .cycling: return "cycling"
+        case .outdoorFitness: return "outdoor-fitness"
+        case .recovery: return "recovery"
         }
     }
 

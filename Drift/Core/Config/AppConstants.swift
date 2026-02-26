@@ -4,12 +4,20 @@ enum AppConstants {
     static let appName = "Drift"
     static let tagline = "Discover your flow"
 
-    // DFW Neighborhoods
+    // DFW Neighborhoods (kept for backward compat)
     static let neighborhoods = [
         "Deep Ellum", "Uptown", "Bishop Arts", "Lower Greenville",
         "Oak Lawn", "Addison", "Frisco", "Fort Worth", "Knox/Henderson",
         "Design District", "Trinity Groves", "Lakewood", "Park Cities",
         "Las Colinas", "Plano", "McKinney", "Denton", "Arlington"
+    ]
+
+    // DFW Cities (primary geography filter)
+    static let dfwCities = [
+        "Dallas", "Fort Worth", "Plano", "Frisco", "Arlington",
+        "McKinney", "Denton", "Richardson", "Irving", "Garland",
+        "Allen", "Flower Mound", "Southlake", "Grapevine", "Addison",
+        "Carrollton", "Lewisville", "Cedar Hill", "Mesquite", "Grand Prairie"
     ]
 
     // Event tags
@@ -30,19 +38,15 @@ enum AppConstants {
     static let avatarSize: CGFloat = 40
     static let smallAvatarSize: CGFloat = 28
 
-    // For You scoring weights
+    // For You scoring weights (deterministic, explainable)
     enum ForYouWeights {
-        static let interestMatch: Double = 1.0
-        static let categoryMatch: Double = 2.0
-        static let friendGoing: Double = 1.5
-        static let maxFriendPoints: Double = 5.0
-        static let proximityClose: Double = 3.0    // < 5mi
-        static let proximityMedium: Double = 2.0   // < 10mi
-        static let proximityFar: Double = 1.0      // < 20mi
-        static let trendingHigh: Double = 2.0      // > 20 RSVPs
-        static let trendingMedium: Double = 1.0    // > 10 RSVPs
-        static let recencySoon: Double = 2.0       // < 2 days
-        static let recencyWeek: Double = 1.0       // < 7 days
+        static let base: Double = 10.0
+        static let interestMatch: Double = 25.0      // category matches onboarding interests
+        static let cityMatch: Double = 20.0           // event in user's city
+        static let followsOrganizer: Double = 20.0    // user follows this organizer
+        static let pastRSVPOrganizer: Double = 15.0   // user has RSVP'd to this organizer before
+        static let freshness: Double = 10.0           // events sooner score higher
+        static let featuredBoost: Double = 30.0       // featured/sponsored events
     }
 
     // Colors

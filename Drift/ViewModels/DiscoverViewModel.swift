@@ -14,6 +14,12 @@ final class DiscoverViewModel {
     var isLoading = false
     var error: Error?
 
+    // User context for scoring (populated from AuthViewModel/UserDefaults)
+    var userInterests: [String] = []
+    var userCity: String?
+    var followedOrganizerIds: Set<UUID> = []
+    var rsvpdOrganizerIds: Set<UUID> = []
+
     enum FeedMode: String, CaseIterable {
         case forYou = "For You"
         case all = "All"
@@ -67,7 +73,6 @@ final class DiscoverViewModel {
     }
 
     private func sortByForYouScore(_ events: [Event]) -> [Event] {
-        // Simple scoring without user profile for now
         events.sorted { a, b in
             let scoreA = calculateScore(for: a)
             let scoreB = calculateScore(for: b)
@@ -75,27 +80,43 @@ final class DiscoverViewModel {
         }
     }
 
+    /// Deterministic, explainable For You scoring
     private func calculateScore(for event: Event) -> Double {
-        var score: Double = 0
+        let W = AppConstants.ForYouWeights.self
+        var score = W.base
 
-        // Proximity scoring
-        if let distance = locationManager.distanceTo(lat: event.locationLat, lng: event.locationLng) {
-            if distance < 5 { score += AppConstants.ForYouWeights.proximityClose }
-            else if distance < 10 { score += AppConstants.ForYouWeights.proximityMedium }
-            else if distance < 20 { score += AppConstants.ForYouWeights.proximityFar }
+        // Interest match: category matches user's onboarding interests
+        if userInterests.contains(event.category) {
+            score += W.interestMatch
         }
 
-        // Trending
-        if event.rsvpCount > 20 { score += AppConstants.ForYouWeights.trendingHigh }
-        else if event.rsvpCount > 10 { score += AppConstants.ForYouWeights.trendingMedium }
+        // City match: event in user's selected city
+        if let userCity, let eventCity = event.city, !eventCity.isEmpty,
+           eventCity.localizedCaseInsensitiveCompare(userCity) == .orderedSame {
+            score += W.cityMatch
+        }
 
-        // Recency
-        let daysUntil = event.startTime.daysUntil
-        if daysUntil < 2 { score += AppConstants.ForYouWeights.recencySoon }
-        else if daysUntil < 7 { score += AppConstants.ForYouWeights.recencyWeek }
+        // Follows organizer
+        if followedOrganizerIds.contains(event.organizerId) {
+            score += W.followsOrganizer
+        }
+
+        // Past RSVP to this organizer
+        if rsvpdOrganizerIds.contains(event.organizerId) {
+            score += W.pastRSVPOrganizer
+        }
+
+        // Freshness: events sooner score higher (linear decay over 14 days)
+        let daysUntil = max(0, event.startTime.daysUntil)
+        if daysUntil < 14 {
+            let freshnessRatio = 1.0 - (Double(daysUntil) / 14.0)
+            score += W.freshness * freshnessRatio
+        }
 
         // Featured boost
-        if event.isFeatured { score += 3.0 }
+        if event.isCurrentlyFeatured {
+            score += W.featuredBoost
+        }
 
         return score
     }

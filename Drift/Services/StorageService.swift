@@ -13,10 +13,10 @@ enum StorageService {
     }
 
     static func uploadCoverImage(client: SupabaseClient, eventId: UUID, imageData: Data) async throws -> String {
-        let fileName = "\(eventId.uuidString).jpg"
+        let fileName = "\(eventId.uuidString).webp"
 
         try await client.storage.from("cover-images")
-            .upload(fileName, data: imageData, options: .init(contentType: "image/jpeg", upsert: true))
+            .upload(fileName, data: imageData, options: .init(contentType: "image/webp", upsert: true))
 
         let publicURL = try client.storage.from("cover-images").getPublicURL(path: fileName)
         return publicURL.absoluteString

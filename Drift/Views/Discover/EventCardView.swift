@@ -125,11 +125,11 @@ struct EventCardView: View {
 
                     Spacer()
 
-                    if event.isFeatured {
+                    if let label = event.sponsorDisplayLabel {
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
                                 .font(.caption)
-                            Text("Featured")
+                            Text(label)
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }

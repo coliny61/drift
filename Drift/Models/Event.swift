@@ -24,6 +24,14 @@ struct Event: Codable, Identifiable, Hashable {
     let rsvpCount: Int
     let status: String
 
+    // Phase 2 fields
+    var approvalStatus: String? = nil
+    var featuredUntil: Date? = nil
+    var sponsorLabel: String? = nil
+    var submittedBy: UUID? = nil
+    var city: String? = nil
+    var ticketUrl: String? = nil
+
     // MARK: - Computed Properties
 
     var isFree: Bool {
@@ -48,6 +56,53 @@ struct Event: Codable, Identifiable, Hashable {
 
     var isUpcoming: Bool {
         startTime > Date()
+    }
+
+    var isApproved: Bool {
+        approvalStatus == "approved" || approvalStatus == nil
+    }
+
+    var isPending: Bool {
+        approvalStatus == "pending"
+    }
+
+    var isRejected: Bool {
+        approvalStatus == "rejected"
+    }
+
+    var isCurrentlyFeatured: Bool {
+        guard isFeatured else { return false }
+        if let until = featuredUntil {
+            return until > Date()
+        }
+        return true
+    }
+
+    var sponsorDisplayLabel: String? {
+        guard isCurrentlyFeatured else { return nil }
+        if let label = sponsorLabel, !label.isEmpty {
+            return "Sponsored by \(label)"
+        }
+        return "Featured"
+    }
+
+    /// Returns ticket URL if paid event, falls back to external URL
+    var purchaseUrl: String? {
+        if !isFree {
+            return ticketUrl ?? externalUrl
+        }
+        return externalUrl
+    }
+
+    var isInCheckInWindow: Bool {
+        let now = Date()
+        let windowStart = startTime.addingTimeInterval(-30 * 60) // 30 min before
+        let windowEnd = endTime.addingTimeInterval(30 * 60)       // 30 min after
+        return now >= windowStart && now <= windowEnd
+    }
+
+    var hasEnded: Bool {
+        endTime < Date()
     }
 
     // MARK: - CodingKeys
@@ -75,5 +130,11 @@ struct Event: Codable, Identifiable, Hashable {
         case isFeatured = "is_featured"
         case rsvpCount = "rsvp_count"
         case status
+        case approvalStatus = "approval_status"
+        case featuredUntil = "featured_until"
+        case sponsorLabel = "sponsor_label"
+        case submittedBy = "submitted_by"
+        case city
+        case ticketUrl = "ticket_url"
     }
 }
