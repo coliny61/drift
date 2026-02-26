@@ -47,25 +47,98 @@ struct FilterSheetView: View {
 
                     Divider().background(Color(hex: "2A2A2A"))
 
+                    // City
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("City")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                // "All" chip
+                                let allSelected = viewModel.selectedCity == nil
+                                Button {
+                                    viewModel.selectedCity = nil
+                                } label: {
+                                    Text("All DFW")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(allSelected ? Color(hex: "60A5FA").opacity(0.2) : Color(hex: "2A2A2A"))
+                                        .foregroundStyle(allSelected ? Color(hex: "60A5FA") : Color(hex: "9CA3AF"))
+                                        .clipShape(Capsule())
+                                }
+
+                                ForEach(AppConstants.dfwCities, id: \.self) { city in
+                                    let isSelected = viewModel.selectedCity == city
+                                    Button {
+                                        viewModel.selectedCity = isSelected ? nil : city
+                                    } label: {
+                                        Text(city)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.2) : Color(hex: "2A2A2A"))
+                                            .foregroundStyle(isSelected ? Color(hex: "60A5FA") : Color(hex: "9CA3AF"))
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Divider().background(Color(hex: "2A2A2A"))
+
                     // Date Range
                     VStack(alignment: .leading, spacing: 12) {
                         Text("When")
                             .font(.headline)
                             .foregroundStyle(.white)
 
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(SearchViewModel.DateRange.allCases, id: \.self) { range in
+                                    let isSelected = viewModel.dateRange == range
+                                    Button {
+                                        viewModel.dateRange = range
+                                    } label: {
+                                        Text(range.rawValue)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(isSelected ? Color(hex: "FF6B35").opacity(0.2) : Color(hex: "2A2A2A"))
+                                            .foregroundStyle(isSelected ? Color(hex: "FF6B35") : Color(hex: "9CA3AF"))
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Divider().background(Color(hex: "2A2A2A"))
+
+                    // Time of Day
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Time of Day")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+
                         HStack(spacing: 8) {
-                            ForEach(SearchViewModel.DateRange.allCases, id: \.self) { range in
-                                let isSelected = viewModel.dateRange == range
+                            ForEach(SearchViewModel.TimeOfDay.allCases, id: \.self) { time in
+                                let isSelected = viewModel.timeOfDay == time
                                 Button {
-                                    viewModel.dateRange = range
+                                    viewModel.timeOfDay = time
                                 } label: {
-                                    Text(range.rawValue)
+                                    Text(time.rawValue)
                                         .font(.caption)
                                         .fontWeight(.medium)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(isSelected ? Color(hex: "FF6B35").opacity(0.2) : Color(hex: "2A2A2A"))
-                                        .foregroundStyle(isSelected ? Color(hex: "FF6B35") : Color(hex: "9CA3AF"))
+                                        .background(isSelected ? Color(hex: "A78BFA").opacity(0.2) : Color(hex: "2A2A2A"))
+                                        .foregroundStyle(isSelected ? Color(hex: "A78BFA") : Color(hex: "9CA3AF"))
                                         .clipShape(Capsule())
                                 }
                             }

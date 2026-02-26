@@ -132,7 +132,8 @@ struct SearchView: View {
     }
 
     private var hasActiveFilters: Bool {
-        !viewModel.selectedCategories.isEmpty || viewModel.alcoholFreeOnly || viewModel.freeOnly ||
+        !viewModel.selectedCategories.isEmpty || viewModel.selectedCity != nil ||
+        viewModel.alcoholFreeOnly || viewModel.freeOnly ||
         viewModel.dateRange != .anytime || viewModel.timeOfDay != .anytime
     }
 }

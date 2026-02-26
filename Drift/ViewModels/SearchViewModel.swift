@@ -11,12 +11,16 @@ final class SearchViewModel {
 
     // Filters
     var selectedCategories: Set<Category> = []
+    var selectedCity: String?
     var maxDistance: Double = 25 // miles
     var dateRange: DateRange = .anytime
     var timeOfDay: TimeOfDay = .anytime
     var alcoholFreeOnly = false
     var freeOnly = false
     var showFilters = false
+
+    // Unfiltered results for re-applying filters
+    private var unfilteredResults: [Event] = []
 
     enum DateRange: String, CaseIterable {
         case anytime = "Anytime"
@@ -41,22 +45,29 @@ final class SearchViewModel {
     func search() async {
         guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
             results = []
+            unfilteredResults = []
             return
         }
 
         isSearching = true
-        results = await eventService.searchEvents(query: query)
+        unfilteredResults = await eventService.searchEvents(query: query)
         applyLocalFilters()
         saveRecentSearch(query)
         isSearching = false
     }
 
     func applyLocalFilters() {
-        var filtered = results
+        var filtered = unfilteredResults
 
         if !selectedCategories.isEmpty {
             filtered = filtered.filter { event in
                 selectedCategories.contains(where: { $0.slug == event.category })
+            }
+        }
+
+        if let city = selectedCity {
+            filtered = filtered.filter { event in
+                event.city?.localizedCaseInsensitiveCompare(city) == .orderedSame
             }
         }
 
@@ -86,11 +97,31 @@ final class SearchViewModel {
             filtered = filtered.filter { $0.startTime <= endOfMonth }
         }
 
+        switch timeOfDay {
+        case .anytime: break
+        case .morning:
+            filtered = filtered.filter {
+                let hour = Calendar.current.component(.hour, from: $0.startTime)
+                return hour >= 5 && hour < 12
+            }
+        case .afternoon:
+            filtered = filtered.filter {
+                let hour = Calendar.current.component(.hour, from: $0.startTime)
+                return hour >= 12 && hour < 17
+            }
+        case .evening:
+            filtered = filtered.filter {
+                let hour = Calendar.current.component(.hour, from: $0.startTime)
+                return hour >= 17 || hour < 5
+            }
+        }
+
         results = filtered
     }
 
     func clearFilters() {
         selectedCategories = []
+        selectedCity = nil
         maxDistance = 25
         dateRange = .anytime
         timeOfDay = .anytime
