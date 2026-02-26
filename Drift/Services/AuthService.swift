@@ -37,6 +37,21 @@ final class AuthService {
         await fetchProfile(userId: session.user.id)
     }
 
+    func signUpWithEmail(email: String, password: String) async throws {
+        isLoading = true
+        defer { isLoading = false }
+        let response = try await client.auth.signUp(email: email, password: password)
+        currentUser = response.user
+    }
+
+    func signInWithEmail(email: String, password: String) async throws {
+        isLoading = true
+        defer { isLoading = false }
+        let session = try await client.auth.signIn(email: email, password: password)
+        currentUser = session.user
+        await fetchProfile(userId: session.user.id)
+    }
+
     func signOut() async throws {
         try await client.auth.signOut()
         currentUser = nil

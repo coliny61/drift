@@ -13,14 +13,23 @@ final class AuthViewModel {
     // Onboarding state
     var onboardingStep: OnboardingStep = .welcome
     var selectedInterests: Set<Category> = []
-    var selectedNeighborhood: String?
+    var selectedCity: String?
     var displayName = ""
     var username = ""
+
+    // Email auth state
+    var email = ""
+    var password = ""
+    var confirmPassword = ""
+    var isSignUpMode = true
+
+    // Backward compat
+    var selectedNeighborhood: String?
 
     private var currentNonce: String?
 
     enum OnboardingStep: Int, CaseIterable {
-        case welcome, interests, neighborhood, permissions, signIn
+        case welcome, interests, city, permissions, signIn
     }
 
     /// Returns the authenticated profile, or a local anonymous profile for browse-mode users
@@ -58,7 +67,8 @@ final class AuthViewModel {
             neighborhood: selectedNeighborhood,
             streakCount: 0,
             eventsAttended: 0,
-            createdAt: .now
+            createdAt: .now,
+            city: selectedCity
         )
     }
 
@@ -69,11 +79,76 @@ final class AuthViewModel {
             selectedInterests = Set(saved.compactMap { slug in Category.allCases.first { $0.slug == slug } })
         }
         selectedNeighborhood = UserDefaults.standard.string(forKey: "drift_selected_neighborhood")
+        selectedCity = UserDefaults.standard.string(forKey: "drift_selected_city")
     }
 
     func initialize() async {
         await authService.initialize()
     }
+
+    // MARK: - Email Auth
+
+    func signUpWithEmail() async {
+        guard !email.isEmpty, !password.isEmpty else {
+            error = "Email and password are required"
+            return
+        }
+        guard password == confirmPassword else {
+            error = "Passwords don't match"
+            return
+        }
+        guard password.count >= 6 else {
+            error = "Password must be at least 6 characters"
+            return
+        }
+
+        isLoading = true
+        error = nil
+        do {
+            try await authService.signUpWithEmail(email: email, password: password)
+
+            // Create profile for new user
+            if let user = authService.currentUser {
+                let profile = Profile(
+                    id: user.id,
+                    username: "user_\(UUID().uuidString.prefix(8))",
+                    displayName: displayName.isEmpty ? "Drifter" : displayName,
+                    bio: nil,
+                    avatarUrl: nil,
+                    interests: selectedInterests.map(\.slug),
+                    locationLat: nil,
+                    locationLng: nil,
+                    neighborhood: selectedNeighborhood,
+                    streakCount: 0,
+                    eventsAttended: 0,
+                    createdAt: .now,
+                    city: selectedCity
+                )
+                try await authService.createProfile(profile)
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    func signInWithEmail() async {
+        guard !email.isEmpty, !password.isEmpty else {
+            error = "Email and password are required"
+            return
+        }
+
+        isLoading = true
+        error = nil
+        do {
+            try await authService.signInWithEmail(email: email, password: password)
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    // MARK: - Apple Sign In
 
     func handleSignInWithApple(_ result: Result<ASAuthorization, Error>) async {
         switch result {
@@ -104,7 +179,8 @@ final class AuthViewModel {
                         neighborhood: selectedNeighborhood,
                         streakCount: 0,
                         eventsAttended: 0,
-                        createdAt: .now
+                        createdAt: .now,
+                        city: selectedCity
                     )
                     try await authService.createProfile(profile)
                 }
@@ -132,6 +208,9 @@ final class AuthViewModel {
 
     func signOut() async {
         try? await authService.signOut()
+        email = ""
+        password = ""
+        confirmPassword = ""
     }
 
     func nextOnboardingStep() {

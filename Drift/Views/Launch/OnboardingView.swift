@@ -1,5 +1,4 @@
 import SwiftUI
-import AuthenticationServices
 
 struct OnboardingView: View {
     @Environment(AuthViewModel.self) private var viewModel
@@ -23,7 +22,7 @@ struct OnboardingView: View {
                 TabView(selection: Bindable(viewModel).onboardingStep) {
                     welcomeStep.tag(AuthViewModel.OnboardingStep.welcome)
                     interestsStep.tag(AuthViewModel.OnboardingStep.interests)
-                    neighborhoodStep.tag(AuthViewModel.OnboardingStep.neighborhood)
+                    cityStep.tag(AuthViewModel.OnboardingStep.city)
                     permissionsStep.tag(AuthViewModel.OnboardingStep.permissions)
                     signInStep.tag(AuthViewModel.OnboardingStep.signIn)
                 }
@@ -203,95 +202,73 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Neighborhood
+    // MARK: - City
 
-    private var neighborhoodStep: some View {
+    private var cityStep: some View {
         VStack(spacing: 0) {
-            Spacer()
+            VStack(spacing: 8) {
+                Text("What's your city?")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
 
-            // Location hero
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color(hex: "60A5FA").opacity(0.12), .clear],
-                            center: .center,
-                            startRadius: 30,
-                            endRadius: 140
-                        )
-                    )
-                    .frame(width: 280, height: 280)
+                Text("We'll prioritize events near you")
+                    .font(.subheadline)
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
+            }
+            .padding(.top, 32)
 
-                VStack(spacing: 20) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 52, weight: .light))
-                        .foregroundStyle(Color(hex: "60A5FA"))
-                        .symbolEffect(.pulse, options: .repeating)
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 10)], spacing: 10) {
+                    ForEach(AppConstants.dfwCities, id: \.self) { city in
+                        let isSelected = viewModel.selectedCity == city
 
-                    Text("Dallas Fort Worth")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
+                        Button {
+                            withAnimation(.spring(duration: 0.2)) {
+                                viewModel.selectedCity = city
+                            }
+                            HapticManager.selection()
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                    .font(.subheadline)
+                                    .symbolEffect(.bounce, value: isSelected)
 
-                    Text("Events from Deep Ellum to Fort Worth,\nUptown to Frisco — we've got DFW covered")
-                        .font(.subheadline)
-                        .foregroundStyle(AppConstants.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(4)
+                                Text(city)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 14)
+                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.15) : AppConstants.Colors.cardBackground)
+                            .foregroundStyle(isSelected ? Color(hex: "60A5FA") : AppConstants.Colors.textSecondary)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(isSelected ? Color(hex: "60A5FA").opacity(0.5) : .clear, lineWidth: 1.5)
+                            )
+                        }
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.top, 24)
+                .padding(.bottom, 16)
             }
-
-            Spacer()
-
-            // DFW neighborhood chips preview
-            VStack(spacing: 12) {
-                Text("Neighborhoods we cover")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundStyle(AppConstants.Colors.textTertiary)
-
-                flowLayout(items: ["Deep Ellum", "Uptown", "Bishop Arts", "Oak Lawn", "Knox", "Frisco", "Fort Worth", "Lakewood"])
-            }
-            .padding(.horizontal, 24)
-
-            Spacer()
 
             primaryButton("Continue") {
+                if let city = viewModel.selectedCity {
+                    UserDefaults.standard.set(city, forKey: "drift_selected_city")
+                }
+                // Backward compat
                 viewModel.selectedNeighborhood = "Dallas Fort Worth"
                 UserDefaults.standard.set("Dallas Fort Worth", forKey: "drift_selected_neighborhood")
                 viewModel.nextOnboardingStep()
             }
+            .opacity(viewModel.selectedCity != nil ? 1 : 0.4)
+            .disabled(viewModel.selectedCity == nil)
             .padding(.horizontal, 24)
             .padding(.bottom, 48)
-        }
-    }
-
-    private func flowLayout(items: [String]) -> some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                ForEach(items.prefix(4), id: \.self) { item in
-                    Text(item)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(AppConstants.Colors.cardBackground)
-                        .foregroundStyle(AppConstants.Colors.textSecondary)
-                        .clipShape(Capsule())
-                }
-            }
-            HStack(spacing: 8) {
-                ForEach(items.suffix(4), id: \.self) { item in
-                    Text(item)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(AppConstants.Colors.cardBackground)
-                        .foregroundStyle(AppConstants.Colors.textSecondary)
-                        .clipShape(Capsule())
-                }
-            }
         }
     }
 
@@ -379,69 +356,116 @@ struct OnboardingView: View {
 
     private var signInStep: some View {
         VStack(spacing: 0) {
-            Spacer()
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    // Hero
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [AppConstants.Colors.accent.opacity(0.12), .clear],
+                                    center: .center,
+                                    startRadius: 30,
+                                    endRadius: 120
+                                )
+                            )
+                            .frame(width: 240, height: 240)
 
-            // Hero
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [AppConstants.Colors.accent.opacity(0.12), .clear],
-                            center: .center,
-                            startRadius: 30,
-                            endRadius: 140
-                        )
-                    )
-                    .frame(width: 280, height: 280)
+                        VStack(spacing: 16) {
+                            Image(systemName: "wind")
+                                .font(.system(size: 40, weight: .light))
+                                .foregroundStyle(AppConstants.Colors.accent)
+                                .symbolEffect(.pulse, options: .repeating)
 
-                VStack(spacing: 16) {
-                    Image(systemName: "wind")
-                        .font(.system(size: 44, weight: .light))
-                        .foregroundStyle(AppConstants.Colors.accent)
-                        .symbolEffect(.pulse, options: .repeating)
+                            Text("Join Drift")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
 
-                    Text("Join Drift")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
+                            Text("Create an account to RSVP,\nfollow organizers, and more")
+                                .font(.subheadline)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .lineSpacing(4)
+                        }
+                    }
+                    .padding(.top, 16)
 
-                    Text("Sign in to RSVP, follow friends,\nand join event chats")
-                        .font(.subheadline)
-                        .foregroundStyle(AppConstants.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(4)
+                    // Email form
+                    VStack(spacing: 14) {
+                        TextField("Email", text: Bindable(viewModel).email)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .padding(14)
+                            .background(AppConstants.Colors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(.white)
+
+                        SecureField("Password", text: Bindable(viewModel).password)
+                            .textContentType(viewModel.isSignUpMode ? .newPassword : .password)
+                            .padding(14)
+                            .background(AppConstants.Colors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(.white)
+
+                        if viewModel.isSignUpMode {
+                            SecureField("Confirm Password", text: Bindable(viewModel).confirmPassword)
+                                .textContentType(.newPassword)
+                                .padding(14)
+                                .background(AppConstants.Colors.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
+                    if let error = viewModel.error {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(Color(hex: "EF5350"))
+                            .padding(.horizontal, 24)
+                    }
                 }
             }
 
-            Spacer()
-
-            // Social proof
-            HStack(spacing: 6) {
-                Image(systemName: "person.2.fill")
-                    .font(.caption)
-                Text("Wellness community in DFW")
-                    .font(.caption)
-                    .fontWeight(.medium)
-            }
-            .foregroundStyle(AppConstants.Colors.textTertiary)
-            .padding(.bottom, 24)
-
-            // Sign in + browse
+            // Bottom actions
             VStack(spacing: 16) {
-                SignInWithAppleButton(.signIn) { request in
-                    viewModel.prepareSignInRequest(request)
-                } onCompletion: { result in
+                primaryButton(viewModel.isSignUpMode ? "Create Account" : "Sign In") {
                     Task {
-                        await viewModel.handleSignInWithApple(result)
+                        if viewModel.isSignUpMode {
+                            await viewModel.signUpWithEmail()
+                        } else {
+                            await viewModel.signInWithEmail()
+                        }
                         if viewModel.isAuthenticated {
                             UserDefaults.standard.set(true, forKey: "drift_has_onboarded")
                             onDismiss()
                         }
                     }
                 }
-                .signInWithAppleButtonStyle(.white)
-                .frame(height: 52)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .opacity(viewModel.isLoading ? 0.6 : 1)
+                .disabled(viewModel.isLoading)
+                .overlay {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    }
+                }
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.isSignUpMode.toggle()
+                        viewModel.error = nil
+                    }
+                } label: {
+                    Text(viewModel.isSignUpMode
+                         ? "Already have an account? **Sign In**"
+                         : "Don't have an account? **Sign Up**")
+                        .font(.subheadline)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                }
 
                 Button {
                     UserDefaults.standard.set(true, forKey: "drift_has_onboarded")
@@ -450,7 +474,7 @@ struct OnboardingView: View {
                     Text("Browse without account")
                         .font(.subheadline)
                         .fontWeight(.medium)
-                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .foregroundStyle(AppConstants.Colors.textTertiary)
                 }
             }
             .padding(.horizontal, 24)
