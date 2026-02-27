@@ -4,6 +4,8 @@ import Supabase
 @Observable
 final class DiscoverViewModel {
     private let eventService: EventService
+    private let organizerService: OrganizerService
+    private let rsvpService: RSVPService
     private let locationManager: LocationManager
 
     var events: [Event] = []
@@ -14,7 +16,7 @@ final class DiscoverViewModel {
     var isLoading = false
     var error: Error?
 
-    // User context for scoring (populated from AuthViewModel/UserDefaults)
+    // User context for scoring
     var userInterests: [String] = []
     var userCity: String?
     var followedOrganizerIds: Set<UUID> = []
@@ -26,8 +28,10 @@ final class DiscoverViewModel {
         case thisWeek = "This Week"
     }
 
-    init(eventService: EventService, locationManager: LocationManager) {
+    init(eventService: EventService, organizerService: OrganizerService, rsvpService: RSVPService, locationManager: LocationManager) {
         self.eventService = eventService
+        self.organizerService = organizerService
+        self.rsvpService = rsvpService
         self.locationManager = locationManager
     }
 
@@ -38,6 +42,29 @@ final class DiscoverViewModel {
         featuredEvents = eventService.featuredEvents
         applyFilters()
         isLoading = false
+    }
+
+    /// Populate user context for For You scoring. Call after auth/onboarding is ready.
+    func loadUserContext(userId: UUID) async {
+        // Interests from onboarding
+        if let saved = UserDefaults.standard.array(forKey: "drift_selected_interests") as? [String] {
+            userInterests = saved
+        }
+
+        // City from onboarding
+        userCity = UserDefaults.standard.string(forKey: "drift_selected_city")
+
+        // Followed organizers
+        followedOrganizerIds = await organizerService.getFollowedOrganizerIds(userId: userId)
+
+        // RSVP'd organizer IDs (get user's RSVPs, then map event→organizer)
+        let rsvps = await rsvpService.getUserUpcomingRSVPs(userId: userId)
+        let rsvpEventIds = Set(rsvps.map(\.eventId))
+        let rsvpdOrgs = events.filter { rsvpEventIds.contains($0.id) }.map(\.organizerId)
+        rsvpdOrganizerIds = Set(rsvpdOrgs)
+
+        // Re-apply filters with updated context
+        applyFilters()
     }
 
     func selectCategory(_ category: Category?) {

@@ -57,7 +57,7 @@ struct DriftApp: App {
 
         // ViewModels
         _authViewModel = State(initialValue: AuthViewModel(authService: auth))
-        _discoverViewModel = State(initialValue: DiscoverViewModel(eventService: events, locationManager: location))
+        _discoverViewModel = State(initialValue: DiscoverViewModel(eventService: events, organizerService: organizers, rsvpService: rsvps, locationManager: location))
         _eventDetailViewModel = State(initialValue: EventDetailViewModel(eventService: events, rsvpService: rsvps))
         _mapViewModel = State(initialValue: MapViewModel(eventService: events))
         _searchViewModel = State(initialValue: SearchViewModel(eventService: events))

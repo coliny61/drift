@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiscoverView: View {
     @Environment(DiscoverViewModel.self) private var viewModel
+    @Environment(AuthViewModel.self) private var authViewModel
     @State private var selectedEventId: UUID?
 
     var body: some View {
@@ -44,6 +45,8 @@ struct DiscoverView: View {
                 if viewModel.events.isEmpty {
                     await viewModel.loadEvents()
                 }
+                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                await viewModel.loadUserContext(userId: userId)
             }
         }
     }
