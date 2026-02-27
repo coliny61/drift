@@ -17,7 +17,14 @@ struct ActivityFeedView: View {
                 } else {
                     LazyVStack(spacing: 0) {
                         ForEach(viewModel.feedItems) { item in
-                            ActivityItemView(item: item)
+                            if let eventId = item.targetEventId {
+                                NavigationLink(value: AppDestination.event(eventId)) {
+                                    ActivityItemView(item: item)
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                ActivityItemView(item: item)
+                            }
                             Divider().background(Color(hex: "2A2A2A"))
                         }
                     }
@@ -27,6 +34,12 @@ struct ActivityFeedView: View {
             .navigationTitle("Activity")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationDestination(for: AppDestination.self) { destination in
+                switch destination {
+                case .event(let id): EventDetailView(eventId: id)
+                case .organizer(let id): OrganizerDetailView(organizerId: id)
+                }
+            }
             .refreshable {
                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                 await viewModel.refresh(userId: userId)

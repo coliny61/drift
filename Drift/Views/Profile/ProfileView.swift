@@ -70,8 +70,7 @@ struct ProfileView: View {
                     .padding(.horizontal)
 
                     // My Organizations
-                    if authViewModel.isAuthenticated {
-                        NavigationLink {
+                    NavigationLink {
                             MyOrganizersView()
                         } label: {
                             HStack(spacing: 10) {
@@ -91,7 +90,6 @@ struct ProfileView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .padding(.horizontal)
-                    }
 
                     // Interests
                     if let interests = authViewModel.currentProfile?.interests, !interests.isEmpty {
@@ -148,7 +146,7 @@ struct ProfileView: View {
                             .padding(.horizontal)
                         } else {
                             ForEach(profileViewModel.upcomingEvents) { event in
-                                NavigationLink(value: event.id) {
+                                NavigationLink(value: AppDestination.event(event.id)) {
                                     HStack(spacing: 12) {
                                         VStack(alignment: .center, spacing: 2) {
                                             Text(event.startTime.formatted(.dateTime.month(.abbreviated)).uppercased())
@@ -204,8 +202,11 @@ struct ProfileView: View {
                     }
                 }
             }
-            .navigationDestination(for: UUID.self) { eventId in
-                EventDetailView(eventId: eventId)
+            .navigationDestination(for: AppDestination.self) { destination in
+                switch destination {
+                case .event(let id): EventDetailView(eventId: id)
+                case .organizer(let id): OrganizerDetailView(organizerId: id)
+                }
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()

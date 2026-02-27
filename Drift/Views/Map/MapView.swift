@@ -68,7 +68,7 @@ struct DriftMapView: View {
         .overlay(alignment: .bottom) {
             // Selected event card
             if let event = viewModel.selectedEvent {
-                NavigationLink(value: event.id) {
+                NavigationLink(value: AppDestination.event(event.id)) {
                     MapEventCardView(event: event)
                 }
                 .buttonStyle(.plain)

@@ -263,10 +263,7 @@ struct OrganizerRegistrationView: View {
     // MARK: - Submit
 
     private func submit() async {
-        guard let profileId = authViewModel.currentProfile?.id else {
-            error = "You must be signed in to register as an organizer"
-            return
-        }
+        let profileId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
 
         isSubmitting = true
         error = nil

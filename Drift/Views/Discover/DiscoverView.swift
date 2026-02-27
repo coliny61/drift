@@ -26,7 +26,7 @@ struct DiscoverView: View {
                     // Event cards
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.filteredEvents) { event in
-                            NavigationLink(value: event.id) {
+                            NavigationLink(value: AppDestination.event(event.id)) {
                                 EventCardView(event: event)
                             }
                             .buttonStyle(.plain)
@@ -40,8 +40,11 @@ struct DiscoverView: View {
             .navigationTitle("Drift")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .navigationDestination(for: UUID.self) { eventId in
-                EventDetailView(eventId: eventId)
+            .navigationDestination(for: AppDestination.self) { destination in
+                switch destination {
+                case .event(let id): EventDetailView(eventId: id)
+                case .organizer(let id): OrganizerDetailView(organizerId: id)
+                }
             }
             .refreshable {
                 await viewModel.loadEvents()
@@ -98,7 +101,7 @@ struct DiscoverView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 14) {
                     ForEach(viewModel.featuredEvents) { event in
-                        NavigationLink(value: event.id) {
+                        NavigationLink(value: AppDestination.event(event.id)) {
                             featuredCard(event)
                         }
                         .buttonStyle(.plain)

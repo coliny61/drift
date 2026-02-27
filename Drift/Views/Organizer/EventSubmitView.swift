@@ -365,7 +365,7 @@ struct EventSubmitView: View {
             rsvpCount: 0,
             status: "upcoming",
             approvalStatus: "pending",
-            submittedBy: authViewModel.currentProfile?.id,
+            submittedBy: authViewModel.currentProfile?.id ?? authViewModel.localUserId,
             city: city,
             ticketUrl: ticketUrl.isEmpty ? nil : ticketUrl
         )

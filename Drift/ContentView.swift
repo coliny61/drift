@@ -22,8 +22,11 @@ struct ContentView: View {
                     .navigationTitle("Map")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbarColorScheme(.dark, for: .navigationBar)
-                    .navigationDestination(for: UUID.self) { eventId in
-                        EventDetailView(eventId: eventId)
+                    .navigationDestination(for: AppDestination.self) { destination in
+                        switch destination {
+                        case .event(let id): EventDetailView(eventId: id)
+                        case .organizer(let id): OrganizerDetailView(organizerId: id)
+                        }
                     }
             }
             .tabItem {

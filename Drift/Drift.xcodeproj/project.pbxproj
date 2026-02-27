@@ -78,6 +78,7 @@
 		AA0001110001000500010001 /* EventSubmitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000500010001 /* EventSubmitView.swift */; };
 		AA0001110001000600010001 /* OrganizerDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000600010001 /* OrganizerDashboardView.swift */; };
 		AA0001110001000700010001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000700010001 /* NotificationService.swift */; };
+		AA0001110001000800010001 /* AppDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000800010001 /* AppDestination.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +154,7 @@
 		AA0001110002000500010001 /* EventSubmitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSubmitView.swift; sourceTree = "<group>"; };
 		AA0001110002000600010001 /* OrganizerDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerDashboardView.swift; sourceTree = "<group>"; };
 		AA0001110002000700010001 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		AA0001110002000800010001 /* AppDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDestination.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -303,11 +305,20 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
+		AA0001110003000200010001 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001110002000800010001 /* AppDestination.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		879927A8D452FBBEC203D1CC /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				1D31E779FFC313A49A5177DA /* Config */,
 				DB83D9AECD0F3225EAC499EB /* Extensions */,
+				AA0001110003000200010001 /* Navigation */,
 				D86CC653C33F25EB4C746251 /* Utilities */,
 			);
 			path = Core;
@@ -525,6 +536,7 @@
 				AA0001110001000500010001 /* EventSubmitView.swift in Sources */,
 				AA0001110001000600010001 /* OrganizerDashboardView.swift in Sources */,
 				AA0001110001000700010001 /* NotificationService.swift in Sources */,
+				AA0001110001000800010001 /* AppDestination.swift in Sources */,
 				AA0001110001000100010001 /* OrganizerService.swift in Sources */,
 				549CA94B5EA7D07662335C40 /* OtherProfileView.swift in Sources */,
 				814579EB801A8E52B61C3586 /* PhotoService.swift in Sources */,

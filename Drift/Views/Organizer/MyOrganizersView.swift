@@ -19,7 +19,7 @@ struct MyOrganizersView: View {
                     emptyState
                 } else {
                     ForEach(organizers) { org in
-                        NavigationLink(value: org.id) {
+                        NavigationLink(value: AppDestination.organizer(org.id)) {
                             organizerCard(org)
                         }
                         .buttonStyle(.plain)
@@ -43,8 +43,11 @@ struct MyOrganizersView: View {
                 }
             }
         }
-        .navigationDestination(for: UUID.self) { orgId in
-            OrganizerDetailView(organizerId: orgId)
+        .navigationDestination(for: AppDestination.self) { destination in
+            switch destination {
+            case .event(let id): EventDetailView(eventId: id)
+            case .organizer(let id): OrganizerDetailView(organizerId: id)
+            }
         }
         .sheet(isPresented: $showRegistration) {
             OrganizerRegistrationView()
@@ -160,9 +163,8 @@ struct MyOrganizersView: View {
 
     private func loadOrganizers() async {
         isLoading = true
-        if let profileId = authViewModel.currentProfile?.id {
-            organizers = await organizerService.fetchMyOrganizers(profileId: profileId)
-        }
+        let profileId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+        organizers = await organizerService.fetchMyOrganizers(profileId: profileId)
         isLoading = false
     }
 }

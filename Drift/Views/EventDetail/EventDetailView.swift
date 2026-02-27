@@ -221,7 +221,7 @@ struct EventDetailView: View {
                             Divider()
                                 .background(Color(hex: "2A2A2A"))
 
-                            NavigationLink(value: organizer.id) {
+                            NavigationLink(value: AppDestination.organizer(organizer.id)) {
                                 HStack(spacing: 12) {
                                     if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
                                         AsyncImage(url: url) { phase in
@@ -406,8 +406,11 @@ struct EventDetailView: View {
         .background(Color(hex: "0A0A0A"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .navigationDestination(for: UUID.self) { id in
-            OrganizerDetailView(organizerId: id)
+        .navigationDestination(for: AppDestination.self) { destination in
+            switch destination {
+            case .event(let id): EventDetailView(eventId: id)
+            case .organizer(let id): OrganizerDetailView(organizerId: id)
+            }
         }
         .task {
             await viewModel.loadEvent(id: eventId)

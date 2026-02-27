@@ -105,7 +105,7 @@ struct SearchView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.results) { event in
-                                NavigationLink(value: event.id) {
+                                NavigationLink(value: AppDestination.event(event.id)) {
                                     EventCardView(event: event)
                                 }
                                 .buttonStyle(.plain)
@@ -122,8 +122,11 @@ struct SearchView: View {
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .navigationDestination(for: UUID.self) { eventId in
-                EventDetailView(eventId: eventId)
+            .navigationDestination(for: AppDestination.self) { destination in
+                switch destination {
+                case .event(let id): EventDetailView(eventId: id)
+                case .organizer(let id): OrganizerDetailView(organizerId: id)
+                }
             }
             .sheet(isPresented: Bindable(viewModel).showFilters) {
                 FilterSheetView()
