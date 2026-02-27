@@ -156,7 +156,26 @@ struct OrganizerDetailView: View {
                 .foregroundStyle(AppConstants.Colors.textSecondary)
             }
 
-            // Follow button
+            // Dashboard / Follow buttons
+            if isOwnOrganizer {
+                NavigationLink {
+                    OrganizerDashboardView(organizer: organizer)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chart.bar.fill")
+                            .font(.caption)
+                        Text("Dashboard")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 10)
+                    .background(AppConstants.Colors.accent)
+                    .clipShape(Capsule())
+                }
+            }
+
             Button {
                 Task { await toggleFollow() }
             } label: {
