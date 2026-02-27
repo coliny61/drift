@@ -5,16 +5,30 @@ struct EventChatView: View {
     @Environment(ChatViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authViewModel
 
+    private var currentUserId: UUID {
+        authViewModel.currentProfile?.id ?? authViewModel.localUserId
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Messages
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(viewModel.messages) { message in
-                        chatBubble(message)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.messages) { message in
+                            chatBubble(message)
+                                .id(message.id)
+                        }
+                    }
+                    .padding()
+                }
+                .onChange(of: viewModel.messages.count) { _, _ in
+                    if let last = viewModel.messages.last {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
                     }
                 }
-                .padding()
             }
 
             Divider().background(Color(hex: "2A2A2A"))
@@ -28,8 +42,7 @@ struct EventChatView: View {
                     .foregroundStyle(.white)
 
                 Button {
-                    guard let userId = authViewModel.currentProfile?.id else { return }
-                    Task { await viewModel.sendMessage(eventId: eventId, senderId: userId) }
+                    Task { await viewModel.sendMessage(eventId: eventId, senderId: currentUserId) }
                 } label: {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
@@ -58,7 +71,7 @@ struct EventChatView: View {
     }
 
     private func chatBubble(_ message: ChatMessage) -> some View {
-        let isOwn = message.senderId == authViewModel.currentProfile?.id
+        let isOwn = message.senderId == currentUserId
         return HStack {
             if isOwn { Spacer() }
 

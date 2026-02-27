@@ -300,6 +300,26 @@ struct EventDetailView: View {
                             }
                         }
 
+                        // Chat
+                        NavigationLink {
+                            EventChatView(eventId: event.id)
+                        } label: {
+                            HStack {
+                                Image(systemName: "bubble.left.and.bubble.right.fill")
+                                Text("Event Chat")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white)
+                            .padding()
+                            .background(AppConstants.Colors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+
                         // Share button
                         ShareLink(
                             item: event.externalUrl ?? "Check out \(event.title) on Drift!",
