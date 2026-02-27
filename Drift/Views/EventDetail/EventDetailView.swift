@@ -1,5 +1,14 @@
 import SwiftUI
 import MapKit
+import SafariServices
+
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        SFSafariViewController(url: url)
+    }
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
+}
 
 struct EventDetailView: View {
     let eventId: UUID
@@ -8,6 +17,7 @@ struct EventDetailView: View {
     @Environment(OrganizerService.self) private var organizerService
     @Environment(\.dismiss) private var dismiss
     @State private var organizer: Organizer?
+    @State private var showTicketSafari = false
 
     var body: some View {
         ScrollView {
@@ -172,6 +182,37 @@ struct EventDetailView: View {
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(categoryColor)
+                            }
+                        }
+
+                        // Ticket button
+                        if let ticketUrlString = event.ticketUrl, let ticketUrl = URL(string: ticketUrlString) {
+                            Button {
+                                showTicketSafari = true
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "ticket.fill")
+                                    Text("Get Tickets")
+                                        .fontWeight(.semibold)
+                                    Spacer()
+                                    Text(event.isFree ? "Free" : event.priceFormatted)
+                                        .fontWeight(.bold)
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.caption)
+                                }
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                                .padding(16)
+                                .background(AppConstants.Colors.accent)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+                            .fullScreenCover(isPresented: $showTicketSafari) {
+                                // Auto-RSVP on dismiss
+                                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                                Task { await viewModel.toggleRSVP(userId: userId, status: .going) }
+                            } content: {
+                                SafariView(url: ticketUrl)
+                                    .ignoresSafeArea()
                             }
                         }
 
