@@ -28,14 +28,16 @@ struct ActivityFeedView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .refreshable {
-                if let userId = authViewModel.currentProfile?.id {
-                    await viewModel.loadFeed(userId: userId)
-                }
+                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                await viewModel.refresh(userId: userId)
             }
             .task {
-                if let userId = authViewModel.currentProfile?.id {
-                    await viewModel.loadFeed(userId: userId)
-                }
+                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                await viewModel.loadFeed(userId: userId)
+                viewModel.startPolling(userId: userId)
+            }
+            .onDisappear {
+                viewModel.stopPolling()
             }
         }
     }

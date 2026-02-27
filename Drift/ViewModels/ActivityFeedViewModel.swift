@@ -3,6 +3,7 @@ import Foundation
 @Observable
 final class ActivityFeedViewModel {
     private let activityService: ActivityService
+    private var pollingTask: Task<Void, Never>?
 
     var feedItems: [ActivityFeedItem] { activityService.feedItems }
     var isLoading: Bool { activityService.isLoading }
@@ -17,5 +18,29 @@ final class ActivityFeedViewModel {
 
     func refresh(userId: UUID) async {
         await activityService.fetchFeed(userId: userId)
+    }
+
+    func startPolling(userId: UUID) {
+        pollingTask?.cancel()
+        pollingTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(30))
+                guard !Task.isCancelled else { break }
+                await activityService.fetchFeed(userId: userId)
+            }
+        }
+    }
+
+    func stopPolling() {
+        pollingTask?.cancel()
+        pollingTask = nil
+    }
+
+    func logRSVP(userId: UUID, eventId: UUID) async {
+        await activityService.logActivity(actorId: userId, actionType: "rsvp", targetEventId: eventId)
+    }
+
+    func logFollow(userId: UUID, targetUserId: UUID) async {
+        await activityService.logActivity(actorId: userId, actionType: "follow", targetUserId: targetUserId)
     }
 }
