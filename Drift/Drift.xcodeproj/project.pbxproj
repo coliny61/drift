@@ -75,6 +75,7 @@
 		AA0001110001000200010001 /* OrganizerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000200010001 /* OrganizerDetailView.swift */; };
 		AA0001110001000300010001 /* OrganizerRegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000300010001 /* OrganizerRegistrationView.swift */; };
 		AA0001110001000400010001 /* MyOrganizersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000400010001 /* MyOrganizersView.swift */; };
+		AA0001110001000500010001 /* EventSubmitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000500010001 /* EventSubmitView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -147,6 +148,7 @@
 		AA0001110002000200010001 /* OrganizerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerDetailView.swift; sourceTree = "<group>"; };
 		AA0001110002000300010001 /* OrganizerRegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerRegistrationView.swift; sourceTree = "<group>"; };
 		AA0001110002000400010001 /* MyOrganizersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyOrganizersView.swift; sourceTree = "<group>"; };
+		AA0001110002000500010001 /* EventSubmitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSubmitView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +255,7 @@
 				AA0001110002000400010001 /* MyOrganizersView.swift */,
 				AA0001110002000200010001 /* OrganizerDetailView.swift */,
 				AA0001110002000300010001 /* OrganizerRegistrationView.swift */,
+				AA0001110002000500010001 /* EventSubmitView.swift */,
 			);
 			path = Organizer;
 			sourceTree = "<group>";
@@ -513,6 +516,7 @@
 				AA0001110001000200010001 /* OrganizerDetailView.swift in Sources */,
 				AA0001110001000300010001 /* OrganizerRegistrationView.swift in Sources */,
 				AA0001110001000400010001 /* MyOrganizersView.swift in Sources */,
+				AA0001110001000500010001 /* EventSubmitView.swift in Sources */,
 				AA0001110001000100010001 /* OrganizerService.swift in Sources */,
 				549CA94B5EA7D07662335C40 /* OtherProfileView.swift in Sources */,
 				814579EB801A8E52B61C3586 /* PhotoService.swift in Sources */,

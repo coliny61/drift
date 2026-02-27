@@ -10,6 +10,13 @@ struct OrganizerDetailView: View {
     @State private var followerCount = 0
     @State private var isFollowing = false
     @State private var isLoading = true
+    @State private var showEventSubmit = false
+
+    private var isOwnOrganizer: Bool {
+        guard let organizer else { return false }
+        let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+        return organizer.profileId == userId
+    }
 
     var body: some View {
         ScrollView {
@@ -75,6 +82,28 @@ struct OrganizerDetailView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(for: UUID.self) { eventId in
             EventDetailView(eventId: eventId)
+        }
+        .toolbar {
+            if isOwnOrganizer {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showEventSubmit = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus")
+                            Text("Event")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(AppConstants.Colors.accent)
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showEventSubmit) {
+            if let organizer {
+                EventSubmitView(organizer: organizer)
+            }
         }
         .task {
             await loadData()

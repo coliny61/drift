@@ -81,6 +81,7 @@ struct DriftApp: App {
                 .environment(settingsViewModel)
                 .environment(photoService)
                 .environment(organizerService)
+                .environment(eventService)
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()

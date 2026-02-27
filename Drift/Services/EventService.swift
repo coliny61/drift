@@ -99,6 +99,38 @@ final class EventService {
         }
     }
 
+    func createEvent(_ event: Event) async throws {
+        try await client.from("events")
+            .insert(event)
+            .execute()
+    }
+
+    func updateEvent(_ event: Event) async throws {
+        try await client.from("events")
+            .update(event)
+            .eq("id", value: event.id.uuidString)
+            .execute()
+    }
+
+    func fetchOrganizerEvents(organizerId: UUID, includeAll: Bool = false) async -> [Event] {
+        do {
+            var query = client.from("events")
+                .select()
+                .eq("organizer_id", value: organizerId.uuidString)
+            if !includeAll {
+                query = query.eq("status", value: "upcoming")
+            }
+            let response: [Event] = try await query
+                .order("start_time", ascending: false)
+                .execute()
+                .value
+            return response
+        } catch {
+            print("Error fetching organizer events: \(error)")
+            return []
+        }
+    }
+
     func searchEvents(query: String) async -> [Event] {
         if Self.useSeedData {
             let q = query.lowercased()
