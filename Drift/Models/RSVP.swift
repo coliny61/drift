@@ -12,6 +12,11 @@ struct RSVP: Codable, Identifiable, Hashable {
     enum RSVPStatus: String, Codable {
         case going
         case interested
+        case checkedIn = "checked_in"
+    }
+
+    var isCheckedIn: Bool {
+        status == RSVPStatus.checkedIn.rawValue
     }
 
     // MARK: - CodingKeys

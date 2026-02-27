@@ -74,6 +74,16 @@ final class RSVPService {
         }
     }
 
+    func checkIn(eventId: UUID, userId: UUID) async throws {
+        try await client.from("rsvps")
+            .upsert([
+                "event_id": eventId.uuidString,
+                "user_id": userId.uuidString,
+                "status": RSVP.RSVPStatus.checkedIn.rawValue
+            ])
+            .execute()
+    }
+
     func getUserUpcomingRSVPs(userId: UUID) async -> [RSVP] {
         do {
             let rsvps: [RSVP] = try await client.from("rsvps")

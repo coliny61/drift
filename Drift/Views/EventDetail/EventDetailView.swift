@@ -318,6 +318,27 @@ struct EventDetailView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
 
+                        // Check-in
+                        if viewModel.canCheckIn {
+                            Button {
+                                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                                Task { await viewModel.checkIn(userId: userId) }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: viewModel.isCheckedIn ? "checkmark.circle.fill" : "location.fill")
+                                    Text(viewModel.isCheckedIn ? "Checked In" : "Check In")
+                                        .fontWeight(.semibold)
+                                }
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .background(viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE"))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+                            .disabled(viewModel.isCheckedIn)
+                        }
+
                         // RSVP
                         RSVPButtonView(
                             isGoing: viewModel.userRSVP?.status == RSVP.RSVPStatus.going.rawValue,

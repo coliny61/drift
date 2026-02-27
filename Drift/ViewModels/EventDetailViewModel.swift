@@ -73,6 +73,32 @@ final class EventDetailViewModel {
         HapticManager.impact(.medium)
     }
 
+    func checkIn(userId: UUID) async {
+        guard let event else { return }
+        try? await rsvpService.checkIn(eventId: event.id, userId: userId)
+        userRSVP = RSVP(
+            id: UUID(),
+            eventId: event.id,
+            userId: userId,
+            status: RSVP.RSVPStatus.checkedIn.rawValue,
+            createdAt: .now
+        )
+        Self.saveLocalRSVP(eventId: event.id, status: .checkedIn)
+        HapticManager.notification(.success)
+    }
+
+    var canCheckIn: Bool {
+        guard let event else { return false }
+        let now = Date()
+        let checkInStart = event.startTime.addingTimeInterval(-1800) // 30 min before
+        let checkInEnd = event.endTime
+        return now >= checkInStart && now <= checkInEnd
+    }
+
+    var isCheckedIn: Bool {
+        userRSVP?.isCheckedIn ?? false
+    }
+
     // MARK: - Local RSVP storage (for browse-without-account mode)
 
     private static let localRSVPKey = "drift_local_rsvps"
