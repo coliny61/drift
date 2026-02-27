@@ -170,6 +170,27 @@ struct OrganizerDashboardView: View {
             }
 
             Spacer()
+
+            if event.isApproved && !event.isCurrentlyFeatured {
+                Button {
+                    Task {
+                        try? await eventService.requestBoost(eventId: event.id)
+                        HapticManager.selection()
+                    }
+                } label: {
+                    Image(systemName: "star")
+                        .font(.caption)
+                        .foregroundStyle(Color(hex: "FBBF24"))
+                        .padding(8)
+                        .background(Color(hex: "FBBF24").opacity(0.12))
+                        .clipShape(Circle())
+                }
+            } else if event.isCurrentlyFeatured {
+                Image(systemName: "star.fill")
+                    .font(.caption)
+                    .foregroundStyle(Color(hex: "FBBF24"))
+                    .padding(8)
+            }
         }
         .padding(14)
         .background(AppConstants.Colors.cardBackground)

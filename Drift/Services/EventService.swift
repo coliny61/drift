@@ -131,6 +131,13 @@ final class EventService {
         }
     }
 
+    func requestBoost(eventId: UUID) async throws {
+        try await client.from("events")
+            .update(["boost_requested": true] as [String: Bool])
+            .eq("id", value: eventId.uuidString)
+            .execute()
+    }
+
     func searchEvents(query: String) async -> [Event] {
         if Self.useSeedData {
             let q = query.lowercased()

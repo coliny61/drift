@@ -18,6 +18,11 @@ struct DiscoverView: View {
                     categoryChips
                         .padding(.top, 12)
 
+                    // Featured carousel
+                    if !viewModel.featuredEvents.isEmpty {
+                        featuredCarousel
+                    }
+
                     // Event cards
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.filteredEvents) { event in
@@ -75,6 +80,107 @@ struct DiscoverView: View {
         }
         .background(Color(hex: "1A1A1A"))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var featuredCarousel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "star.fill")
+                    .font(.caption)
+                    .foregroundStyle(AppConstants.Colors.accent)
+                Text("Featured")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+            }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) {
+                    ForEach(viewModel.featuredEvents) { event in
+                        NavigationLink(value: event.id) {
+                            featuredCard(event)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+        .padding(.top, 16)
+    }
+
+    private func featuredCard(_ event: Event) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().scaledToFill()
+                    default:
+                        featuredGradient(event)
+                    }
+                }
+            } else {
+                featuredGradient(event)
+            }
+        }
+        .frame(width: 280, height: 160)
+        .clipped()
+        .overlay(
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.7)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+        .overlay(alignment: .bottomLeading) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Image(systemName: "calendar")
+                        .font(.caption2)
+                    Text(event.startTime.relativeDescription)
+                        .font(.caption)
+                }
+                .foregroundStyle(.white.opacity(0.8))
+            }
+            .padding(12)
+        }
+        .overlay(alignment: .topTrailing) {
+            HStack(spacing: 3) {
+                Image(systemName: "star.fill")
+                    .font(.caption2)
+                Text("Featured")
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(AppConstants.Colors.accent)
+            .clipShape(Capsule())
+            .padding(8)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func featuredGradient(_ event: Event) -> some View {
+        Rectangle()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color(hex: event.categoryEnum?.color ?? "FF6B35").opacity(0.6),
+                        Color(hex: event.categoryEnum?.color ?? "FF6B35").opacity(0.2)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
     }
 
     private var categoryChips: some View {
