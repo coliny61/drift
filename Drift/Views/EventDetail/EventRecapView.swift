@@ -1,14 +1,24 @@
 import SwiftUI
+import PhotosUI
 
 struct EventRecapView: View {
     let eventId: UUID
     @Environment(PhotoService.self) private var photoService
+    @Environment(AuthViewModel.self) private var authViewModel
+
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var isUploading = false
+    @State private var selectedImage: EventPhoto?
 
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
+    private var currentUserId: UUID {
+        authViewModel.currentProfile?.id ?? authViewModel.localUserId
+    }
+
     var body: some View {
         ScrollView {
-            if photoService.photos.isEmpty {
+            if photoService.photos.isEmpty && !isUploading {
                 EmptyStateView(
                     icon: "photo.on.rectangle.angled",
                     title: "No Photos Yet",
@@ -18,26 +28,160 @@ struct EventRecapView: View {
             } else {
                 LazyVGrid(columns: columns, spacing: 2) {
                     ForEach(photoService.photos) { photo in
-                        AsyncImage(url: URL(string: photo.photoUrl)) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            Rectangle()
-                                .fill(Color(hex: "2A2A2A"))
+                        Button {
+                            selectedImage = photo
+                        } label: {
+                            AsyncImage(url: URL(string: photo.photoUrl)) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                Rectangle()
+                                    .fill(Color(hex: "2A2A2A"))
+                            }
+                            .frame(height: 120)
+                            .clipped()
                         }
-                        .frame(height: 120)
-                        .clipped()
                     }
                 }
             }
         }
-        .background(Color(hex: "0A0A0A"))
-        .navigationTitle("Recap")
+        .background(AppConstants.Colors.background)
+        .navigationTitle("Recap (\(photoService.photos.count))")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.circle.fill")
+                        Text("Add")
+                    }
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(AppConstants.Colors.accent)
+                }
+            }
+        }
+        .overlay {
+            if isUploading {
+                Color.black.opacity(0.5).ignoresSafeArea()
+                ProgressView("Uploading...")
+                    .tint(.white)
+                    .foregroundStyle(.white)
+            }
+        }
+        .sheet(item: $selectedImage) { photo in
+            PhotoDetailSheet(photo: photo, currentUserId: currentUserId)
+        }
+        .onChange(of: selectedPhoto) { _, newItem in
+            guard let newItem else { return }
+            Task { await uploadPhoto(item: newItem) }
+        }
         .task {
             await photoService.fetchPhotos(eventId: eventId)
         }
+    }
+
+    private func uploadPhoto(item: PhotosPickerItem) async {
+        isUploading = true
+        defer { isUploading = false }
+
+        guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+
+        do {
+            let photo = try await photoService.uploadPhoto(
+                eventId: eventId,
+                userId: currentUserId,
+                imageData: data,
+                caption: nil
+            )
+            photoService.photos.insert(photo, at: 0)
+            HapticManager.notification(.success)
+        } catch {
+            print("Upload failed: \(error)")
+        }
+
+        selectedPhoto = nil
+    }
+}
+
+// MARK: - Photo Detail Sheet
+
+struct PhotoDetailSheet: View {
+    let photo: EventPhoto
+    let currentUserId: UUID
+    @Environment(PhotoService.self) private var photoService
+    @Environment(\.dismiss) private var dismiss
+
+    private let reactions = ["fire", "heart", "clap", "camera", "star"]
+    private let reactionEmojis: [String: String] = [
+        "fire": "🔥",
+        "heart": "❤️",
+        "clap": "👏",
+        "camera": "📸",
+        "star": "⭐"
+    ]
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                AsyncImage(url: URL(string: photo.photoUrl)) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                } placeholder: {
+                    Rectangle()
+                        .fill(Color(hex: "2A2A2A"))
+                        .frame(height: 300)
+                }
+
+                if let caption = photo.caption, !caption.isEmpty {
+                    Text(caption)
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .padding()
+                }
+
+                // Reactions
+                HStack(spacing: 16) {
+                    ForEach(reactions, id: \.self) { reaction in
+                        Button {
+                            Task {
+                                try? await photoService.addReaction(
+                                    photoId: photo.id,
+                                    userId: currentUserId,
+                                    reactionType: reaction
+                                )
+                                HapticManager.impact(.light)
+                            }
+                        } label: {
+                            Text(reactionEmojis[reaction] ?? "")
+                                .font(.title2)
+                                .padding(10)
+                                .background(AppConstants.Colors.cardBackground)
+                                .clipShape(Circle())
+                        }
+                    }
+                }
+                .padding(.top, 16)
+
+                Text(photo.createdAt.relativeDescription)
+                    .font(.caption)
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
+                    .padding(.top, 12)
+
+                Spacer()
+            }
+            .background(AppConstants.Colors.background)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundStyle(AppConstants.Colors.accent)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
     }
 }
