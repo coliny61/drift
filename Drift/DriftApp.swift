@@ -15,6 +15,7 @@ struct DriftApp: App {
     @State private var activityService: ActivityService
     @State private var photoService: PhotoService
     @State private var organizerService: OrganizerService
+    @State private var notificationService = NotificationService()
 
     // MARK: - ViewModels
     @State private var authViewModel: AuthViewModel
@@ -82,6 +83,7 @@ struct DriftApp: App {
                 .environment(photoService)
                 .environment(organizerService)
                 .environment(eventService)
+                .environment(notificationService)
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()
