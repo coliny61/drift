@@ -69,6 +69,30 @@ struct ProfileView: View {
                     }
                     .padding(.horizontal)
 
+                    // My Organizations
+                    if authViewModel.isAuthenticated {
+                        NavigationLink {
+                            MyOrganizersView()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "building.2")
+                                    .foregroundStyle(AppConstants.Colors.accent)
+                                Text("My Organizations")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
+                            }
+                            .padding(14)
+                            .background(AppConstants.Colors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .padding(.horizontal)
+                    }
+
                     // Interests
                     if let interests = authViewModel.currentProfile?.interests, !interests.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {

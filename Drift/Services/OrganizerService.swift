@@ -87,6 +87,34 @@ final class OrganizerService {
             .execute()
     }
 
+    func createOrganizer(_ organizer: Organizer) async throws {
+        try await client.from("organizers")
+            .insert(organizer)
+            .execute()
+    }
+
+    func updateOrganizer(_ organizer: Organizer) async throws {
+        try await client.from("organizers")
+            .update(organizer)
+            .eq("id", value: organizer.id.uuidString)
+            .execute()
+    }
+
+    func fetchMyOrganizers(profileId: UUID) async -> [Organizer] {
+        do {
+            let orgs: [Organizer] = try await client.from("organizers")
+                .select()
+                .eq("profile_id", value: profileId.uuidString)
+                .order("name", ascending: true)
+                .execute()
+                .value
+            return orgs
+        } catch {
+            print("Error fetching my organizers: \(error)")
+            return []
+        }
+    }
+
     func getFollowedOrganizerIds(userId: UUID) async -> Set<UUID> {
         do {
             struct FollowRow: Decodable {
