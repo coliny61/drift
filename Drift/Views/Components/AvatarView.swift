@@ -21,16 +21,26 @@ struct AvatarView: View {
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
+        .overlay(
+            Circle()
+                .strokeBorder(.white.opacity(0.08), lineWidth: 1)
+        )
     }
 
     private var initialsView: some View {
         ZStack {
             Circle()
-                .fill(Color(hex: "2A2A2A"))
+                .fill(
+                    LinearGradient(
+                        colors: [AppConstants.Colors.accent.opacity(0.25), AppConstants.Colors.accent.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
             Text(fallbackInitials)
-                .font(size > 30 ? .body : .caption)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .font(size > 50 ? .title3 : size > 30 ? .body : .caption)
+                .fontWeight(.bold)
+                .foregroundStyle(AppConstants.Colors.accent)
         }
     }
 }
@@ -45,7 +55,7 @@ struct AvatarStackView: View {
         HStack(spacing: -(size * 0.3)) {
             ForEach(Array(urls.prefix(maxDisplay).enumerated()), id: \.offset) { index, url in
                 AvatarView(url: url, size: size)
-                    .overlay(Circle().strokeBorder(Color(hex: "1A1A1A"), lineWidth: 2))
+                    .overlay(Circle().strokeBorder(AppConstants.Colors.cardBackground, lineWidth: 2))
                     .zIndex(Double(maxDisplay - index))
             }
 
@@ -55,9 +65,9 @@ struct AvatarStackView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                     .frame(width: size, height: size)
-                    .background(Color(hex: "FF6B35"))
+                    .background(AppConstants.Colors.accent)
                     .clipShape(Circle())
-                    .overlay(Circle().strokeBorder(Color(hex: "1A1A1A"), lineWidth: 2))
+                    .overlay(Circle().strokeBorder(AppConstants.Colors.cardBackground, lineWidth: 2))
             }
         }
     }

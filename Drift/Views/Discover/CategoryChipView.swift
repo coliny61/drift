@@ -12,21 +12,25 @@ struct CategoryChipView: View {
             action()
             HapticManager.selection()
         }) {
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: icon)
-                    .font(.caption)
+                    .font(.system(size: 11, weight: .semibold))
                 Text(title)
                     .font(.subheadline)
-                    .fontWeight(isSelected ? .semibold : .regular)
+                    .fontWeight(isSelected ? .bold : .medium)
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(isSelected ? color.opacity(0.2) : Color(hex: "2A2A2A"))
-            .foregroundStyle(isSelected ? color : Color(hex: "9CA3AF"))
+            .padding(.vertical, 9)
+            .background(
+                isSelected
+                    ? color.opacity(0.15)
+                    : AppConstants.Colors.secondaryBackground
+            )
+            .foregroundStyle(isSelected ? color : AppConstants.Colors.textSecondary)
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .strokeBorder(isSelected ? color.opacity(0.5) : .clear, lineWidth: 1)
+                    .strokeBorder(isSelected ? color.opacity(0.4) : .clear, lineWidth: 1.5)
             )
         }
     }

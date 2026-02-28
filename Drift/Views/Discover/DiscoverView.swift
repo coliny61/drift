@@ -24,7 +24,7 @@ struct DiscoverView: View {
                     }
 
                     // Event cards
-                    LazyVStack(spacing: 16) {
+                    LazyVStack(spacing: 20) {
                         ForEach(viewModel.filteredEvents) { event in
                             NavigationLink(value: AppDestination.event(event.id)) {
                                 EventCardView(event: event)
@@ -33,10 +33,11 @@ struct DiscoverView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 16)
+                    .padding(.top, 20)
+                    .padding(.bottom, 32)
                 }
             }
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
             .navigationTitle("Drift")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -59,6 +60,8 @@ struct DiscoverView: View {
         }
     }
 
+    // MARK: - Feed Mode Picker
+
     private var feedModePicker: some View {
         HStack(spacing: 0) {
             ForEach(DiscoverViewModel.FeedMode.allCases, id: \.self) { mode in
@@ -70,31 +73,36 @@ struct DiscoverView: View {
                 } label: {
                     Text(mode.rawValue)
                         .font(.subheadline)
-                        .fontWeight(viewModel.feedMode == mode ? .semibold : .regular)
-                        .foregroundStyle(viewModel.feedMode == mode ? .white : Color(hex: "9CA3AF"))
+                        .fontWeight(viewModel.feedMode == mode ? .bold : .medium)
+                        .foregroundStyle(viewModel.feedMode == mode ? .white : AppConstants.Colors.textSecondary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                         .background(
-                            viewModel.feedMode == mode ? Color(hex: "2A2A2A") : .clear
+                            viewModel.feedMode == mode
+                                ? AppConstants.Colors.secondaryBackground
+                                : .clear
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
         }
-        .background(Color(hex: "1A1A1A"))
+        .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
+    // MARK: - Featured Carousel
+
     private var featuredCarousel: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
                 Image(systemName: "star.fill")
-                    .font(.caption)
+                    .font(.system(size: 11))
                     .foregroundStyle(AppConstants.Colors.accent)
-                Text("Featured")
-                    .font(.headline)
+                Text("FEATURED")
+                    .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .tracking(1.2)
+                    .foregroundStyle(AppConstants.Colors.accent)
             }
             .padding(.horizontal)
 
@@ -110,7 +118,7 @@ struct DiscoverView: View {
                 .padding(.horizontal)
             }
         }
-        .padding(.top, 16)
+        .padding(.top, 20)
     }
 
     private func featuredCard(_ event: Event) -> some View {
@@ -128,48 +136,61 @@ struct DiscoverView: View {
                 featuredGradient(event)
             }
         }
-        .frame(width: 280, height: 160)
+        .frame(width: 300, height: 180)
         .clipped()
         .overlay(
             LinearGradient(
-                colors: [.clear, .black.opacity(0.7)],
+                colors: [.clear, .clear, .black.opacity(0.8)],
                 startPoint: .top,
                 endPoint: .bottom
             )
         )
         .overlay(alignment: .bottomLeading) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(event.title)
-                    .font(.subheadline)
+                    .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .font(.caption2)
-                    Text(event.startTime.relativeDescription)
-                        .font(.caption)
+                    .lineLimit(2)
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                            .font(.caption2)
+                        Text(event.startTime.relativeDescription)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                    if event.rsvpCount > 0 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "person.2.fill")
+                                .font(.system(size: 9))
+                            Text("\(event.rsvpCount)")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                    }
                 }
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.white.opacity(0.85))
             }
-            .padding(12)
+            .padding(14)
         }
         .overlay(alignment: .topTrailing) {
             HStack(spacing: 3) {
                 Image(systemName: "star.fill")
-                    .font(.caption2)
-                Text("Featured")
-                    .font(.caption2)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 8))
+                Text("FEATURED")
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.5)
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
             .background(AppConstants.Colors.accent)
             .clipShape(Capsule())
-            .padding(8)
+            .padding(10)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
     }
 
     private func featuredGradient(_ event: Event) -> some View {
@@ -184,7 +205,14 @@ struct DiscoverView: View {
                     endPoint: .bottomTrailing
                 )
             )
+            .overlay {
+                Image(systemName: event.categoryEnum?.icon ?? "star")
+                    .font(.system(size: 48, weight: .ultraLight))
+                    .foregroundStyle(.white.opacity(0.15))
+            }
     }
+
+    // MARK: - Category Chips
 
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -194,7 +222,7 @@ struct DiscoverView: View {
                     title: "All",
                     icon: "square.grid.2x2",
                     isSelected: viewModel.selectedCategory == nil,
-                    color: Color(hex: "FF6B35")
+                    color: AppConstants.Colors.accent
                 ) {
                     viewModel.selectCategory(nil)
                 }

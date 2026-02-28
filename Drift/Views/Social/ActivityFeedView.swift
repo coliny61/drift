@@ -25,12 +25,15 @@ struct ActivityFeedView: View {
                             } else {
                                 ActivityItemView(item: item)
                             }
-                            Divider().background(Color(hex: "2A2A2A"))
+                            Rectangle()
+                                .fill(AppConstants.Colors.divider)
+                                .frame(height: 0.5)
+                                .padding(.leading, 72)
                         }
                     }
                 }
             }
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
             .navigationTitle("Activity")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)

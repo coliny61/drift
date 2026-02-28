@@ -10,7 +10,7 @@ struct MyOrganizersView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 if isLoading {
                     ProgressView()
                         .tint(AppConstants.Colors.accent)
@@ -28,6 +28,7 @@ struct MyOrganizersView: View {
             }
             .padding(.horizontal)
             .padding(.top, 16)
+            .padding(.bottom, 32)
         }
         .background(AppConstants.Colors.background)
         .navigationTitle("My Organizations")
@@ -63,21 +64,28 @@ struct MyOrganizersView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 18) {
             Spacer().frame(height: 40)
 
-            Image(systemName: "building.2")
-                .font(.system(size: 48))
-                .foregroundStyle(AppConstants.Colors.textTertiary)
+            ZStack {
+                Circle()
+                    .fill(AppConstants.Colors.accent.opacity(0.06))
+                    .frame(width: 100, height: 100)
+                Image(systemName: "building.2")
+                    .font(.system(size: 36, weight: .light))
+                    .foregroundStyle(AppConstants.Colors.textTertiary)
+            }
 
             Text("No organizations yet")
                 .font(.headline)
+                .fontWeight(.bold)
                 .foregroundStyle(.white)
 
             Text("Register as an organizer to start hosting wellness events in DFW")
                 .font(.subheadline)
                 .foregroundStyle(AppConstants.Colors.textSecondary)
                 .multilineTextAlignment(.center)
+                .lineSpacing(3)
                 .padding(.horizontal, 32)
 
             Button {
@@ -88,14 +96,15 @@ struct MyOrganizersView: View {
                     Text("Register Organization")
                 }
                 .font(.subheadline)
-                .fontWeight(.semibold)
+                .fontWeight(.bold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
-                .padding(.vertical, 12)
+                .padding(.vertical, 13)
                 .background(AppConstants.Colors.accent)
                 .clipShape(Capsule())
+                .shadow(color: AppConstants.Colors.accent.opacity(0.3), radius: 8, x: 0, y: 4)
             }
-            .padding(.top, 8)
+            .padding(.top, 4)
         }
     }
 
@@ -103,8 +112,14 @@ struct MyOrganizersView: View {
         HStack(spacing: 14) {
             // Logo placeholder
             Circle()
-                .fill(AppConstants.Colors.accent.opacity(0.2))
-                .frame(width: 50, height: 50)
+                .fill(
+                    LinearGradient(
+                        colors: [AppConstants.Colors.accent.opacity(0.25), AppConstants.Colors.accent.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 52, height: 52)
                 .overlay {
                     Text(String(org.name.prefix(1)))
                         .font(.title3)
@@ -112,10 +127,11 @@ struct MyOrganizersView: View {
                         .foregroundStyle(AppConstants.Colors.accent)
                 }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 6) {
                     Text(org.name)
                         .font(.headline)
+                        .fontWeight(.bold)
                         .foregroundStyle(.white)
                     if org.isVerifiedOrganizer {
                         Image(systemName: "checkmark.seal.fill")
@@ -135,16 +151,17 @@ struct MyOrganizersView: View {
         }
         .padding(16)
         .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func statusBadge(_ org: Organizer) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 5) {
             Circle()
                 .fill(statusColor(org))
                 .frame(width: 6, height: 6)
             Text(statusText(org))
                 .font(.caption)
+                .fontWeight(.semibold)
                 .foregroundStyle(statusColor(org))
         }
     }

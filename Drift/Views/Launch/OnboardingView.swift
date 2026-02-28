@@ -8,7 +8,6 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            // Background with subtle gradient
             AppConstants.Colors.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -42,7 +41,7 @@ struct OnboardingView: View {
                     .fill(step == viewModel.onboardingStep
                           ? AppConstants.Colors.accent
                           : AppConstants.Colors.secondaryBackground)
-                    .frame(width: step == viewModel.onboardingStep ? 24 : 8, height: 4)
+                    .frame(width: step == viewModel.onboardingStep ? 28 : 8, height: 4)
                     .animation(.spring(duration: 0.3), value: viewModel.onboardingStep)
             }
         }
@@ -60,23 +59,22 @@ struct OnboardingView: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [AppConstants.Colors.accent.opacity(0.15), .clear],
+                            colors: [AppConstants.Colors.accent.opacity(0.18), .clear],
                             center: .center,
                             startRadius: 40,
-                            endRadius: 180
+                            endRadius: 200
                         )
                     )
-                    .frame(width: 360, height: 360)
+                    .frame(width: 400, height: 400)
 
                 VStack(spacing: 20) {
-                    // App icon
                     Image(systemName: "wind")
-                        .font(.system(size: 56, weight: .light))
+                        .font(.system(size: 60, weight: .light))
                         .foregroundStyle(AppConstants.Colors.accent)
                         .symbolEffect(.pulse, options: .repeating)
 
                     Text("Drift")
-                        .font(.system(size: 52, weight: .bold, design: .default))
+                        .font(.system(size: 56, weight: .bold, design: .default))
                         .foregroundStyle(.white)
 
                     Text("Discover your flow")
@@ -92,13 +90,12 @@ struct OnboardingView: View {
             VStack(spacing: 16) {
                 featureRow(icon: "figure.run", text: "Run clubs, yoga, sound baths & more", color: AppConstants.Colors.accent)
                 featureRow(icon: "mappin.circle.fill", text: "Events across DFW, near you", color: Color(hex: "60A5FA"))
-                featureRow(icon: "person.2.fill", text: "Find your people, build your streak", color: Color(hex: "81C784"))
+                featureRow(icon: "person.2.fill", text: "Find your people, build your streak", color: AppConstants.Colors.success)
             }
             .padding(.horizontal, 32)
 
             Spacer()
 
-            // CTA
             primaryButton("Get Started") {
                 viewModel.nextOnboardingStep()
             }
@@ -110,14 +107,15 @@ struct OnboardingView: View {
     private func featureRow(icon: String, text: String, color: Color) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
-                .font(.body)
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(color)
-                .frame(width: 36, height: 36)
+                .frame(width: 40, height: 40)
                 .background(color.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .clipShape(RoundedRectangle(cornerRadius: 11))
 
             Text(text)
                 .font(.subheadline)
+                .fontWeight(.medium)
                 .foregroundStyle(AppConstants.Colors.textSecondary)
 
             Spacer()
@@ -160,16 +158,16 @@ struct OnboardingView: View {
 
                                 Text(category.displayName)
                                     .font(.caption)
-                                    .fontWeight(.semibold)
+                                    .fontWeight(.bold)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18)
+                            .padding(.vertical, 20)
                             .background(isSelected ? catColor.opacity(0.15) : AppConstants.Colors.cardBackground)
                             .foregroundStyle(isSelected ? catColor : AppConstants.Colors.textSecondary)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                             .overlay(
-                                RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
-                                    .strokeBorder(isSelected ? catColor.opacity(0.5) : .clear, lineWidth: 1.5)
+                                RoundedRectangle(cornerRadius: 16)
+                                    .strokeBorder(isSelected ? catColor.opacity(0.4) : .clear, lineWidth: 1.5)
                             )
                         }
                     }
@@ -184,7 +182,7 @@ struct OnboardingView: View {
                 if !viewModel.selectedInterests.isEmpty {
                     Text("\(viewModel.selectedInterests.count) selected")
                         .font(.caption)
-                        .fontWeight(.medium)
+                        .fontWeight(.bold)
                         .foregroundStyle(viewModel.selectedInterests.count >= 3
                                          ? AppConstants.Colors.accent
                                          : AppConstants.Colors.textTertiary)
@@ -236,17 +234,17 @@ struct OnboardingView: View {
 
                                 Text(city)
                                     .font(.subheadline)
-                                    .fontWeight(.medium)
+                                    .fontWeight(.semibold)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 14)
-                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.15) : AppConstants.Colors.cardBackground)
+                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.12) : AppConstants.Colors.cardBackground)
                             .foregroundStyle(isSelected ? Color(hex: "60A5FA") : AppConstants.Colors.textSecondary)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(isSelected ? Color(hex: "60A5FA").opacity(0.5) : .clear, lineWidth: 1.5)
+                                RoundedRectangle(cornerRadius: 14)
+                                    .strokeBorder(isSelected ? Color(hex: "60A5FA").opacity(0.4) : .clear, lineWidth: 1.5)
                             )
                         }
                     }
@@ -260,7 +258,6 @@ struct OnboardingView: View {
                 if let city = viewModel.selectedCity {
                     UserDefaults.standard.set(city, forKey: "drift_selected_city")
                 }
-                // Backward compat
                 viewModel.selectedNeighborhood = "Dallas Fort Worth"
                 UserDefaults.standard.set("Dallas Fort Worth", forKey: "drift_selected_neighborhood")
                 viewModel.nextOnboardingStep()
@@ -290,7 +287,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 permissionCard(
                     icon: "location.fill",
                     title: "Location",
@@ -308,7 +305,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            VStack(spacing: 12) {
+            VStack(spacing: 14) {
                 primaryButton("Enable & Continue") {
                     viewModel.nextOnboardingStep()
                 }
@@ -318,6 +315,7 @@ struct OnboardingView: View {
                 } label: {
                     Text("Maybe later")
                         .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundStyle(AppConstants.Colors.textTertiary)
                 }
             }
@@ -329,7 +327,7 @@ struct OnboardingView: View {
     private func permissionCard(icon: String, title: String, description: String, color: Color) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title3)
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(color)
                 .frame(width: 48, height: 48)
                 .background(color.opacity(0.12))
@@ -338,6 +336,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
+                    .fontWeight(.bold)
                     .foregroundStyle(.white)
                 Text(description)
                     .font(.subheadline)
@@ -349,7 +348,7 @@ struct OnboardingView: View {
         }
         .padding(16)
         .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Sign In
@@ -392,7 +391,7 @@ struct OnboardingView: View {
                     .padding(.top, 16)
 
                     // Email form
-                    VStack(spacing: 14) {
+                    VStack(spacing: 12) {
                         TextField("Email", text: Bindable(viewModel).email)
                             .textContentType(.emailAddress)
                             .keyboardType(.emailAddress)
@@ -400,14 +399,14 @@ struct OnboardingView: View {
                             .autocorrectionDisabled()
                             .padding(14)
                             .background(AppConstants.Colors.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                             .foregroundStyle(.white)
 
                         SecureField("Password", text: Bindable(viewModel).password)
                             .textContentType(viewModel.isSignUpMode ? .newPassword : .password)
                             .padding(14)
                             .background(AppConstants.Colors.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                             .foregroundStyle(.white)
 
                         if viewModel.isSignUpMode {
@@ -415,7 +414,7 @@ struct OnboardingView: View {
                                 .textContentType(.newPassword)
                                 .padding(14)
                                 .background(AppConstants.Colors.cardBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                                 .foregroundStyle(.white)
                         }
                     }
@@ -473,7 +472,7 @@ struct OnboardingView: View {
                 } label: {
                     Text("Browse without account")
                         .font(.subheadline)
-                        .fontWeight(.medium)
+                        .fontWeight(.semibold)
                         .foregroundStyle(AppConstants.Colors.textTertiary)
                 }
             }
@@ -488,11 +487,13 @@ struct OnboardingView: View {
         Button(action: action) {
             Text(title)
                 .font(.headline)
+                .fontWeight(.bold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(AppConstants.Colors.accent)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: AppConstants.Colors.accent.opacity(0.25), radius: 8, x: 0, y: 4)
         }
     }
 }

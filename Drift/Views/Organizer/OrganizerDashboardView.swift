@@ -24,7 +24,7 @@ struct OrganizerDashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 // Analytics cards
                 analyticsSection
 
@@ -32,6 +32,7 @@ struct OrganizerDashboardView: View {
                 eventsSection
             }
             .padding(.top, 16)
+            .padding(.bottom, 32)
         }
         .background(AppConstants.Colors.background)
         .navigationTitle("Dashboard")
@@ -47,7 +48,7 @@ struct OrganizerDashboardView: View {
                         Text("Event")
                     }
                     .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
                     .foregroundStyle(AppConstants.Colors.accent)
                 }
             }
@@ -76,28 +77,32 @@ struct OrganizerDashboardView: View {
     }
 
     private func analyticsCard(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.title2)
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(color)
+                .frame(width: 40, height: 40)
+                .background(color.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 11))
             Text(value)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
             Text(label)
                 .font(.caption)
-                .foregroundStyle(AppConstants.Colors.textSecondary)
+                .fontWeight(.medium)
+                .foregroundStyle(AppConstants.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
+        .padding(.vertical, 20)
         .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Events
 
     private var eventsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             if pendingCount > 0 {
                 sectionLabel("Pending Review (\(pendingCount))")
                 ForEach(events.filter { $0.isPending }) { event in
@@ -108,19 +113,22 @@ struct OrganizerDashboardView: View {
             sectionLabel("All Events (\(events.count))")
 
             if events.isEmpty && !isLoading {
-                VStack(spacing: 12) {
+                VStack(spacing: 14) {
                     Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 40))
+                        .font(.system(size: 36, weight: .light))
                         .foregroundStyle(AppConstants.Colors.textTertiary)
                     Text("No events yet")
                         .font(.subheadline)
+                        .fontWeight(.semibold)
                         .foregroundStyle(AppConstants.Colors.textSecondary)
                     Text("Submit your first event to get started")
                         .font(.caption)
                         .foregroundStyle(AppConstants.Colors.textTertiary)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
+                .padding(.vertical, 44)
+                .background(AppConstants.Colors.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             } else {
                 ForEach(events) { event in
                     eventRow(event)
@@ -133,15 +141,17 @@ struct OrganizerDashboardView: View {
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
             .font(.headline)
+            .fontWeight(.bold)
             .foregroundStyle(.white)
     }
 
     private func eventRow(_ event: Event) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             VStack(alignment: .center, spacing: 2) {
                 Text(event.startTime.formatted(.dateTime.month(.abbreviated)).uppercased())
                     .font(.caption2)
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
+                    .tracking(0.5)
                     .foregroundStyle(AppConstants.Colors.accent)
                 Text(event.startTime.formatted(.dateTime.day()))
                     .font(.title3)
@@ -150,18 +160,19 @@ struct OrganizerDashboardView: View {
             }
             .frame(width: 44)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(event.title)
                     .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     HStack(spacing: 3) {
                         Image(systemName: "person.2")
                             .font(.caption2)
                         Text("\(event.rsvpCount)")
                             .font(.caption)
+                            .fontWeight(.medium)
                     }
                     .foregroundStyle(AppConstants.Colors.textSecondary)
 
@@ -179,22 +190,22 @@ struct OrganizerDashboardView: View {
                     }
                 } label: {
                     Image(systemName: "star")
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color(hex: "FBBF24"))
-                        .padding(8)
+                        .frame(width: 32, height: 32)
                         .background(Color(hex: "FBBF24").opacity(0.12))
                         .clipShape(Circle())
                 }
             } else if event.isCurrentlyFeatured {
                 Image(systemName: "star.fill")
-                    .font(.caption)
+                    .font(.system(size: 12))
                     .foregroundStyle(Color(hex: "FBBF24"))
-                    .padding(8)
+                    .frame(width: 32, height: 32)
             }
         }
-        .padding(14)
+        .padding(16)
         .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private func approvalBadge(_ event: Event) -> some View {
@@ -204,7 +215,7 @@ struct OrganizerDashboardView: View {
                 .frame(width: 6, height: 6)
             Text(approvalText(event))
                 .font(.caption2)
-                .fontWeight(.medium)
+                .fontWeight(.bold)
                 .foregroundStyle(approvalColor(event))
         }
         .padding(.horizontal, 8)

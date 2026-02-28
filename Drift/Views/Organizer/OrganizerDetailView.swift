@@ -30,17 +30,19 @@ struct OrganizerDetailView: View {
 
                     // About
                     if !organizer.description.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("About")
-                                .font(.headline)
-                                .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("ABOUT")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .tracking(1)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
                             Text(organizer.description)
                                 .font(.subheadline)
                                 .foregroundStyle(AppConstants.Colors.textSecondary)
-                                .lineSpacing(4)
+                                .lineSpacing(5)
                         }
                         .padding(.horizontal, 20)
-                        .padding(.top, 20)
+                        .padding(.top, 24)
                     }
 
                     // Links
@@ -50,13 +52,15 @@ struct OrganizerDetailView: View {
 
                     // Upcoming events
                     if !events.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Upcoming Events")
-                                .font(.headline)
-                                .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("UPCOMING EVENTS")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .tracking(1)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
                                 .padding(.horizontal, 20)
 
-                            LazyVStack(spacing: 16) {
+                            LazyVStack(spacing: 18) {
                                 ForEach(events) { event in
                                     NavigationLink(value: AppDestination.event(event.id)) {
                                         EventCardView(event: event)
@@ -66,7 +70,7 @@ struct OrganizerDetailView: View {
                             }
                             .padding(.horizontal, 20)
                         }
-                        .padding(.top, 24)
+                        .padding(.top, 28)
                     }
                 }
                 .padding(.bottom, 40)
@@ -97,7 +101,7 @@ struct OrganizerDetailView: View {
                             Text("Event")
                         }
                         .font(.subheadline)
-                        .fontWeight(.semibold)
+                        .fontWeight(.bold)
                         .foregroundStyle(AppConstants.Colors.accent)
                     }
                 }
@@ -125,8 +129,9 @@ struct OrganizerDetailView: View {
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 80, height: 80)
+                            .frame(width: 88, height: 88)
                             .clipShape(Circle())
+                            .shadow(color: AppConstants.Colors.accent.opacity(0.2), radius: 12, x: 0, y: 4)
                     default:
                         logoPlaceholder(organizer)
                     }
@@ -150,71 +155,82 @@ struct OrganizerDetailView: View {
             }
 
             if let city = organizer.city {
-                HStack(spacing: 4) {
+                HStack(spacing: 5) {
                     Image(systemName: "mappin")
-                        .font(.caption)
+                        .font(.system(size: 11))
                     Text(city)
                         .font(.subheadline)
+                        .fontWeight(.medium)
                 }
                 .foregroundStyle(AppConstants.Colors.textSecondary)
             }
 
             // Dashboard / Follow buttons
-            if isOwnOrganizer {
-                NavigationLink {
-                    OrganizerDashboardView(organizer: organizer)
+            HStack(spacing: 12) {
+                if isOwnOrganizer {
+                    NavigationLink {
+                        OrganizerDashboardView(organizer: organizer)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chart.bar.fill")
+                                .font(.caption)
+                            Text("Dashboard")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 11)
+                        .background(AppConstants.Colors.accent)
+                        .clipShape(Capsule())
+                        .shadow(color: AppConstants.Colors.accent.opacity(0.25), radius: 8, x: 0, y: 4)
+                    }
+                }
+
+                Button {
+                    Task { await toggleFollow() }
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: "chart.bar.fill")
+                        Image(systemName: isFollowing ? "checkmark" : "plus")
                             .font(.caption)
-                        Text("Dashboard")
+                        Text(isFollowing ? "Following" : "Follow")
                             .font(.subheadline)
-                            .fontWeight(.semibold)
+                            .fontWeight(.bold)
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isFollowing ? AppConstants.Colors.textSecondary : .white)
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 10)
-                    .background(AppConstants.Colors.accent)
+                    .padding(.vertical, 11)
+                    .background(isFollowing ? AppConstants.Colors.cardBackground : AppConstants.Colors.accent)
                     .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(isFollowing ? AppConstants.Colors.secondaryBackground : .clear, lineWidth: 1.5)
+                    )
                 }
-            }
-
-            Button {
-                Task { await toggleFollow() }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: isFollowing ? "checkmark" : "plus")
-                        .font(.caption)
-                    Text(isFollowing ? "Following" : "Follow")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-                .foregroundStyle(isFollowing ? AppConstants.Colors.textSecondary : .white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 10)
-                .background(isFollowing ? AppConstants.Colors.cardBackground : AppConstants.Colors.accent)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule()
-                        .strokeBorder(isFollowing ? AppConstants.Colors.secondaryBackground : .clear, lineWidth: 1)
-                )
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 24)
-        .padding(.bottom, 16)
+        .padding(.bottom, 20)
     }
 
     private func logoPlaceholder(_ organizer: Organizer) -> some View {
         Circle()
-            .fill(AppConstants.Colors.accent.opacity(0.2))
-            .frame(width: 80, height: 80)
+            .fill(
+                LinearGradient(
+                    colors: [AppConstants.Colors.accent.opacity(0.3), AppConstants.Colors.accent.opacity(0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 88, height: 88)
             .overlay {
                 Text(String(organizer.name.prefix(1)))
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundStyle(AppConstants.Colors.accent)
             }
+            .shadow(color: AppConstants.Colors.accent.opacity(0.15), radius: 12, x: 0, y: 4)
     }
 
     // MARK: - Stats
@@ -222,20 +238,20 @@ struct OrganizerDetailView: View {
     private func statsBar(_ organizer: Organizer) -> some View {
         HStack(spacing: 0) {
             statItem(value: "\(followerCount)", label: "Followers")
-            Divider()
-                .frame(height: 30)
-                .background(AppConstants.Colors.secondaryBackground)
+            Rectangle()
+                .fill(AppConstants.Colors.secondaryBackground)
+                .frame(width: 1, height: 28)
             statItem(value: "\(events.count)", label: "Events")
             if organizer.isVerifiedOrganizer {
-                Divider()
-                    .frame(height: 30)
-                    .background(AppConstants.Colors.secondaryBackground)
+                Rectangle()
+                    .fill(AppConstants.Colors.secondaryBackground)
+                    .frame(width: 1, height: 28)
                 statItem(value: "Verified", label: "Status", color: Color(hex: "60A5FA"))
             }
         }
-        .padding(.vertical, 16)
+        .padding(.vertical, 18)
         .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
         .padding(.horizontal, 20)
     }
 
@@ -247,7 +263,8 @@ struct OrganizerDetailView: View {
                 .foregroundStyle(color)
             Text(label)
                 .font(.caption)
-                .foregroundStyle(AppConstants.Colors.textSecondary)
+                .fontWeight(.medium)
+                .foregroundStyle(AppConstants.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
     }
@@ -259,39 +276,55 @@ struct OrganizerDetailView: View {
             if let handle = organizer.instagramHandle, !handle.isEmpty,
                let url = URL(string: "https://instagram.com/\(handle)") {
                 Link(destination: url) {
-                    HStack {
+                    HStack(spacing: 12) {
                         Image(systemName: "camera.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color(hex: "E1306C"))
+                            .frame(width: 34, height: 34)
+                            .background(Color(hex: "E1306C").opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 9))
                         Text("@\(handle)")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white)
                         Spacer()
                         Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundStyle(AppConstants.Colors.textTertiary)
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(Color(hex: "E1306C"))
-                    .padding()
+                    .padding(14)
                     .background(AppConstants.Colors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
 
             if let website = organizer.website, !website.isEmpty,
                let url = URL(string: website) {
                 Link(destination: url) {
-                    HStack {
+                    HStack(spacing: 12) {
                         Image(systemName: "globe")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color(hex: "60A5FA"))
+                            .frame(width: 34, height: 34)
+                            .background(Color(hex: "60A5FA").opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 9))
                         Text(website.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: ""))
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white)
                         Spacer()
                         Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundStyle(AppConstants.Colors.textTertiary)
                     }
-                    .font(.subheadline)
-                    .foregroundStyle(Color(hex: "60A5FA"))
-                    .padding()
+                    .padding(14)
                     .background(AppConstants.Colors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, 24)
     }
 
     // MARK: - Data

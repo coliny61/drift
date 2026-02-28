@@ -14,7 +14,7 @@ struct EventCardView: View {
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .frame(height: 180)
+                                .frame(height: 200)
                                 .clipped()
                         case .failure:
                             gradientPlaceholder
@@ -28,10 +28,10 @@ struct EventCardView: View {
                             gradientPlaceholder
                         }
                     }
-                    .frame(height: 180)
+                    .frame(height: 200)
                     .overlay(
                         LinearGradient(
-                            colors: [.clear, .clear, Color.black.opacity(0.3)],
+                            colors: [.black.opacity(0.15), .clear, .black.opacity(0.5)],
                             startPoint: .top,
                             endPoint: .bottom
                         )
@@ -41,122 +41,148 @@ struct EventCardView: View {
                 }
 
                 // Tags overlay
-                HStack(spacing: 6) {
-                    // Category pill
-                    Text(event.categoryEnum?.displayName ?? event.category)
-                        .font(.caption)
-                        .fontWeight(.semibold)
+                VStack {
+                    HStack(spacing: 6) {
+                        // Category pill
+                        HStack(spacing: 4) {
+                            Image(systemName: categoryIcon)
+                                .font(.system(size: 9, weight: .bold))
+                            Text(event.categoryEnum?.displayName ?? event.category)
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .textCase(.uppercase)
+                                .tracking(0.3)
+                        }
                         .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(categoryColor)
+                        .padding(.vertical, 5)
+                        .background(.ultraThinMaterial)
+                        .background(categoryColor.opacity(0.4))
                         .foregroundStyle(.white)
                         .clipShape(Capsule())
 
-                    if event.isAlcoholFree {
-                        Text("Alcohol-Free")
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                        if event.isAlcoholFree {
+                            Text("AF")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .background(.ultraThinMaterial)
+                                .background(Color(hex: "34D399").opacity(0.4))
+                                .foregroundStyle(.white)
+                                .clipShape(Capsule())
+                        }
+
+                        Spacer()
+
+                        // Price badge
+                        Text(event.isFree ? "FREE" : event.priceFormatted)
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .tracking(0.5)
                             .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color(hex: "34D399"))
+                            .padding(.vertical, 5)
+                            .background(.ultraThinMaterial)
+                            .background(event.isFree ? Color(hex: "60A5FA").opacity(0.4) : Color.black.opacity(0.3))
                             .foregroundStyle(.white)
                             .clipShape(Capsule())
                     }
+                    .padding(12)
 
                     Spacer()
 
-                    // Price badge
-                    Text(event.isFree ? "FREE" : event.priceFormatted)
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(event.isFree ? Color(hex: "60A5FA") : Color(hex: "2A2A2A").opacity(0.9))
+                    // Bottom date overlay on image
+                    HStack {
+                        HStack(spacing: 6) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text(event.startTime.relativeDescription)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
                         .foregroundStyle(.white)
-                        .clipShape(Capsule())
+
+                        Spacer()
+
+                        if event.rsvpCount > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "person.2.fill")
+                                    .font(.system(size: 10))
+                                Text("\(event.rsvpCount)")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundStyle(.white.opacity(0.9))
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 12)
                 }
-                .padding(12)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .frame(height: 200)
+            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
 
             // Content
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(event.title)
-                    .font(.headline)
-                    .fontWeight(.bold)
+                    .font(.system(.headline, design: .default, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(2)
-
-                // Date and time
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .font(.caption)
-                    Text(event.startTime.relativeDescription)
-                        .font(.subheadline)
-                }
-                .foregroundStyle(Color(hex: "9CA3AF"))
 
                 // Location
                 HStack(spacing: 4) {
                     Image(systemName: "mappin")
-                        .font(.caption)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(categoryColor)
                     Text(event.locationName)
                         .font(.subheadline)
                         .lineLimit(1)
 
                     if !event.neighborhood.isEmpty {
                         Text("\u{00B7}")
+                            .fontWeight(.bold)
                         Text(event.neighborhood)
                             .font(.subheadline)
                     }
                 }
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
 
-                // Bottom row: attendees + organizer
-                HStack {
-                    // RSVP count
+                // Sponsor label
+                if let label = event.sponsorDisplayLabel {
                     HStack(spacing: 4) {
-                        Image(systemName: "person.2.fill")
-                            .font(.caption)
-                        Text("\(event.rsvpCount) going")
-                            .font(.caption)
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 9))
+                        Text(label)
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .textCase(.uppercase)
+                            .tracking(0.5)
                     }
-                    .foregroundStyle(Color(hex: "9CA3AF"))
-
-                    Spacer()
-
-                    if let label = event.sponsorDisplayLabel {
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.caption)
-                            Text(label)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundStyle(Color(hex: "FF6B35"))
-                    }
+                    .foregroundStyle(AppConstants.Colors.accent)
+                    .padding(.top, 2)
                 }
             }
-            .padding(14)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
         }
-        .background(Color(hex: "1A1A1A"))
+        .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
     }
 
     private var gradientPlaceholder: some View {
         Rectangle()
             .fill(
                 LinearGradient(
-                    colors: [categoryColor.opacity(0.6), categoryColor.opacity(0.2)],
+                    colors: [categoryColor.opacity(0.7), categoryColor.opacity(0.15)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
-            .frame(height: 180)
-            .overlay(alignment: .center) {
+            .frame(height: 200)
+            .overlay {
                 Image(systemName: categoryIcon)
-                    .font(.system(size: 40))
-                    .foregroundStyle(.white.opacity(0.3))
+                    .font(.system(size: 48, weight: .ultraLight))
+                    .foregroundStyle(.white.opacity(0.2))
             }
     }
 

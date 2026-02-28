@@ -4,26 +4,31 @@ struct ActivityItemView: View {
     let item: ActivityFeedItem
 
     var body: some View {
-        HStack(spacing: 12) {
-            AvatarView(url: item.actor?.avatarUrl, size: 40, fallbackInitials: "?")
+        HStack(spacing: 14) {
+            AvatarView(url: item.actor?.avatarUrl, size: 44, fallbackInitials: "?")
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(activityText)
                     .font(.subheadline)
                     .foregroundStyle(.white)
+                    .lineLimit(2)
 
                 Text(item.createdAt.relativeDescription)
                     .font(.caption)
-                    .foregroundStyle(Color(hex: "9CA3AF"))
+                    .foregroundStyle(AppConstants.Colors.textTertiary)
             }
 
             Spacer()
 
             Image(systemName: actionIcon)
-                .foregroundStyle(Color(hex: "FF6B35"))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(actionColor)
+                .frame(width: 36, height: 36)
+                .background(actionColor.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .padding(.horizontal)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
     }
 
     private var activityText: AttributedString {
@@ -56,6 +61,16 @@ struct ActivityItemView: View {
         case "photo_upload": return "photo"
         case "new_event": return "calendar.badge.plus"
         default: return "bell"
+        }
+    }
+
+    private var actionColor: Color {
+        switch item.actionType {
+        case "rsvp": return AppConstants.Colors.success
+        case "follow": return Color(hex: "60A5FA")
+        case "photo_upload": return Color(hex: "EC407A")
+        case "new_event": return AppConstants.Colors.accent
+        default: return AppConstants.Colors.textSecondary
         }
     }
 }

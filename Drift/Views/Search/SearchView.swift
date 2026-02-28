@@ -8,10 +8,11 @@ struct SearchView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Search bar
-                HStack(spacing: 12) {
-                    HStack(spacing: 8) {
+                HStack(spacing: 10) {
+                    HStack(spacing: 10) {
                         Image(systemName: "magnifyingglass")
-                            .foregroundStyle(Color(hex: "9CA3AF"))
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(AppConstants.Colors.textTertiary)
                         TextField("Search events, places, vibes...", text: Bindable(viewModel).query)
                             .foregroundStyle(.white)
                             .focused($isSearchFocused)
@@ -25,24 +26,29 @@ struct SearchView: View {
                                 viewModel.results = []
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(Color(hex: "9CA3AF"))
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
                             }
                         }
                     }
-                    .padding(12)
-                    .background(Color(hex: "1A1A1A"))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(13)
+                    .background(AppConstants.Colors.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
 
                     // Filter button
                     Button {
                         viewModel.showFilters = true
                     } label: {
                         Image(systemName: "slider.horizontal.3")
-                            .font(.body)
-                            .foregroundStyle(hasActiveFilters ? Color(hex: "FF6B35") : Color(hex: "9CA3AF"))
-                            .padding(12)
-                            .background(Color(hex: "1A1A1A"))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(hasActiveFilters ? AppConstants.Colors.accent : AppConstants.Colors.textSecondary)
+                            .frame(width: 44, height: 44)
+                            .background(AppConstants.Colors.cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .strokeBorder(hasActiveFilters ? AppConstants.Colors.accent.opacity(0.3) : .clear, lineWidth: 1.5)
+                            )
                     }
                 }
                 .padding(.horizontal)
@@ -53,36 +59,41 @@ struct SearchView: View {
                     if !viewModel.recentSearches.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Recent")
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
+                                Text("RECENT")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .tracking(1)
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
                                 Spacer()
                                 Button("Clear") {
                                     viewModel.clearRecentSearches()
                                 }
-                                .font(.subheadline)
-                                .foregroundStyle(Color(hex: "9CA3AF"))
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
                             }
                             .padding(.horizontal)
-                            .padding(.top, 20)
+                            .padding(.top, 24)
 
                             ForEach(viewModel.recentSearches, id: \.self) { search in
                                 Button {
                                     viewModel.query = search
                                     Task { await viewModel.search() }
                                 } label: {
-                                    HStack(spacing: 10) {
+                                    HStack(spacing: 12) {
                                         Image(systemName: "clock.arrow.circlepath")
-                                            .foregroundStyle(Color(hex: "9CA3AF"))
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(AppConstants.Colors.textTertiary)
                                         Text(search)
+                                            .font(.subheadline)
                                             .foregroundStyle(.white)
                                         Spacer()
                                         Image(systemName: "arrow.up.left")
-                                            .font(.caption)
-                                            .foregroundStyle(Color(hex: "9CA3AF"))
+                                            .font(.system(size: 11))
+                                            .foregroundStyle(AppConstants.Colors.textTertiary)
                                     }
                                     .padding(.horizontal)
-                                    .padding(.vertical, 8)
+                                    .padding(.vertical, 10)
                                 }
                             }
                         }
@@ -103,7 +114,7 @@ struct SearchView: View {
                     )
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 16) {
+                        LazyVStack(spacing: 18) {
                             ForEach(viewModel.results) { event in
                                 NavigationLink(value: AppDestination.event(event.id)) {
                                     EventCardView(event: event)
@@ -118,7 +129,7 @@ struct SearchView: View {
 
                 Spacer()
             }
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)

@@ -8,49 +8,62 @@ struct RSVPButtonView: View {
     let onInterested: () -> Void
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             HStack(spacing: 12) {
+                // Going button
                 Button(action: onGoing) {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Image(systemName: isGoing ? "checkmark.circle.fill" : "hand.raised.fill")
+                            .font(.system(size: 15, weight: .semibold))
                         Text(isGoing ? "Going!" : "I'm Going")
+                            .fontWeight(.bold)
                     }
                     .font(.subheadline)
-                    .fontWeight(.semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(isGoing ? Color(hex: "34D399") : Color(hex: "FF6B35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.vertical, 16)
+                    .background(
+                        isGoing
+                            ? AppConstants.Colors.success
+                            : AppConstants.Colors.accent
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .shadow(
+                        color: (isGoing ? AppConstants.Colors.success : AppConstants.Colors.accent).opacity(0.3),
+                        radius: 8, x: 0, y: 4
+                    )
                 }
 
+                // Interested button
                 Button(action: onInterested) {
                     HStack(spacing: 6) {
                         Image(systemName: isInterested ? "star.fill" : "star")
+                            .font(.system(size: 14, weight: .semibold))
                         Text("Interested")
+                            .fontWeight(.semibold)
                     }
                     .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(isInterested ? Color(hex: "FFD54F") : Color(hex: "9CA3AF"))
+                    .foregroundStyle(isInterested ? Color(hex: "FFD54F") : AppConstants.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color(hex: "2A2A2A"))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.vertical, 16)
+                    .background(AppConstants.Colors.secondaryBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(isInterested ? Color(hex: "FFD54F").opacity(0.5) : .clear, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(isInterested ? Color(hex: "FFD54F").opacity(0.4) : .clear, lineWidth: 1.5)
                     )
                 }
             }
 
             if attendeeCount > 0 {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Image(systemName: "person.2.fill")
-                        .font(.caption2)
+                        .font(.system(size: 10))
                     Text("\(attendeeCount) going")
                         .font(.caption)
+                        .fontWeight(.medium)
                 }
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
             }
         }
     }

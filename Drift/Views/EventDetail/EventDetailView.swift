@@ -32,7 +32,7 @@ struct EventDetailView: View {
                                     image
                                         .resizable()
                                         .scaledToFill()
-                                        .frame(height: 260)
+                                        .frame(height: 300)
                                         .clipped()
                                 case .failure:
                                     heroGradientPlaceholder(event: event)
@@ -46,10 +46,10 @@ struct EventDetailView: View {
                                     heroGradientPlaceholder(event: event)
                                 }
                             }
-                            .frame(height: 260)
+                            .frame(height: 300)
                             .overlay(
                                 LinearGradient(
-                                    colors: [.black.opacity(0.3), .clear, .black.opacity(0.4)],
+                                    colors: [.black.opacity(0.3), .clear, .black.opacity(0.6)],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 )
@@ -58,76 +58,132 @@ struct EventDetailView: View {
                             heroGradientPlaceholder(event: event)
                         }
 
-                        // Tags
-                        HStack(spacing: 6) {
-                            Text(event.categoryEnum?.displayName ?? event.category)
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(categoryColor)
+                        // Tags overlay
+                        VStack {
+                            HStack(spacing: 6) {
+                                // Category pill
+                                HStack(spacing: 4) {
+                                    Image(systemName: event.categoryEnum?.icon ?? "star")
+                                        .font(.system(size: 10, weight: .bold))
+                                    Text(event.categoryEnum?.displayName ?? event.category)
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .textCase(.uppercase)
+                                        .tracking(0.3)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(.ultraThinMaterial)
+                                .background(categoryColor.opacity(0.4))
                                 .foregroundStyle(.white)
                                 .clipShape(Capsule())
 
-                            if event.isAlcoholFree {
-                                Text("Alcohol-Free")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 4)
-                                    .background(Color(hex: "34D399"))
-                                    .foregroundStyle(.white)
-                                    .clipShape(Capsule())
-                            }
+                                if event.isAlcoholFree {
+                                    Text("AF")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(.ultraThinMaterial)
+                                        .background(AppConstants.Colors.alcoholFreeBadge.opacity(0.4))
+                                        .foregroundStyle(.white)
+                                        .clipShape(Capsule())
+                                }
 
-                            ForEach(event.tags.filter { $0 != "alcohol-free" }.prefix(2), id: \.self) { tag in
-                                Text(tag.replacingOccurrences(of: "-", with: " ").capitalized)
+                                ForEach(event.tags.filter { $0 != "alcohol-free" }.prefix(2), id: \.self) { tag in
+                                    Text(tag.replacingOccurrences(of: "-", with: " ").capitalized)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(.ultraThinMaterial)
+                                        .foregroundStyle(.white)
+                                        .clipShape(Capsule())
+                                }
+                            }
+                            .padding()
+                            .padding(.top, 44)
+
+                            Spacer()
+
+                            // Bottom overlay — price badge
+                            HStack {
+                                Spacer()
+                                Text(event.isFree ? "FREE" : event.priceFormatted)
                                     .font(.caption)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 4)
-                                    .background(Color(hex: "2A2A2A").opacity(0.8))
+                                    .fontWeight(.bold)
+                                    .tracking(0.5)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 7)
+                                    .background(.ultraThinMaterial)
+                                    .background(event.isFree ? AppConstants.Colors.freeBadge.opacity(0.4) : Color.black.opacity(0.3))
                                     .foregroundStyle(.white)
                                     .clipShape(Capsule())
                             }
+                            .padding(16)
                         }
-                        .padding()
-                        .padding(.top, 40)
                     }
+                    .frame(height: 300)
 
-                    VStack(alignment: .leading, spacing: 20) {
+                    // Content
+                    VStack(alignment: .leading, spacing: 24) {
                         // Title
                         Text(event.title)
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
+                            .padding(.top, 4)
 
-                        // Date & Time
+                        // Date & Time + Add to Calendar
                         HStack(spacing: 12) {
-                            infoRow(icon: "calendar", title: event.startTime.relativeDescription)
+                            HStack(spacing: 10) {
+                                Image(systemName: "calendar")
+                                    .font(.body)
+                                    .foregroundStyle(AppConstants.Colors.accent)
+                                    .frame(width: 22)
+                                Text(event.startTime.relativeDescription)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.white)
+                            }
                             Spacer()
-                            // Add to Calendar
                             Button {
                                 Task { await viewModel.addToCalendar() }
                             } label: {
                                 HStack(spacing: 4) {
                                     Image(systemName: viewModel.calendarAdded ? "checkmark.circle.fill" : "plus.circle")
-                                    Text(viewModel.calendarAdded ? "Added" : "Add to Calendar")
+                                    Text(viewModel.calendarAdded ? "Added" : "Add to Cal")
                                 }
                                 .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(viewModel.calendarAdded ? Color(hex: "34D399") : Color(hex: "FF6B35"))
+                                .fontWeight(.semibold)
+                                .foregroundStyle(viewModel.calendarAdded ? AppConstants.Colors.success : AppConstants.Colors.accent)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    (viewModel.calendarAdded ? AppConstants.Colors.success : AppConstants.Colors.accent).opacity(0.12)
+                                )
+                                .clipShape(Capsule())
                             }
                         }
 
                         // Location
-                        VStack(alignment: .leading, spacing: 8) {
-                            infoRow(icon: "mappin", title: event.locationName)
-                            Text(event.locationAddress)
-                                .font(.subheadline)
-                                .foregroundStyle(Color(hex: "9CA3AF"))
-                                .padding(.leading, 28)
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "mappin")
+                                    .font(.body)
+                                    .foregroundStyle(AppConstants.Colors.accent)
+                                    .frame(width: 22)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(event.locationName)
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.white)
+                                    Text(event.locationAddress)
+                                        .font(.caption)
+                                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                                }
+                            }
 
-                            // Get Directions button
                             Button {
                                 openMaps(event: event)
                             } label: {
@@ -136,9 +192,9 @@ struct EventDetailView: View {
                                     Text("Get Directions")
                                 }
                                 .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(Color(hex: "FF6B35"))
-                                .padding(.leading, 28)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(AppConstants.Colors.accent)
+                                .padding(.leading, 32)
                             }
                         }
 
@@ -151,32 +207,34 @@ struct EventDetailView: View {
                             .tint(categoryColor)
                         }
                         .frame(height: 160)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
                         .allowsHitTesting(false)
 
-                        Divider()
-                            .background(Color(hex: "2A2A2A"))
-
-                        // Price & Attendees
+                        // Price & Attendees row
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Price")
-                                    .font(.caption)
-                                    .foregroundStyle(Color(hex: "9CA3AF"))
+                                Text("PRICE")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .tracking(0.8)
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
                                 Text(event.isFree ? "Free" : event.priceFormatted)
                                     .font(.title3)
                                     .fontWeight(.bold)
-                                    .foregroundStyle(event.isFree ? Color(hex: "60A5FA") : .white)
+                                    .foregroundStyle(event.isFree ? AppConstants.Colors.freeBadge : .white)
                             }
 
                             Spacer()
 
                             VStack(alignment: .trailing, spacing: 4) {
-                                Text("Attending")
-                                    .font(.caption)
-                                    .foregroundStyle(Color(hex: "9CA3AF"))
-                                HStack(spacing: 4) {
+                                Text("ATTENDING")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .tracking(0.8)
+                                    .foregroundStyle(AppConstants.Colors.textTertiary)
+                                HStack(spacing: 6) {
                                     Image(systemName: "person.2.fill")
+                                        .font(.system(size: 14))
                                     Text("\(viewModel.attendeeCount)")
                                 }
                                 .font(.title3)
@@ -184,16 +242,20 @@ struct EventDetailView: View {
                                 .foregroundStyle(categoryColor)
                             }
                         }
+                        .padding(16)
+                        .background(AppConstants.Colors.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
 
                         // Ticket button
                         if let ticketUrlString = event.ticketUrl, let ticketUrl = URL(string: ticketUrlString) {
                             Button {
                                 showTicketSafari = true
                             } label: {
-                                HStack(spacing: 8) {
+                                HStack(spacing: 10) {
                                     Image(systemName: "ticket.fill")
+                                        .font(.system(size: 16))
                                     Text("Get Tickets")
-                                        .fontWeight(.semibold)
+                                        .fontWeight(.bold)
                                     Spacer()
                                     Text(event.isFree ? "Free" : event.priceFormatted)
                                         .fontWeight(.bold)
@@ -205,9 +267,9 @@ struct EventDetailView: View {
                                 .padding(16)
                                 .background(AppConstants.Colors.accent)
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .shadow(color: AppConstants.Colors.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                             }
                             .fullScreenCover(isPresented: $showTicketSafari) {
-                                // Auto-RSVP on dismiss
                                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                                 Task { await viewModel.toggleRSVP(userId: userId, status: .going) }
                             } content: {
@@ -218,11 +280,8 @@ struct EventDetailView: View {
 
                         // Organizer
                         if let organizer {
-                            Divider()
-                                .background(Color(hex: "2A2A2A"))
-
                             NavigationLink(value: AppDestination.organizer(organizer.id)) {
-                                HStack(spacing: 12) {
+                                HStack(spacing: 14) {
                                     if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
                                         AsyncImage(url: url) { phase in
                                             switch phase {
@@ -230,7 +289,7 @@ struct EventDetailView: View {
                                                 image
                                                     .resizable()
                                                     .scaledToFill()
-                                                    .frame(width: 44, height: 44)
+                                                    .frame(width: 48, height: 48)
                                                     .clipShape(Circle())
                                             default:
                                                 organizerLogoPlaceholder(organizer)
@@ -240,11 +299,11 @@ struct EventDetailView: View {
                                         organizerLogoPlaceholder(organizer)
                                     }
 
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        HStack(spacing: 4) {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        HStack(spacing: 5) {
                                             Text(organizer.name)
                                                 .font(.subheadline)
-                                                .fontWeight(.semibold)
+                                                .fontWeight(.bold)
                                                 .foregroundStyle(.white)
                                             if organizer.isVerifiedOrganizer {
                                                 Image(systemName: "checkmark.seal.fill")
@@ -254,108 +313,88 @@ struct EventDetailView: View {
                                         }
                                         Text("Organizer")
                                             .font(.caption)
-                                            .foregroundStyle(Color(hex: "9CA3AF"))
+                                            .foregroundStyle(AppConstants.Colors.textTertiary)
                                     }
 
                                     Spacer()
 
                                     Image(systemName: "chevron.right")
                                         .font(.caption)
-                                        .foregroundStyle(Color(hex: "9CA3AF"))
+                                        .foregroundStyle(AppConstants.Colors.textTertiary)
                                 }
-                                .padding(14)
-                                .background(Color(hex: "1A1A1A"))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .padding(16)
+                                .background(AppConstants.Colors.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                             }
                             .buttonStyle(.plain)
                         }
 
-                        Divider()
-                            .background(Color(hex: "2A2A2A"))
+                        // About
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("ABOUT")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .tracking(1)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
 
-                        // Description
-                        Text("About")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-
-                        Text(event.description)
-                            .font(.body)
-                            .foregroundStyle(Color(hex: "9CA3AF"))
-                            .lineSpacing(4)
+                            Text(event.description)
+                                .font(.body)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
+                                .lineSpacing(5)
+                        }
 
                         // External link
                         if let urlString = event.externalUrl, let url = URL(string: urlString) {
                             Link(destination: url) {
-                                HStack {
+                                HStack(spacing: 10) {
                                     Image(systemName: "link")
+                                        .font(.system(size: 14, weight: .semibold))
                                     Text("View on organizer's site")
+                                        .fontWeight(.medium)
                                     Spacer()
                                     Image(systemName: "arrow.up.right")
+                                        .font(.caption)
                                 }
                                 .font(.subheadline)
-                                .foregroundStyle(Color(hex: "FF6B35"))
-                                .padding()
-                                .background(Color(hex: "2A2A2A"))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .foregroundStyle(AppConstants.Colors.accent)
+                                .padding(16)
+                                .background(AppConstants.Colors.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
                             }
                         }
 
-                        // Photo Recap
-                        NavigationLink {
-                            EventRecapView(eventId: event.id)
-                        } label: {
-                            HStack {
-                                Image(systemName: "photo.on.rectangle.angled")
-                                Text("Photo Recap")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(AppConstants.Colors.textTertiary)
+                        // Photo Recap & Chat
+                        VStack(spacing: 10) {
+                            NavigationLink {
+                                EventRecapView(eventId: event.id)
+                            } label: {
+                                detailActionRow(icon: "photo.on.rectangle.angled", title: "Photo Recap", color: Color(hex: "EC407A"))
                             }
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.white)
-                            .padding()
-                            .background(AppConstants.Colors.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                            NavigationLink {
+                                EventChatView(eventId: event.id)
+                            } label: {
+                                detailActionRow(icon: "bubble.left.and.bubble.right.fill", title: "Event Chat", color: Color(hex: "60A5FA"))
+                            }
                         }
 
-                        // Chat
-                        NavigationLink {
-                            EventChatView(eventId: event.id)
-                        } label: {
-                            HStack {
-                                Image(systemName: "bubble.left.and.bubble.right.fill")
-                                Text("Event Chat")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(AppConstants.Colors.textTertiary)
-                            }
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.white)
-                            .padding()
-                            .background(AppConstants.Colors.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-
-                        // Share button
+                        // Share
                         ShareLink(
                             item: event.externalUrl ?? "Check out \(event.title) on Drift!",
                             preview: SharePreview(event.title)
                         ) {
-                            HStack {
+                            HStack(spacing: 10) {
                                 Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 14, weight: .semibold))
                                 Text("Share Event")
+                                    .fontWeight(.semibold)
                             }
                             .font(.subheadline)
-                            .fontWeight(.medium)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(hex: "2A2A2A"))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(16)
+                            .background(AppConstants.Colors.secondaryBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
                         // Check-in
@@ -367,7 +406,7 @@ struct EventDetailView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: viewModel.isCheckedIn ? "checkmark.circle.fill" : "location.fill")
                                     Text(viewModel.isCheckedIn ? "Checked In" : "Check In")
-                                        .fontWeight(.semibold)
+                                        .fontWeight(.bold)
                                 }
                                 .font(.subheadline)
                                 .foregroundStyle(.white)
@@ -375,6 +414,10 @@ struct EventDetailView: View {
                                 .padding(16)
                                 .background(viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE"))
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .shadow(
+                                    color: (viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE")).opacity(0.3),
+                                    radius: 8, x: 0, y: 4
+                                )
                             }
                             .disabled(viewModel.isCheckedIn)
                         }
@@ -395,15 +438,16 @@ struct EventDetailView: View {
                         )
                     }
                     .padding(20)
+                    .padding(.bottom, 16)
                 }
             } else if viewModel.isLoading {
                 ProgressView()
-                    .tint(Color(hex: "FF6B35"))
+                    .tint(AppConstants.Colors.accent)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.top, 200)
             }
         }
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationDestination(for: AppDestination.self) { destination in
@@ -423,32 +467,56 @@ struct EventDetailView: View {
         }
     }
 
+    // MARK: - Helpers
+
+    private func detailActionRow(icon: String, title: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 34, height: 34)
+                .background(color.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 9))
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(AppConstants.Colors.textTertiary)
+        }
+        .padding(14)
+        .background(AppConstants.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
     private func heroGradientPlaceholder(event: Event) -> some View {
         Rectangle()
             .fill(
                 LinearGradient(
-                    colors: [categoryColor.opacity(0.7), categoryColor.opacity(0.2)],
+                    colors: [categoryColor.opacity(0.7), categoryColor.opacity(0.15)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
-            .frame(height: 260)
+            .frame(height: 300)
             .overlay {
                 Image(systemName: event.categoryEnum?.icon ?? "star")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.white.opacity(0.2))
+                    .font(.system(size: 64, weight: .ultraLight))
+                    .foregroundStyle(.white.opacity(0.15))
             }
     }
 
     private func infoRow(icon: String, title: String) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(Color(hex: "FF6B35"))
-                .frame(width: 20)
+                .foregroundStyle(AppConstants.Colors.accent)
+                .frame(width: 22)
             Text(title)
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .foregroundStyle(.white)
         }
     }
@@ -463,8 +531,14 @@ struct EventDetailView: View {
 
     private func organizerLogoPlaceholder(_ organizer: Organizer) -> some View {
         Circle()
-            .fill(AppConstants.Colors.accent.opacity(0.2))
-            .frame(width: 44, height: 44)
+            .fill(
+                LinearGradient(
+                    colors: [AppConstants.Colors.accent.opacity(0.3), AppConstants.Colors.accent.opacity(0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 48, height: 48)
             .overlay {
                 Text(String(organizer.name.prefix(1)))
                     .font(.headline)
