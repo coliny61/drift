@@ -29,6 +29,7 @@ final class NotificationService {
     // MARK: - Event Reminders
 
     func scheduleEventReminder(event: Event, minutesBefore: Int = 60) async {
+        guard UserDefaults.standard.bool(forKey: "drift_notify_reminders") else { return }
         if !isAuthorized {
             let granted = await requestPermission()
             guard granted else { return }

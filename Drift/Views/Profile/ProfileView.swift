@@ -232,6 +232,10 @@ struct ProfileView: View {
             .sheet(isPresented: $showEditProfile) {
                 EditProfileView()
             }
+            .refreshable {
+                let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                await profileViewModel.loadProfile(userId: userId, currentUserId: userId)
+            }
             .task {
                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                 await profileViewModel.loadProfile(userId: userId, currentUserId: userId)

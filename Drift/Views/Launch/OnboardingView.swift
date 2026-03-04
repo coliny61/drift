@@ -2,6 +2,8 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(AuthViewModel.self) private var viewModel
+    @Environment(LocationManager.self) private var locationManager
+    @Environment(NotificationService.self) private var notificationService
     var onDismiss: () -> Void
 
     private let totalSteps = AuthViewModel.OnboardingStep.allCases.count
@@ -307,6 +309,8 @@ struct OnboardingView: View {
 
             VStack(spacing: 14) {
                 primaryButton("Enable & Continue") {
+                    locationManager.requestPermission()
+                    Task { await notificationService.requestPermission() }
                     viewModel.nextOnboardingStep()
                 }
 
@@ -419,6 +423,19 @@ struct OnboardingView: View {
                         }
                     }
                     .padding(.horizontal, 24)
+                    .disabled(viewModel.isLoading)
+
+                    if viewModel.resetEmailSent {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(AppConstants.Colors.success)
+                            Text("Reset link sent — check your email")
+                                .foregroundStyle(AppConstants.Colors.success)
+                        }
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 24)
+                    }
 
                     if let error = viewModel.error {
                         Text(error)
@@ -428,6 +445,7 @@ struct OnboardingView: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
 
             // Bottom actions
             VStack(spacing: 16) {
@@ -457,6 +475,7 @@ struct OnboardingView: View {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         viewModel.isSignUpMode.toggle()
                         viewModel.error = nil
+                        viewModel.resetEmailSent = false
                     }
                 } label: {
                     Text(viewModel.isSignUpMode
@@ -464,6 +483,18 @@ struct OnboardingView: View {
                          : "Don't have an account? **Sign Up**")
                         .font(.subheadline)
                         .foregroundStyle(AppConstants.Colors.textSecondary)
+                }
+
+                if !viewModel.isSignUpMode {
+                    Button {
+                        Task { await viewModel.sendPasswordReset() }
+                    } label: {
+                        Text("Forgot Password?")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(AppConstants.Colors.accent)
+                    }
+                    .disabled(viewModel.isLoading)
                 }
 
                 Button {

@@ -37,9 +37,13 @@ final class DiscoverViewModel {
 
     func loadEvents() async {
         isLoading = true
+        error = nil
         await eventService.fetchEvents()
         events = eventService.events
         featuredEvents = eventService.featuredEvents
+        if events.isEmpty && eventService.error != nil {
+            error = eventService.error
+        }
         applyFilters()
         isLoading = false
     }

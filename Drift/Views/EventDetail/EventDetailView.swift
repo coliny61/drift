@@ -15,13 +15,44 @@ struct EventDetailView: View {
     @Environment(EventDetailViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(OrganizerService.self) private var organizerService
+    @Environment(LocationManager.self) private var locationManager
     @Environment(\.dismiss) private var dismiss
     @State private var organizer: Organizer?
     @State private var showTicketSafari = false
 
     var body: some View {
         ScrollView {
-            if let event = viewModel.event {
+            if viewModel.isLoading && viewModel.event == nil {
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .tint(AppConstants.Colors.accent)
+                    Text("Loading event...")
+                        .font(.subheadline)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 120)
+            } else if viewModel.loadError {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 40, weight: .light))
+                        .foregroundStyle(AppConstants.Colors.textTertiary)
+                    Text("Event not found")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    Text("This event may have been removed or is no longer available.")
+                        .font(.subheadline)
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                    Button("Go Back") { dismiss() }
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(AppConstants.Colors.accent)
+                }
+                .padding(.horizontal, 32)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 120)
+            } else if let event = viewModel.event {
                 VStack(alignment: .leading, spacing: 0) {
                     // Hero image
                     ZStack(alignment: .topLeading) {
@@ -399,27 +430,28 @@ struct EventDetailView: View {
 
                         // Check-in
                         if viewModel.canCheckIn {
+                            let nearEvent = viewModel.isNearEvent(locationManager: locationManager)
                             Button {
                                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                                 Task { await viewModel.checkIn(userId: userId) }
                             } label: {
                                 HStack(spacing: 8) {
-                                    Image(systemName: viewModel.isCheckedIn ? "checkmark.circle.fill" : "location.fill")
-                                    Text(viewModel.isCheckedIn ? "Checked In" : "Check In")
+                                    Image(systemName: viewModel.isCheckedIn ? "checkmark.circle.fill" : (nearEvent ? "location.fill" : "location.slash"))
+                                    Text(viewModel.isCheckedIn ? "Checked In" : (nearEvent ? "Check In" : "Too far to check in"))
                                         .fontWeight(.bold)
                                 }
                                 .font(.subheadline)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(16)
-                                .background(viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE"))
+                                .background(viewModel.isCheckedIn ? AppConstants.Colors.success : (nearEvent ? Color(hex: "7B68EE") : AppConstants.Colors.secondaryBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                                 .shadow(
-                                    color: (viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE")).opacity(0.3),
+                                    color: (viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE")).opacity(nearEvent ? 0.3 : 0),
                                     radius: 8, x: 0, y: 4
                                 )
                             }
-                            .disabled(viewModel.isCheckedIn)
+                            .disabled(viewModel.isCheckedIn || !nearEvent)
                         }
 
                         // RSVP

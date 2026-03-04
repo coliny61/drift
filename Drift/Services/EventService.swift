@@ -4,6 +4,7 @@ import Supabase
 @Observable
 final class EventService {
     private let client: SupabaseClient
+    var supabaseClient: SupabaseClient { client }
 
     var events: [Event] = []
     var featuredEvents: [Event] = []

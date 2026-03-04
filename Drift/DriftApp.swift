@@ -87,7 +87,6 @@ struct DriftApp: App {
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()
-                    locationManager.requestPermission()
                 }
         }
     }

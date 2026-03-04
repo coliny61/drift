@@ -52,6 +52,10 @@ final class AuthService {
         await fetchProfile(userId: session.user.id)
     }
 
+    func resetPassword(email: String) async throws {
+        try await client.auth.resetPasswordForEmail(email)
+    }
+
     func signOut() async throws {
         try await client.auth.signOut()
         currentUser = nil
@@ -85,5 +89,9 @@ final class AuthService {
             .eq("id", value: profile.id.uuidString)
             .execute()
         currentProfile = profile
+    }
+
+    func uploadAvatar(userId: UUID, imageData: Data) async throws -> String {
+        try await StorageService.uploadAvatar(client: client, userId: userId, imageData: imageData)
     }
 }

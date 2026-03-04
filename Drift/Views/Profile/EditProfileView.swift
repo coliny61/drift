@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct EditProfileView: View {
     @Environment(AuthViewModel.self) private var authViewModel
@@ -8,6 +9,9 @@ struct EditProfileView: View {
     @State private var bio = ""
     @State private var selectedInterests: Set<Category> = []
     @State private var isSaving = false
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var avatarData: Data?
+    @State private var isUploadingAvatar = false
 
     var body: some View {
         NavigationStack {
@@ -15,16 +19,56 @@ struct EditProfileView: View {
                 VStack(spacing: 24) {
                     // Avatar
                     VStack(spacing: 8) {
-                        AvatarView(
-                            url: authViewModel.currentProfile?.avatarUrl,
-                            size: 80,
-                            fallbackInitials: String(displayName.prefix(1))
-                        )
-                        Button("Change Photo") {}
-                            .font(.subheadline)
-                            .foregroundStyle(Color(hex: "FF6B35"))
+                        ZStack {
+                            if let data = avatarData, let uiImage = UIImage(data: data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(Circle())
+                            } else {
+                                AvatarView(
+                                    url: authViewModel.currentProfile?.avatarUrl,
+                                    size: 80,
+                                    fallbackInitials: String(displayName.prefix(1))
+                                )
+                            }
+
+                            if isUploadingAvatar {
+                                Circle()
+                                    .fill(.black.opacity(0.5))
+                                    .frame(width: 80, height: 80)
+                                    .overlay {
+                                        ProgressView()
+                                            .tint(.white)
+                                    }
+                            }
+                        }
+
+                        PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                            Text("Change Photo")
+                                .font(.subheadline)
+                                .foregroundStyle(AppConstants.Colors.accent)
+                        }
+                        .disabled(isUploadingAvatar)
                     }
                     .padding(.top, 20)
+                    .onChange(of: selectedPhoto) { _, newItem in
+                        guard let newItem else { return }
+                        Task {
+                            if let data = try? await newItem.loadTransferable(type: Data.self) {
+                                avatarData = data
+                                isUploadingAvatar = true
+                                do {
+                                    _ = try await authViewModel.uploadAvatar(imageData: data)
+                                } catch {
+                                    // Revert preview on failure
+                                    avatarData = nil
+                                }
+                                isUploadingAvatar = false
+                            }
+                        }
+                    }
 
                     // Fields
                     VStack(spacing: 16) {
@@ -34,11 +78,11 @@ struct EditProfileView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Bio")
                                 .font(.subheadline)
-                                .foregroundStyle(Color(hex: "9CA3AF"))
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
                             TextEditor(text: $bio)
                                 .frame(height: 80)
                                 .padding(8)
-                                .background(Color(hex: "1A1A1A"))
+                                .background(AppConstants.Colors.cardBackground)
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                 .foregroundStyle(.white)
                                 .scrollContentBackground(.hidden)
@@ -69,8 +113,8 @@ struct EditProfileView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
-                                    .background(isSelected ? Color(hex: category.color).opacity(0.2) : Color(hex: "2A2A2A"))
-                                    .foregroundStyle(isSelected ? Color(hex: category.color) : Color(hex: "9CA3AF"))
+                                    .background(isSelected ? Color(hex: category.color).opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                    .foregroundStyle(isSelected ? Color(hex: category.color) : AppConstants.Colors.textSecondary)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                 }
                             }
@@ -79,14 +123,15 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .background(Color(hex: "0A0A0A"))
+            .scrollDismissesKeyboard(.interactively)
+            .background(AppConstants.Colors.background)
             .navigationTitle("Edit Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Color(hex: "9CA3AF"))
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
@@ -113,8 +158,8 @@ struct EditProfileView: View {
                         }
                     }
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color(hex: "FF6B35"))
-                    .disabled(isSaving)
+                    .foregroundStyle(AppConstants.Colors.accent)
+                    .disabled(isSaving || isUploadingAvatar)
                 }
             }
             .onAppear {
@@ -133,10 +178,10 @@ struct EditProfileView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
             TextField(title, text: text)
                 .padding(12)
-                .background(Color(hex: "1A1A1A"))
+                .background(AppConstants.Colors.cardBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .foregroundStyle(.white)
         }

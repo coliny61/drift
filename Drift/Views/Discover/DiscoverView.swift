@@ -23,18 +23,50 @@ struct DiscoverView: View {
                         featuredCarousel
                     }
 
-                    // Event cards
-                    LazyVStack(spacing: 20) {
-                        ForEach(viewModel.filteredEvents) { event in
-                            NavigationLink(value: AppDestination.event(event.id)) {
-                                EventCardView(event: event)
-                            }
-                            .buttonStyle(.plain)
+                    if viewModel.isLoading && viewModel.events.isEmpty {
+                        ProgressView()
+                            .tint(AppConstants.Colors.accent)
+                            .padding(.top, 60)
+                    } else if viewModel.error != nil && viewModel.events.isEmpty {
+                        VStack(spacing: 14) {
+                            Image(systemName: "wifi.slash")
+                                .font(.system(size: 36, weight: .light))
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                            Text("Couldn't load events")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                            Text("Check your connection and pull to refresh")
+                                .font(.subheadline)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
                         }
+                        .padding(.top, 60)
+                    } else if viewModel.filteredEvents.isEmpty {
+                        VStack(spacing: 14) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 36, weight: .light))
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                            Text("No events found")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                            Text("Try a different category or feed")
+                                .font(.subheadline)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
+                        }
+                        .padding(.top, 60)
+                    } else {
+                        // Event cards
+                        LazyVStack(spacing: 20) {
+                            ForEach(viewModel.filteredEvents) { event in
+                                NavigationLink(value: AppDestination.event(event.id)) {
+                                    EventCardView(event: event)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                        .padding(.bottom, 32)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 20)
-                    .padding(.bottom, 32)
                 }
             }
             .background(AppConstants.Colors.background)

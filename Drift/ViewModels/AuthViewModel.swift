@@ -148,6 +148,26 @@ final class AuthViewModel {
         isLoading = false
     }
 
+    // MARK: - Password Reset
+
+    var resetEmailSent = false
+
+    func sendPasswordReset() async {
+        guard !email.isEmpty else {
+            error = "Enter your email address"
+            return
+        }
+        isLoading = true
+        error = nil
+        do {
+            try await authService.resetPassword(email: email)
+            resetEmailSent = true
+        } catch {
+            self.error = "Could not send reset email. Check your email address and try again."
+        }
+        isLoading = false
+    }
+
     // MARK: - Apple Sign In
 
     func handleSignInWithApple(_ result: Result<ASAuthorization, Error>) async {
@@ -204,6 +224,23 @@ final class AuthViewModel {
 
     func updateProfile(_ profile: Profile) async throws {
         try await authService.updateProfile(profile)
+    }
+
+    func uploadAvatar(imageData: Data) async throws -> String {
+        guard let userId = currentProfile?.id else { throw URLError(.userAuthenticationRequired) }
+        let url = try await authService.uploadAvatar(userId: userId, imageData: imageData)
+        // Update profile with new avatar URL
+        if var profile = currentProfile {
+            profile = Profile(
+                id: profile.id, username: profile.username, displayName: profile.displayName,
+                bio: profile.bio, avatarUrl: url, interests: profile.interests,
+                locationLat: profile.locationLat, locationLng: profile.locationLng,
+                neighborhood: profile.neighborhood, streakCount: profile.streakCount,
+                eventsAttended: profile.eventsAttended, createdAt: profile.createdAt, city: profile.city
+            )
+            try await authService.updateProfile(profile)
+        }
+        return url
     }
 
     func signOut() async {

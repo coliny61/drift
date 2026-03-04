@@ -18,6 +18,13 @@ final class SettingsViewModel {
     }
 
     init() {
+        // Register defaults so toggles start ON
+        UserDefaults.standard.register(defaults: [
+            "drift_notify_events": true,
+            "drift_notify_friends": true,
+            "drift_notify_reminders": true,
+            "drift_notify_chat": true
+        ])
         let saved = UserDefaults.standard.string(forKey: "drift_appearance") ?? "dark"
         appearance = Appearance(rawValue: saved) ?? .dark
         notifyNewEvents = UserDefaults.standard.bool(forKey: "drift_notify_events")

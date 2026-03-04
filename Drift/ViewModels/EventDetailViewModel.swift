@@ -13,6 +13,7 @@ final class EventDetailViewModel {
     var attendees: [Profile] = []
     var attendeeCount: Int = 0
     var isLoading = false
+    var loadError = false
     var calendarAdded = false
     var showShareSheet = false
 
@@ -23,9 +24,12 @@ final class EventDetailViewModel {
 
     func loadEvent(id: UUID) async {
         isLoading = true
+        loadError = false
         event = await eventService.fetchEvent(id: id)
         if let event {
             attendeeCount = event.rsvpCount
+        } else {
+            loadError = true
         }
         isLoading = false
     }
@@ -93,6 +97,15 @@ final class EventDetailViewModel {
         let checkInStart = event.startTime.addingTimeInterval(-1800) // 30 min before
         let checkInEnd = event.endTime
         return now >= checkInStart && now <= checkInEnd
+    }
+
+    /// Check if user is within proximity (~0.5 miles) of the event
+    func isNearEvent(locationManager: LocationManager) -> Bool {
+        guard let event else { return false }
+        guard let distance = locationManager.distanceTo(lat: event.locationLat, lng: event.locationLng) else {
+            return true // If no location, allow check-in (don't block)
+        }
+        return distance <= 0.5
     }
 
     var isCheckedIn: Bool {

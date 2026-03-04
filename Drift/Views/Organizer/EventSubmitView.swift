@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import CoreLocation
 
 struct EventSubmitView: View {
     let organizer: Organizer
@@ -56,6 +57,7 @@ struct EventSubmitView: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Submit Event")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -341,13 +343,41 @@ struct EventSubmitView: View {
 
         let cents = isFree ? 0 : Int((Double(priceText) ?? 0) * 100)
 
+        // Geocode the address for real lat/lng
+        var lat = AppConstants.defaultLatitude
+        var lng = AppConstants.defaultLongitude
+        if !locationAddress.isEmpty {
+            let geocoder = CLGeocoder()
+            if let placemarks = try? await geocoder.geocodeAddressString(locationAddress),
+               let location = placemarks.first?.location {
+                lat = location.coordinate.latitude
+                lng = location.coordinate.longitude
+            }
+        }
+
+        let eventId = UUID()
+        var coverUrl: String?
+
+        // Upload cover image if selected
+        if let imageData = coverImageData {
+            do {
+                coverUrl = try await StorageService.uploadCoverImage(
+                    client: eventService.supabaseClient,
+                    eventId: eventId,
+                    imageData: imageData
+                )
+            } catch {
+                // Continue without cover image rather than failing submission
+            }
+        }
+
         let event = Event(
-            id: UUID(),
+            id: eventId,
             organizerId: organizer.id,
             title: title,
             description: description,
             shortDescription: String(description.prefix(100)),
-            coverImageUrl: nil,
+            coverImageUrl: coverUrl,
             category: selectedCategory.slug,
             tags: Array(tags),
             startTime: startDate,
@@ -355,8 +385,8 @@ struct EventSubmitView: View {
             recurrenceRule: nil,
             locationName: locationName,
             locationAddress: locationAddress,
-            locationLat: AppConstants.defaultLatitude,
-            locationLng: AppConstants.defaultLongitude,
+            locationLat: lat,
+            locationLng: lng,
             neighborhood: neighborhood,
             maxCapacity: nil,
             priceCents: cents,
