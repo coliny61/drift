@@ -5,6 +5,7 @@ struct SettingsView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showSignOutAlert = false
+    @State private var showDeleteAlert = false
 
     var body: some View {
         NavigationStack {
@@ -16,10 +17,10 @@ struct SettingsView: View {
                             Text(appearance.rawValue).tag(appearance)
                         }
                     }
-                    .listRowBackground(Color(hex: "1A1A1A"))
+                    .listRowBackground(AppConstants.Colors.cardBackground)
                     .foregroundStyle(.white)
                 } header: {
-                    Text("Appearance").foregroundStyle(Color(hex: "9CA3AF"))
+                    Text("Appearance").foregroundStyle(AppConstants.Colors.textSecondary)
                 }
 
                 // Notifications
@@ -29,7 +30,7 @@ struct SettingsView: View {
                     notificationToggle("Event Reminders", isOn: Bindable(viewModel).notifyEventReminders)
                     notificationToggle("Chat Messages", isOn: Bindable(viewModel).notifyChatMessages)
                 } header: {
-                    Text("Notifications").foregroundStyle(Color(hex: "9CA3AF"))
+                    Text("Notifications").foregroundStyle(AppConstants.Colors.textSecondary)
                 }
 
                 // About
@@ -39,11 +40,11 @@ struct SettingsView: View {
                             .foregroundStyle(.white)
                         Spacer()
                         Text("1.0.0")
-                            .foregroundStyle(Color(hex: "9CA3AF"))
+                            .foregroundStyle(AppConstants.Colors.textSecondary)
                     }
-                    .listRowBackground(Color(hex: "1A1A1A"))
+                    .listRowBackground(AppConstants.Colors.cardBackground)
                 } header: {
-                    Text("About").foregroundStyle(Color(hex: "9CA3AF"))
+                    Text("About").foregroundStyle(AppConstants.Colors.textSecondary)
                 }
 
                 // Account
@@ -52,20 +53,30 @@ struct SettingsView: View {
                         showSignOutAlert = true
                     } label: {
                         Text("Sign Out")
+                            .foregroundStyle(AppConstants.Colors.accent)
+                    }
+                    .listRowBackground(AppConstants.Colors.cardBackground)
+
+                    Button {
+                        showDeleteAlert = true
+                    } label: {
+                        Text("Delete Account")
                             .foregroundStyle(Color(hex: "EF5350"))
                     }
-                    .listRowBackground(Color(hex: "1A1A1A"))
+                    .listRowBackground(AppConstants.Colors.cardBackground)
+                } header: {
+                    Text("Account").foregroundStyle(AppConstants.Colors.textSecondary)
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(Color(hex: "FF6B35"))
+                        .foregroundStyle(AppConstants.Colors.accent)
                 }
             }
             .alert("Sign Out", isPresented: $showSignOutAlert) {
@@ -79,15 +90,26 @@ struct SettingsView: View {
             } message: {
                 Text("Are you sure you want to sign out?")
             }
+            .alert("Delete Account", isPresented: $showDeleteAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    Task {
+                        await authViewModel.deleteAccount()
+                        dismiss()
+                    }
+                }
+            } message: {
+                Text("This will permanently delete your account and all associated data. This action cannot be undone.")
+            }
         }
         .preferredColorScheme(.dark)
     }
 
     private func notificationToggle(_ title: String, isOn: Binding<Bool>) -> some View {
         Toggle(title, isOn: isOn)
-            .tint(Color(hex: "FF6B35"))
+            .tint(AppConstants.Colors.accent)
             .foregroundStyle(.white)
-            .listRowBackground(Color(hex: "1A1A1A"))
+            .listRowBackground(AppConstants.Colors.cardBackground)
             .onChange(of: isOn.wrappedValue) { _, _ in
                 viewModel.saveNotificationPrefs()
             }

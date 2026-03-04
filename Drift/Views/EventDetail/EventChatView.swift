@@ -22,6 +22,7 @@ struct EventChatView: View {
                     }
                     .padding()
                 }
+                .scrollDismissesKeyboard(.interactively)
                 .onChange(of: viewModel.messages.count) { _, _ in
                     if let last = viewModel.messages.last {
                         withAnimation(.easeOut(duration: 0.2)) {
@@ -31,13 +32,13 @@ struct EventChatView: View {
                 }
             }
 
-            Divider().background(Color(hex: "2A2A2A"))
+            Divider().background(AppConstants.Colors.secondaryBackground)
 
             // Input
             HStack(spacing: 12) {
                 TextField("Message...", text: Bindable(viewModel).messageText)
                     .padding(12)
-                    .background(Color(hex: "1A1A1A"))
+                    .background(AppConstants.Colors.cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .foregroundStyle(.white)
 
@@ -48,16 +49,16 @@ struct EventChatView: View {
                         .font(.title2)
                         .foregroundStyle(
                             viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty
-                            ? Color(hex: "9CA3AF") : Color(hex: "FF6B35")
+                            ? AppConstants.Colors.textSecondary : AppConstants.Colors.accent
                         )
                 }
                 .disabled(viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
         }
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationTitle("Chat")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -79,19 +80,28 @@ struct EventChatView: View {
                 if !isOwn {
                     Text(message.sender?.displayName ?? "User")
                         .font(.caption)
-                        .foregroundStyle(Color(hex: "FF6B35"))
+                        .foregroundStyle(AppConstants.Colors.accent)
                 }
                 Text(message.content)
                     .font(.body)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(isOwn ? Color(hex: "FF6B35") : Color(hex: "2A2A2A"))
+                    .background(isOwn ? AppConstants.Colors.accent : AppConstants.Colors.secondaryBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .contextMenu {
+                        if isOwn {
+                            Button(role: .destructive) {
+                                Task { await viewModel.deleteMessage(messageId: message.id) }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                    }
 
                 Text(message.createdAt.timeOnly)
                     .font(.caption2)
-                    .foregroundStyle(Color(hex: "9CA3AF"))
+                    .foregroundStyle(AppConstants.Colors.textTertiary)
             }
 
             if !isOwn { Spacer() }

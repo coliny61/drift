@@ -62,6 +62,20 @@ final class AuthService {
         currentProfile = nil
     }
 
+    func deleteAccount() async throws {
+        guard let userId = currentUser?.id else { return }
+        // Delete profile first (cascade will handle related data via RLS)
+        try await client.from("profiles")
+            .delete()
+            .eq("id", value: userId.uuidString)
+            .execute()
+        // Sign out (Supabase admin-level user deletion requires service role key,
+        // so we delete profile data and sign out. User auth record becomes orphaned but harmless.)
+        try await client.auth.signOut()
+        currentUser = nil
+        currentProfile = nil
+    }
+
     func fetchProfile(userId: UUID) async {
         do {
             let profile: Profile = try await client.from("profiles")

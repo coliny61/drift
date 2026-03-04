@@ -37,7 +37,7 @@ struct EventRecapView: View {
                                     .scaledToFill()
                             } placeholder: {
                                 Rectangle()
-                                    .fill(Color(hex: "2A2A2A"))
+                                    .fill(AppConstants.Colors.secondaryBackground)
                             }
                             .frame(height: 120)
                             .clipped()
@@ -132,7 +132,7 @@ struct PhotoDetailSheet: View {
                         .scaledToFit()
                 } placeholder: {
                     Rectangle()
-                        .fill(Color(hex: "2A2A2A"))
+                        .fill(AppConstants.Colors.secondaryBackground)
                         .frame(height: 300)
                 }
 
@@ -170,6 +170,27 @@ struct PhotoDetailSheet: View {
                     .font(.caption)
                     .foregroundStyle(AppConstants.Colors.textSecondary)
                     .padding(.top, 12)
+
+                // Delete button for own photos
+                if photo.uploadedBy == currentUserId {
+                    Button(role: .destructive) {
+                        Task {
+                            try? await photoService.deletePhoto(photoId: photo.id)
+                            dismiss()
+                        }
+                    } label: {
+                        Label("Delete Photo", systemImage: "trash")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color(hex: "EF5350"))
+                            .padding(.vertical, 12)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(hex: "EF5350").opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 20)
+                }
 
                 Spacer()
             }

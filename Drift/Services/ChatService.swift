@@ -61,6 +61,14 @@ final class ChatService {
         }
     }
 
+    func deleteMessage(messageId: UUID) async throws {
+        try await client.from("chat_messages")
+            .delete()
+            .eq("id", value: messageId.uuidString)
+            .execute()
+        messages.removeAll { $0.id == messageId }
+    }
+
     func unsubscribe() async {
         if let channel {
             await client.realtimeV2.removeChannel(channel)

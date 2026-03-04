@@ -1,9 +1,11 @@
 import Foundation
 import UserNotifications
+import Supabase
 
 @Observable
 final class NotificationService {
     var isAuthorized = false
+    var supabaseClient: SupabaseClient?
 
     init() {
         Task { await checkAuthorization() }
@@ -90,8 +92,20 @@ final class NotificationService {
 
     // MARK: - Device Token
 
-    func saveDeviceToken(_ token: Data) {
+    func saveDeviceToken(_ token: Data, userId: UUID? = nil) {
         let tokenString = token.map { String(format: "%02x", $0) }.joined()
         UserDefaults.standard.set(tokenString, forKey: "drift_device_token")
+
+        // Save to Supabase if client and userId available
+        guard let client = supabaseClient, let userId else { return }
+        Task {
+            try? await client.from("device_tokens")
+                .upsert([
+                    "user_id": userId.uuidString,
+                    "token": tokenString,
+                    "platform": "ios"
+                ])
+                .execute()
+        }
     }
 }

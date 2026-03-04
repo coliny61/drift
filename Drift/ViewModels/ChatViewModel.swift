@@ -26,6 +26,10 @@ final class ChatViewModel {
         HapticManager.impact(.light)
     }
 
+    func deleteMessage(messageId: UUID) async {
+        try? await chatService.deleteMessage(messageId: messageId)
+    }
+
     func subscribe(eventId: UUID) async {
         isSubscribed = true
         await chatService.subscribeToMessages(eventId: eventId)

@@ -55,6 +55,14 @@ final class PhotoService {
         return photo
     }
 
+    func deletePhoto(photoId: UUID) async throws {
+        try await client.from("event_photos")
+            .delete()
+            .eq("id", value: photoId.uuidString)
+            .execute()
+        photos.removeAll { $0.id == photoId }
+    }
+
     func addReaction(photoId: UUID, userId: UUID, reactionType: String) async throws {
         try await client.from("photo_reactions")
             .upsert([

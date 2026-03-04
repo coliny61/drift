@@ -15,7 +15,7 @@ struct DriftApp: App {
     @State private var activityService: ActivityService
     @State private var photoService: PhotoService
     @State private var organizerService: OrganizerService
-    @State private var notificationService = NotificationService()
+    @State private var notificationService: NotificationService
 
     // MARK: - ViewModels
     @State private var authViewModel: AuthViewModel
@@ -56,12 +56,16 @@ struct DriftApp: App {
         _organizerService = State(initialValue: organizers)
         _locationManager = State(initialValue: location)
 
+        let notifications = NotificationService()
+        notifications.supabaseClient = client
+        _notificationService = State(initialValue: notifications)
+
         // ViewModels
         _authViewModel = State(initialValue: AuthViewModel(authService: auth))
         _discoverViewModel = State(initialValue: DiscoverViewModel(eventService: events, organizerService: organizers, rsvpService: rsvps, locationManager: location))
         _eventDetailViewModel = State(initialValue: EventDetailViewModel(eventService: events, rsvpService: rsvps))
         _mapViewModel = State(initialValue: MapViewModel(eventService: events))
-        _searchViewModel = State(initialValue: SearchViewModel(eventService: events))
+        _searchViewModel = State(initialValue: SearchViewModel(eventService: events, locationManager: location))
         _profileViewModel = State(initialValue: ProfileViewModel(profileService: profiles, rsvpService: rsvps, eventService: events))
         _chatViewModel = State(initialValue: ChatViewModel(chatService: chat))
         _activityFeedViewModel = State(initialValue: ActivityFeedViewModel(activityService: activity))

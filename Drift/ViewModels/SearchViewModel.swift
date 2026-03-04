@@ -3,6 +3,7 @@ import Foundation
 @Observable
 final class SearchViewModel {
     private let eventService: EventService
+    private let locationManager: LocationManager
 
     var query = ""
     var results: [Event] = []
@@ -37,8 +38,9 @@ final class SearchViewModel {
         case evening = "Evening"
     }
 
-    init(eventService: EventService) {
+    init(eventService: EventService, locationManager: LocationManager) {
         self.eventService = eventService
+        self.locationManager = locationManager
         loadRecentSearches()
     }
 
@@ -77,6 +79,16 @@ final class SearchViewModel {
 
         if freeOnly {
             filtered = filtered.filter { $0.isFree }
+        }
+
+        // Distance filter — only apply if user has location and distance is not max
+        if maxDistance < 25, locationManager.userLocation != nil {
+            filtered = filtered.filter { event in
+                guard let distance = locationManager.distanceTo(lat: event.locationLat, lng: event.locationLng) else {
+                    return true
+                }
+                return distance <= maxDistance
+            }
         }
 
         switch dateRange {

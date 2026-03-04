@@ -4,6 +4,7 @@ import CoreLocation
 
 struct EventSubmitView: View {
     let organizer: Organizer
+    var editingEvent: Event? = nil
     @Environment(EventService.self) private var eventService
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(\.dismiss) private var dismiss
@@ -30,6 +31,7 @@ struct EventSubmitView: View {
     @State private var error: String?
     @State private var showSuccess = false
 
+    private var isEditing: Bool { editingEvent != nil }
     private let totalSteps = 4
 
     var body: some View {
@@ -58,7 +60,7 @@ struct EventSubmitView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle("Submit Event")
+            .navigationTitle(isEditing ? "Edit Event" : "Submit Event")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
@@ -69,6 +71,26 @@ struct EventSubmitView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            if let event = editingEvent {
+                title = event.title
+                description = event.description
+                selectedCategory = event.categoryEnum ?? .runClub
+                tags = Set(event.tags)
+                startDate = event.startTime
+                endDate = event.endTime
+                locationName = event.locationName
+                locationAddress = event.locationAddress
+                neighborhood = event.neighborhood
+                city = event.city ?? "Dallas"
+                isFree = event.isFree
+                if !event.isFree {
+                    priceText = String(format: "%.2f", Double(event.priceCents) / 100.0)
+                }
+                externalUrl = event.externalUrl ?? ""
+                ticketUrl = event.ticketUrl ?? ""
+            }
+        }
     }
 
     // MARK: - Step 1: Details
@@ -299,7 +321,7 @@ struct EventSubmitView: View {
                 Spacer(minLength: 40)
                 HStack(spacing: 12) {
                     backButton { step = 2 }
-                    primaryButton("Submit Event") {
+                    primaryButton(isEditing ? "Save Changes" : "Submit Event") {
                         Task { await submitEvent() }
                     }
                     .disabled(isSubmitting)
@@ -321,9 +343,9 @@ struct EventSubmitView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(AppConstants.Colors.success)
-            Text("Event Submitted!")
+            Text(isEditing ? "Event Updated!" : "Event Submitted!")
                 .font(.title2).fontWeight(.bold).foregroundStyle(.white)
-            Text("Your event is under review. You'll be notified once it's approved and visible to the community.")
+            Text(isEditing ? "Your event has been updated successfully." : "Your event is under review. You'll be notified once it's approved and visible to the community.")
                 .font(.subheadline)
                 .foregroundStyle(AppConstants.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -355,8 +377,8 @@ struct EventSubmitView: View {
             }
         }
 
-        let eventId = UUID()
-        var coverUrl: String?
+        let eventId = editingEvent?.id ?? UUID()
+        var coverUrl: String? = editingEvent?.coverImageUrl
 
         // Upload cover image if selected
         if let imageData = coverImageData {
@@ -388,20 +410,26 @@ struct EventSubmitView: View {
             locationLat: lat,
             locationLng: lng,
             neighborhood: neighborhood,
-            maxCapacity: nil,
+            maxCapacity: editingEvent?.maxCapacity,
             priceCents: cents,
             externalUrl: externalUrl.isEmpty ? nil : externalUrl,
-            isFeatured: false,
-            rsvpCount: 0,
-            status: "upcoming",
-            approvalStatus: "pending",
-            submittedBy: authViewModel.currentProfile?.id ?? authViewModel.localUserId,
+            isFeatured: editingEvent?.isFeatured ?? false,
+            rsvpCount: editingEvent?.rsvpCount ?? 0,
+            status: editingEvent?.status ?? "upcoming",
+            approvalStatus: isEditing ? editingEvent?.approvalStatus : "pending",
+            featuredUntil: editingEvent?.featuredUntil,
+            sponsorLabel: editingEvent?.sponsorLabel,
+            submittedBy: editingEvent?.submittedBy ?? (authViewModel.currentProfile?.id ?? authViewModel.localUserId),
             city: city,
             ticketUrl: ticketUrl.isEmpty ? nil : ticketUrl
         )
 
         do {
-            try await eventService.createEvent(event)
+            if isEditing {
+                try await eventService.updateEvent(event)
+            } else {
+                try await eventService.createEvent(event)
+            }
             showSuccess = true
             HapticManager.selection()
         } catch {

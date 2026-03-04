@@ -9,6 +9,8 @@ struct OrganizerDashboardView: View {
     @State private var followerCount = 0
     @State private var isLoading = true
     @State private var showEventSubmit = false
+    @State private var editingEvent: Event?
+    @State private var cancellingEvent: Event?
 
     private var totalRSVPs: Int {
         events.reduce(0) { $0 + $1.rsvpCount }
@@ -56,8 +58,31 @@ struct OrganizerDashboardView: View {
         .sheet(isPresented: $showEventSubmit) {
             EventSubmitView(organizer: organizer)
         }
+        .sheet(item: $editingEvent) { event in
+            EventSubmitView(organizer: organizer, editingEvent: event)
+        }
         .onChange(of: showEventSubmit) { _, showing in
             if !showing { Task { await loadData() } }
+        }
+        .onChange(of: editingEvent) { old, new in
+            if old != nil && new == nil { Task { await loadData() } }
+        }
+        .alert("Cancel Event", isPresented: .init(
+            get: { cancellingEvent != nil },
+            set: { if !$0 { cancellingEvent = nil } }
+        )) {
+            Button("Keep Event", role: .cancel) { cancellingEvent = nil }
+            Button("Cancel Event", role: .destructive) {
+                if let event = cancellingEvent {
+                    Task {
+                        try? await eventService.cancelEvent(eventId: event.id)
+                        await loadData()
+                    }
+                }
+                cancellingEvent = nil
+            }
+        } message: {
+            Text("This will cancel \"\(cancellingEvent?.title ?? "")\" and remove it from the feed. This cannot be undone.")
         }
         .task {
             await loadData()
@@ -206,6 +231,21 @@ struct OrganizerDashboardView: View {
         .padding(16)
         .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .contextMenu {
+            Button {
+                editingEvent = event
+            } label: {
+                Label("Edit Event", systemImage: "pencil")
+            }
+
+            if event.status != "cancelled" {
+                Button(role: .destructive) {
+                    cancellingEvent = event
+                } label: {
+                    Label("Cancel Event", systemImage: "xmark.circle")
+                }
+            }
+        }
     }
 
     private func approvalBadge(_ event: Event) -> some View {

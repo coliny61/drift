@@ -132,6 +132,13 @@ final class EventService {
         }
     }
 
+    func cancelEvent(eventId: UUID) async throws {
+        try await client.from("events")
+            .update(["status": "cancelled"] as [String: String])
+            .eq("id", value: eventId.uuidString)
+            .execute()
+    }
+
     func requestBoost(eventId: UUID) async throws {
         try await client.from("events")
             .update(["boost_requested": true] as [String: Bool])

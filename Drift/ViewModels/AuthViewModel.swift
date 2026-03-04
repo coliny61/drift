@@ -250,6 +250,30 @@ final class AuthViewModel {
         confirmPassword = ""
     }
 
+    func deleteAccount() async {
+        isLoading = true
+        error = nil
+        do {
+            try await authService.deleteAccount()
+            // Clear all local data
+            let defaults = UserDefaults.standard
+            defaults.removeObject(forKey: "drift_local_user_id")
+            defaults.removeObject(forKey: "drift_has_onboarded")
+            defaults.removeObject(forKey: "drift_selected_interests")
+            defaults.removeObject(forKey: "drift_selected_city")
+            defaults.removeObject(forKey: "drift_selected_neighborhood")
+            defaults.removeObject(forKey: "drift_local_rsvps")
+            defaults.removeObject(forKey: "drift_recent_searches")
+            defaults.removeObject(forKey: "drift_device_token")
+            email = ""
+            password = ""
+            confirmPassword = ""
+        } catch {
+            self.error = "Failed to delete account. Please try again."
+        }
+        isLoading = false
+    }
+
     func nextOnboardingStep() {
         if let nextIndex = OnboardingStep(rawValue: onboardingStep.rawValue + 1) {
             onboardingStep = nextIndex
