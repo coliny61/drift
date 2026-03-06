@@ -8,7 +8,7 @@ struct ErrorView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 40))
-                .foregroundStyle(Color(hex: "EF5350"))
+                .foregroundStyle(AppConstants.Colors.error)
 
             Text("Something went wrong")
                 .font(.headline)
@@ -16,7 +16,7 @@ struct ErrorView: View {
 
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
@@ -30,7 +30,7 @@ struct ErrorView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
-                        .background(Color(hex: "FF6B35"))
+                        .background(AppConstants.Colors.accent)
                         .clipShape(Capsule())
                 }
             }

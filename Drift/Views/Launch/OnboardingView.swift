@@ -91,14 +91,14 @@ struct OnboardingView: View {
             // Feature highlights
             VStack(spacing: 16) {
                 featureRow(icon: "figure.run", text: "Run clubs, yoga, sound baths & more", color: AppConstants.Colors.accent)
-                featureRow(icon: "mappin.circle.fill", text: "Events across DFW, near you", color: Color(hex: "60A5FA"))
+                featureRow(icon: "mappin.circle.fill", text: "Events across DFW, near you", color: AppConstants.Colors.info)
                 featureRow(icon: "person.2.fill", text: "Find your people, build your streak", color: AppConstants.Colors.success)
             }
             .padding(.horizontal, 32)
 
             Spacer()
 
-            primaryButton("Get Started") {
+            PrimaryButtonView(title:"Get Started") {
                 viewModel.nextOnboardingStep()
             }
             .padding(.horizontal, 24)
@@ -190,7 +190,7 @@ struct OnboardingView: View {
                                          : AppConstants.Colors.textTertiary)
                 }
 
-                primaryButton("Continue") {
+                PrimaryButtonView(title:"Continue") {
                     UserDefaults.standard.set(viewModel.selectedInterests.map(\.slug), forKey: "drift_selected_interests")
                     viewModel.nextOnboardingStep()
                 }
@@ -241,12 +241,12 @@ struct OnboardingView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 14)
-                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.12) : AppConstants.Colors.cardBackground)
-                            .foregroundStyle(isSelected ? Color(hex: "60A5FA") : AppConstants.Colors.textSecondary)
+                            .background(isSelected ? AppConstants.Colors.info.opacity(0.12) : AppConstants.Colors.cardBackground)
+                            .foregroundStyle(isSelected ? AppConstants.Colors.info : AppConstants.Colors.textSecondary)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .strokeBorder(isSelected ? Color(hex: "60A5FA").opacity(0.4) : .clear, lineWidth: 1.5)
+                                    .strokeBorder(isSelected ? AppConstants.Colors.info.opacity(0.4) : .clear, lineWidth: 1.5)
                             )
                         }
                     }
@@ -256,7 +256,7 @@ struct OnboardingView: View {
                 .padding(.bottom, 16)
             }
 
-            primaryButton("Continue") {
+            PrimaryButtonView(title:"Continue") {
                 if let city = viewModel.selectedCity {
                     UserDefaults.standard.set(city, forKey: "drift_selected_city")
                 }
@@ -294,7 +294,7 @@ struct OnboardingView: View {
                     icon: "location.fill",
                     title: "Location",
                     description: "Find events near you and get directions",
-                    color: Color(hex: "60A5FA")
+                    color: AppConstants.Colors.info
                 )
                 permissionCard(
                     icon: "bell.badge.fill",
@@ -308,7 +308,7 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: 14) {
-                primaryButton("Enable & Continue") {
+                PrimaryButtonView(title:"Enable & Continue") {
                     locationManager.requestPermission()
                     Task { await notificationService.requestPermission() }
                     viewModel.nextOnboardingStep()
@@ -425,6 +425,18 @@ struct OnboardingView: View {
                     .padding(.horizontal, 24)
                     .disabled(viewModel.isLoading)
 
+                    if viewModel.signUpSuccess {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(AppConstants.Colors.success)
+                            Text("Account created! Check your email to verify.")
+                                .foregroundStyle(AppConstants.Colors.success)
+                        }
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 24)
+                    }
+
                     if viewModel.resetEmailSent {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark.circle.fill")
@@ -440,7 +452,7 @@ struct OnboardingView: View {
                     if let error = viewModel.error {
                         Text(error)
                             .font(.caption)
-                            .foregroundStyle(Color(hex: "EF5350"))
+                            .foregroundStyle(AppConstants.Colors.error)
                             .padding(.horizontal, 24)
                     }
                 }
@@ -449,7 +461,7 @@ struct OnboardingView: View {
 
             // Bottom actions
             VStack(spacing: 16) {
-                primaryButton(viewModel.isSignUpMode ? "Create Account" : "Sign In") {
+                PrimaryButtonView(title:viewModel.isSignUpMode ? "Create Account" : "Sign In") {
                     Task {
                         if viewModel.isSignUpMode {
                             await viewModel.signUpWithEmail()
@@ -512,19 +524,4 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Shared Components
-
-    private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(AppConstants.Colors.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .shadow(color: AppConstants.Colors.accent.opacity(0.25), radius: 8, x: 0, y: 4)
-        }
-    }
 }

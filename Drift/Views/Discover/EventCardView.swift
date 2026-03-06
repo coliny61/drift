@@ -67,7 +67,7 @@ struct EventCardView: View {
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 5)
                                 .background(.ultraThinMaterial)
-                                .background(Color(hex: "34D399").opacity(0.4))
+                                .background(AppConstants.Colors.alcoholFreeBadge.opacity(0.4))
                                 .foregroundStyle(.white)
                                 .clipShape(Capsule())
                         }
@@ -82,7 +82,7 @@ struct EventCardView: View {
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background(.ultraThinMaterial)
-                            .background(event.isFree ? Color(hex: "60A5FA").opacity(0.4) : Color.black.opacity(0.3))
+                            .background(event.isFree ? AppConstants.Colors.freeBadge.opacity(0.4) : Color.black.opacity(0.3))
                             .foregroundStyle(.white)
                             .clipShape(Capsule())
                     }

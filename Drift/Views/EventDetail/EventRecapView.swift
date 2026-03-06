@@ -182,10 +182,10 @@ struct PhotoDetailSheet: View {
                         Label("Delete Photo", systemImage: "trash")
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Color(hex: "EF5350"))
+                            .foregroundStyle(AppConstants.Colors.error)
                             .padding(.vertical, 12)
                             .frame(maxWidth: .infinity)
-                            .background(Color(hex: "EF5350").opacity(0.12))
+                            .background(AppConstants.Colors.error.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .padding(.horizontal, 24)

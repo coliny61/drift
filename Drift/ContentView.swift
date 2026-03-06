@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(ActivityFeedViewModel.self) private var activityFeedViewModel
     @State private var selectedTab: Tab = .discover
     @State private var showOnboarding = false
 
@@ -45,6 +46,7 @@ struct ContentView: View {
                     Label("Activity", systemImage: "bell.fill")
                 }
                 .tag(Tab.activity)
+                .badge(activityFeedViewModel.unreadCount)
 
             ProfileView()
                 .tabItem {
@@ -52,7 +54,7 @@ struct ContentView: View {
                 }
                 .tag(Tab.profile)
         }
-        .tint(Color(hex: "FF6B35"))
+        .tint(AppConstants.Colors.accent)
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(onDismiss: {

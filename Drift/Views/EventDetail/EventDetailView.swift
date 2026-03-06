@@ -313,22 +313,7 @@ struct EventDetailView: View {
                         if let organizer {
                             NavigationLink(value: AppDestination.organizer(organizer.id)) {
                                 HStack(spacing: 14) {
-                                    if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
-                                        AsyncImage(url: url) { phase in
-                                            switch phase {
-                                            case .success(let image):
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 48, height: 48)
-                                                    .clipShape(Circle())
-                                            default:
-                                                organizerLogoPlaceholder(organizer)
-                                            }
-                                        }
-                                    } else {
-                                        organizerLogoPlaceholder(organizer)
-                                    }
+                                    OrganizerLogoView(organizer: organizer, size: 48)
 
                                     VStack(alignment: .leading, spacing: 3) {
                                         HStack(spacing: 5) {
@@ -339,7 +324,7 @@ struct EventDetailView: View {
                                             if organizer.isVerifiedOrganizer {
                                                 Image(systemName: "checkmark.seal.fill")
                                                     .font(.caption)
-                                                    .foregroundStyle(Color(hex: "60A5FA"))
+                                                    .foregroundStyle(AppConstants.Colors.info)
                                             }
                                         }
                                         Text("Organizer")
@@ -399,13 +384,13 @@ struct EventDetailView: View {
                             NavigationLink {
                                 EventRecapView(eventId: event.id)
                             } label: {
-                                detailActionRow(icon: "photo.on.rectangle.angled", title: "Photo Recap", color: Color(hex: "EC407A"))
+                                detailActionRow(icon: "photo.on.rectangle.angled", title: "Photo Recap", color: AppConstants.Colors.pink)
                             }
 
                             NavigationLink {
                                 EventChatView(eventId: event.id)
                             } label: {
-                                detailActionRow(icon: "bubble.left.and.bubble.right.fill", title: "Event Chat", color: Color(hex: "60A5FA"))
+                                detailActionRow(icon: "bubble.left.and.bubble.right.fill", title: "Event Chat", color: AppConstants.Colors.info)
                             }
                         }
 
@@ -444,10 +429,10 @@ struct EventDetailView: View {
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(16)
-                                .background(viewModel.isCheckedIn ? AppConstants.Colors.success : (nearEvent ? Color(hex: "7B68EE") : AppConstants.Colors.secondaryBackground))
+                                .background(viewModel.isCheckedIn ? AppConstants.Colors.success : (nearEvent ? AppConstants.Colors.purple : AppConstants.Colors.secondaryBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                                 .shadow(
-                                    color: (viewModel.isCheckedIn ? AppConstants.Colors.success : Color(hex: "7B68EE")).opacity(nearEvent ? 0.3 : 0),
+                                    color: (viewModel.isCheckedIn ? AppConstants.Colors.success : AppConstants.Colors.purple).opacity(nearEvent ? 0.3 : 0),
                                     radius: 8, x: 0, y: 4
                                 )
                             }
@@ -559,24 +544,6 @@ struct EventDetailView: View {
         let mapItem = MKMapItem(placemark: placemark)
         mapItem.name = event.locationName
         mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving])
-    }
-
-    private func organizerLogoPlaceholder(_ organizer: Organizer) -> some View {
-        Circle()
-            .fill(
-                LinearGradient(
-                    colors: [AppConstants.Colors.accent.opacity(0.3), AppConstants.Colors.accent.opacity(0.1)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .frame(width: 48, height: 48)
-            .overlay {
-                Text(String(organizer.name.prefix(1)))
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(AppConstants.Colors.accent)
-            }
     }
 
     private var categoryColor: Color {

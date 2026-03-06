@@ -10,7 +10,7 @@ struct SignInView: View {
 
             Image(systemName: "wind")
                 .font(.system(size: 50))
-                .foregroundStyle(Color(hex: "FF6B35"))
+                .foregroundStyle(AppConstants.Colors.accent)
 
             Text("Drift")
                 .font(.system(size: 40, weight: .bold))
@@ -18,7 +18,7 @@ struct SignInView: View {
 
             Text("Welcome back")
                 .font(.title3)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
 
             Spacer()
 
@@ -46,7 +46,7 @@ struct SignInView: View {
             if let error = viewModel.error {
                 Text(error)
                     .font(.caption)
-                    .foregroundStyle(Color(hex: "EF5350"))
+                    .foregroundStyle(AppConstants.Colors.error)
                     .padding(.horizontal)
             }
 
@@ -78,6 +78,6 @@ struct SignInView: View {
 
             Spacer().frame(height: 40)
         }
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
     }
 }

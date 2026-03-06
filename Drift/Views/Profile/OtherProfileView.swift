@@ -19,12 +19,12 @@ struct OtherProfileView: View {
 
                     Text("@\(profile.username)")
                         .font(.subheadline)
-                        .foregroundStyle(Color(hex: "9CA3AF"))
+                        .foregroundStyle(AppConstants.Colors.textSecondary)
 
                     if let bio = profile.bio, !bio.isEmpty {
                         Text(bio)
                             .font(.body)
-                            .foregroundStyle(Color(hex: "9CA3AF"))
+                            .foregroundStyle(AppConstants.Colors.textSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
                     }
@@ -39,25 +39,25 @@ struct OtherProfileView: View {
                         Text(viewModel.isFollowing ? "Following" : "Follow")
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundStyle(viewModel.isFollowing ? Color(hex: "9CA3AF") : .white)
+                            .foregroundStyle(viewModel.isFollowing ? AppConstants.Colors.textSecondary : .white)
                             .frame(width: 140)
                             .padding(.vertical, 12)
-                            .background(viewModel.isFollowing ? Color(hex: "2A2A2A") : Color(hex: "FF6B35"))
+                            .background(viewModel.isFollowing ? AppConstants.Colors.secondaryBackground : AppConstants.Colors.accent)
                             .clipShape(Capsule())
                     }
 
                     // Stats
                     HStack(spacing: 0) {
                         statItem(value: "\(profile.eventsAttended)", label: "Events")
-                        Divider().frame(height: 30).background(Color(hex: "2A2A2A"))
+                        Divider().frame(height: 30).background(AppConstants.Colors.secondaryBackground)
                         statItem(value: "\(viewModel.followingCount)", label: "Following")
-                        Divider().frame(height: 30).background(Color(hex: "2A2A2A"))
+                        Divider().frame(height: 30).background(AppConstants.Colors.secondaryBackground)
                         statItem(value: "\(viewModel.followerCount)", label: "Followers")
-                        Divider().frame(height: 30).background(Color(hex: "2A2A2A"))
+                        Divider().frame(height: 30).background(AppConstants.Colors.secondaryBackground)
                         statItem(value: "\(profile.streakCount)🔥", label: "Streak")
                     }
                     .padding(.vertical, 16)
-                    .background(Color(hex: "1A1A1A"))
+                    .background(AppConstants.Colors.cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .padding(.horizontal)
 
@@ -79,7 +79,7 @@ struct OtherProfileView: View {
                 LoadingView()
             }
         }
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
@@ -90,7 +90,7 @@ struct OtherProfileView: View {
     private func statItem(value: String, label: String) -> some View {
         VStack(spacing: 4) {
             Text(value).font(.headline).fontWeight(.bold).foregroundStyle(.white)
-            Text(label).font(.caption).foregroundStyle(Color(hex: "9CA3AF"))
+            Text(label).font(.caption).foregroundStyle(AppConstants.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity)
     }

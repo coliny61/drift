@@ -75,6 +75,9 @@ final class EventDetailViewModel {
         }
 
         HapticManager.impact(.medium)
+
+        // Background reconciliation with server
+        Task { await loadAttendees() }
     }
 
     func checkIn(userId: UUID) async {

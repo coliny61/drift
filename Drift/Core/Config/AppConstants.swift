@@ -62,5 +62,13 @@ enum AppConstants {
         static let success = Color(hex: "10B981")
         static let alcoholFreeBadge = Color(hex: "34D399")
         static let freeBadge = Color(hex: "60A5FA")
+        static let info = Color(hex: "60A5FA")
+        static let pink = Color(hex: "EC407A")
+        static let warning = Color(hex: "FBBF24")
+        static let error = Color(hex: "EF5350")
+        static let purple = Color(hex: "7B68EE")
+        static let instagram = Color(hex: "E1306C")
+        static let teal = Color(hex: "34D399")
+        static let interested = Color(hex: "FFD54F")
     }
 }

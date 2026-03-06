@@ -39,12 +39,41 @@ struct SettingsView: View {
                         Text("Version")
                             .foregroundStyle(.white)
                         Spacer()
-                        Text("1.0.0")
+                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
                             .foregroundStyle(AppConstants.Colors.textSecondary)
                     }
                     .listRowBackground(AppConstants.Colors.cardBackground)
                 } header: {
                     Text("About").foregroundStyle(AppConstants.Colors.textSecondary)
+                }
+
+                // Legal
+                Section {
+                    Link(destination: URL(string: "https://driftdfw.com/privacy")!) {
+                        HStack {
+                            Text("Privacy Policy")
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                        }
+                    }
+                    .listRowBackground(AppConstants.Colors.cardBackground)
+
+                    Link(destination: URL(string: "https://driftdfw.com/terms")!) {
+                        HStack {
+                            Text("Terms of Service")
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                        }
+                    }
+                    .listRowBackground(AppConstants.Colors.cardBackground)
+                } header: {
+                    Text("Legal").foregroundStyle(AppConstants.Colors.textSecondary)
                 }
 
                 // Account
@@ -61,7 +90,7 @@ struct SettingsView: View {
                         showDeleteAlert = true
                     } label: {
                         Text("Delete Account")
-                            .foregroundStyle(Color(hex: "EF5350"))
+                            .foregroundStyle(AppConstants.Colors.error)
                     }
                     .listRowBackground(AppConstants.Colors.cardBackground)
                 } header: {

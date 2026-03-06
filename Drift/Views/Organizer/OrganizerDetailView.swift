@@ -10,6 +10,7 @@ struct OrganizerDetailView: View {
     @State private var followerCount = 0
     @State private var isFollowing = false
     @State private var isLoading = true
+    @State private var isFollowLoading = false
     @State private var showEventSubmit = false
 
     private var isOwnOrganizer: Bool {
@@ -122,23 +123,8 @@ struct OrganizerDetailView: View {
     private func headerSection(_ organizer: Organizer) -> some View {
         VStack(spacing: 16) {
             // Logo
-            if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 88, height: 88)
-                            .clipShape(Circle())
-                            .shadow(color: AppConstants.Colors.accent.opacity(0.2), radius: 12, x: 0, y: 4)
-                    default:
-                        logoPlaceholder(organizer)
-                    }
-                }
-            } else {
-                logoPlaceholder(organizer)
-            }
+            OrganizerLogoView(organizer: organizer, size: 88)
+                .shadow(color: AppConstants.Colors.accent.opacity(0.2), radius: 12, x: 0, y: 4)
 
             // Name + verification
             HStack(spacing: 6) {
@@ -149,7 +135,7 @@ struct OrganizerDetailView: View {
 
                 if organizer.isVerifiedOrganizer {
                     Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(Color(hex: "60A5FA"))
+                        .foregroundStyle(AppConstants.Colors.info)
                         .font(.body)
                 }
             }
@@ -191,8 +177,14 @@ struct OrganizerDetailView: View {
                     Task { await toggleFollow() }
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: isFollowing ? "checkmark" : "plus")
-                            .font(.caption)
+                        if isFollowLoading {
+                            ProgressView()
+                                .tint(isFollowing ? AppConstants.Colors.textSecondary : .white)
+                                .scaleEffect(0.7)
+                        } else {
+                            Image(systemName: isFollowing ? "checkmark" : "plus")
+                                .font(.caption)
+                        }
                         Text(isFollowing ? "Following" : "Follow")
                             .font(.subheadline)
                             .fontWeight(.bold)
@@ -207,30 +199,12 @@ struct OrganizerDetailView: View {
                             .strokeBorder(isFollowing ? AppConstants.Colors.secondaryBackground : .clear, lineWidth: 1.5)
                     )
                 }
+                .disabled(isFollowLoading)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 24)
         .padding(.bottom, 20)
-    }
-
-    private func logoPlaceholder(_ organizer: Organizer) -> some View {
-        Circle()
-            .fill(
-                LinearGradient(
-                    colors: [AppConstants.Colors.accent.opacity(0.3), AppConstants.Colors.accent.opacity(0.1)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .frame(width: 88, height: 88)
-            .overlay {
-                Text(String(organizer.name.prefix(1)))
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundStyle(AppConstants.Colors.accent)
-            }
-            .shadow(color: AppConstants.Colors.accent.opacity(0.15), radius: 12, x: 0, y: 4)
     }
 
     // MARK: - Stats
@@ -246,7 +220,7 @@ struct OrganizerDetailView: View {
                 Rectangle()
                     .fill(AppConstants.Colors.secondaryBackground)
                     .frame(width: 1, height: 28)
-                statItem(value: "Verified", label: "Status", color: Color(hex: "60A5FA"))
+                statItem(value: "Verified", label: "Status", color: AppConstants.Colors.info)
             }
         }
         .padding(.vertical, 18)
@@ -279,9 +253,9 @@ struct OrganizerDetailView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "camera.fill")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color(hex: "E1306C"))
+                            .foregroundStyle(AppConstants.Colors.instagram)
                             .frame(width: 34, height: 34)
-                            .background(Color(hex: "E1306C").opacity(0.12))
+                            .background(AppConstants.Colors.instagram.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 9))
                         Text("@\(handle)")
                             .font(.subheadline)
@@ -304,9 +278,9 @@ struct OrganizerDetailView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "globe")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color(hex: "60A5FA"))
+                            .foregroundStyle(AppConstants.Colors.info)
                             .frame(width: 34, height: 34)
-                            .background(Color(hex: "60A5FA").opacity(0.12))
+                            .background(AppConstants.Colors.info.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 9))
                         Text(website.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: ""))
                             .font(.subheadline)
@@ -345,6 +319,7 @@ struct OrganizerDetailView: View {
     }
 
     private func toggleFollow() async {
+        isFollowLoading = true
         let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
         do {
             if isFollowing {
@@ -360,5 +335,6 @@ struct OrganizerDetailView: View {
         } catch {
             print("Error toggling follow: \(error)")
         }
+        isFollowLoading = false
     }
 }

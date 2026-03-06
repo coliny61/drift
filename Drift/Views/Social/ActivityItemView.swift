@@ -67,8 +67,8 @@ struct ActivityItemView: View {
     private var actionColor: Color {
         switch item.actionType {
         case "rsvp": return AppConstants.Colors.success
-        case "follow": return Color(hex: "60A5FA")
-        case "photo_upload": return Color(hex: "EC407A")
+        case "follow": return AppConstants.Colors.info
+        case "photo_upload": return AppConstants.Colors.pink
         case "new_event": return AppConstants.Colors.accent
         default: return AppConstants.Colors.textSecondary
         }

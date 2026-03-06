@@ -11,12 +11,12 @@ struct NotificationPrefsView: View {
                 Toggle("Event Reminders (1hr before)", isOn: Bindable(viewModel).notifyEventReminders)
                 Toggle("Chat Messages", isOn: Bindable(viewModel).notifyChatMessages)
             }
-            .tint(Color(hex: "FF6B35"))
+            .tint(AppConstants.Colors.accent)
             .foregroundStyle(.white)
-            .listRowBackground(Color(hex: "1A1A1A"))
+            .listRowBackground(AppConstants.Colors.cardBackground)
         }
         .scrollContentBackground(.hidden)
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)

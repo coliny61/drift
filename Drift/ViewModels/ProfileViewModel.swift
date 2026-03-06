@@ -35,25 +35,19 @@ final class ProfileViewModel {
         followingCount = await following
         upcomingRSVPs = await rsvps
 
-        // Resolve RSVP event IDs to Event objects
-        var events: [Event] = []
-        for rsvp in upcomingRSVPs {
-            if let event = await eventService.fetchEvent(id: rsvp.eventId) {
-                events.append(event)
-            }
-        }
+        // Resolve RSVP event IDs to Event objects (batch fetch)
+        var allEventIds = upcomingRSVPs.map(\.eventId)
 
         // Also include locally stored RSVPs (browse-without-account mode)
         let localRSVPs = EventDetailViewModel.localRSVPs()
         for (eventIdString, _) in localRSVPs {
             if let eventId = UUID(uuidString: eventIdString),
-               !events.contains(where: { $0.id == eventId }) {
-                if let event = await eventService.fetchEvent(id: eventId) {
-                    events.append(event)
-                }
+               !allEventIds.contains(eventId) {
+                allEventIds.append(eventId)
             }
         }
 
+        let events = await eventService.fetchEventsByIds(allEventIds)
         upcomingEvents = events.sorted { $0.startTime < $1.startTime }
 
         if let currentUserId, !isOwnProfile {

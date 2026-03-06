@@ -51,6 +51,7 @@ struct ActivityFeedView: View {
                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                 await viewModel.loadFeed(userId: userId)
                 viewModel.startPolling(userId: userId)
+                viewModel.markAsRead()
             }
             .onDisappear {
                 viewModel.stopPolling()

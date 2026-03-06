@@ -42,7 +42,7 @@ struct DriftMapView: View {
                         title: "All",
                         icon: "square.grid.2x2",
                         isSelected: viewModel.selectedCategory == nil,
-                        color: Color(hex: "FF6B35")
+                        color: AppConstants.Colors.accent
                     ) {
                         viewModel.selectCategory(nil)
                     }

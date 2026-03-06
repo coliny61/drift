@@ -11,7 +11,7 @@ struct AttendanceHistoryView: View {
                 )
             }
         }
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationTitle("History")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)

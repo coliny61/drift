@@ -136,7 +136,7 @@ struct MyOrganizersView: View {
                     if org.isVerifiedOrganizer {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.caption)
-                            .foregroundStyle(Color(hex: "60A5FA"))
+                            .foregroundStyle(AppConstants.Colors.info)
                     }
                 }
 
@@ -174,7 +174,7 @@ struct MyOrganizersView: View {
 
     private func statusColor(_ org: Organizer) -> Color {
         if org.isVerifiedOrganizer { return AppConstants.Colors.success }
-        if org.isPendingVerification { return Color(hex: "FBBF24") }
+        if org.isPendingVerification { return AppConstants.Colors.warning }
         return AppConstants.Colors.textTertiary
     }
 

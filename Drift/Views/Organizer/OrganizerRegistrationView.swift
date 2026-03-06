@@ -94,7 +94,7 @@ struct OrganizerRegistrationView: View {
 
                 Spacer(minLength: 40)
 
-                primaryButton("Next") {
+                PrimaryButtonView(title:"Next") {
                     step = 1
                 }
                 .disabled(name.isEmpty || description.isEmpty)
@@ -145,7 +145,7 @@ struct OrganizerRegistrationView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
 
-                    primaryButton("Next") {
+                    PrimaryButtonView(title:"Next") {
                         step = 2
                     }
                     .disabled(contactEmail.isEmpty)
@@ -178,7 +178,7 @@ struct OrganizerRegistrationView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "shield.checkered")
                         .font(.title3)
-                        .foregroundStyle(Color(hex: "60A5FA"))
+                        .foregroundStyle(AppConstants.Colors.info)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Verification Required")
                             .font(.subheadline)
@@ -190,13 +190,13 @@ struct OrganizerRegistrationView: View {
                     }
                 }
                 .padding(14)
-                .background(Color(hex: "60A5FA").opacity(0.1))
+                .background(AppConstants.Colors.info.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 if let error {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(Color(hex: "EF5350"))
+                        .foregroundStyle(AppConstants.Colors.error)
                 }
 
                 Spacer(minLength: 40)
@@ -214,7 +214,7 @@ struct OrganizerRegistrationView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
 
-                    primaryButton("Submit") {
+                    PrimaryButtonView(title:"Submit") {
                         Task { await submit() }
                     }
                     .disabled(isSubmitting)
@@ -253,7 +253,7 @@ struct OrganizerRegistrationView: View {
 
             Spacer()
 
-            primaryButton("Done") {
+            PrimaryButtonView(title:"Done") {
                 dismiss()
             }
             .padding(.horizontal, 20)
@@ -335,17 +335,6 @@ struct OrganizerRegistrationView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
-    private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(AppConstants.Colors.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-        }
-    }
 }
 
 // MARK: - Text Field Style

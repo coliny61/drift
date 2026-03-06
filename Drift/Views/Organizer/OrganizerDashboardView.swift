@@ -94,8 +94,8 @@ struct OrganizerDashboardView: View {
     private var analyticsSection: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             analyticsCard(value: "\(events.count)", label: "Total Events", icon: "calendar", color: AppConstants.Colors.accent)
-            analyticsCard(value: "\(totalRSVPs)", label: "Total RSVPs", icon: "person.2.fill", color: Color(hex: "60A5FA"))
-            analyticsCard(value: "\(followerCount)", label: "Followers", icon: "heart.fill", color: Color(hex: "EC407A"))
+            analyticsCard(value: "\(totalRSVPs)", label: "Total RSVPs", icon: "person.2.fill", color: AppConstants.Colors.info)
+            analyticsCard(value: "\(followerCount)", label: "Followers", icon: "heart.fill", color: AppConstants.Colors.pink)
             analyticsCard(value: "\(approvedCount)", label: "Live Events", icon: "checkmark.circle.fill", color: AppConstants.Colors.success)
         }
         .padding(.horizontal)
@@ -216,15 +216,15 @@ struct OrganizerDashboardView: View {
                 } label: {
                     Image(systemName: "star")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Color(hex: "FBBF24"))
+                        .foregroundStyle(AppConstants.Colors.warning)
                         .frame(width: 32, height: 32)
-                        .background(Color(hex: "FBBF24").opacity(0.12))
+                        .background(AppConstants.Colors.warning.opacity(0.12))
                         .clipShape(Circle())
                 }
             } else if event.isCurrentlyFeatured {
                 Image(systemName: "star.fill")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color(hex: "FBBF24"))
+                    .foregroundStyle(AppConstants.Colors.warning)
                     .frame(width: 32, height: 32)
             }
         }
@@ -273,8 +273,8 @@ struct OrganizerDashboardView: View {
 
     private func approvalColor(_ event: Event) -> Color {
         if event.isApproved { return AppConstants.Colors.success }
-        if event.isPending { return Color(hex: "FBBF24") }
-        if event.isRejected { return Color(hex: "EF5350") }
+        if event.isPending { return AppConstants.Colors.warning }
+        if event.isRejected { return AppConstants.Colors.error }
         return AppConstants.Colors.textTertiary
     }
 

@@ -33,8 +33,8 @@ struct FilterSheetView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
-                                    .background(isSelected ? Color(hex: category.color).opacity(0.2) : Color(hex: "2A2A2A"))
-                                    .foregroundStyle(isSelected ? Color(hex: category.color) : Color(hex: "9CA3AF"))
+                                    .background(isSelected ? Color(hex: category.color).opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                    .foregroundStyle(isSelected ? Color(hex: category.color) : AppConstants.Colors.textSecondary)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 10)
@@ -45,7 +45,7 @@ struct FilterSheetView: View {
                         }
                     }
 
-                    Divider().background(Color(hex: "2A2A2A"))
+                    Divider().background(AppConstants.Colors.secondaryBackground)
 
                     // City
                     VStack(alignment: .leading, spacing: 12) {
@@ -65,8 +65,8 @@ struct FilterSheetView: View {
                                         .fontWeight(.medium)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(allSelected ? Color(hex: "60A5FA").opacity(0.2) : Color(hex: "2A2A2A"))
-                                        .foregroundStyle(allSelected ? Color(hex: "60A5FA") : Color(hex: "9CA3AF"))
+                                        .background(allSelected ? AppConstants.Colors.info.opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                        .foregroundStyle(allSelected ? AppConstants.Colors.info : AppConstants.Colors.textSecondary)
                                         .clipShape(Capsule())
                                 }
 
@@ -80,8 +80,8 @@ struct FilterSheetView: View {
                                             .fontWeight(.medium)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
-                                            .background(isSelected ? Color(hex: "60A5FA").opacity(0.2) : Color(hex: "2A2A2A"))
-                                            .foregroundStyle(isSelected ? Color(hex: "60A5FA") : Color(hex: "9CA3AF"))
+                                            .background(isSelected ? AppConstants.Colors.info.opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                            .foregroundStyle(isSelected ? AppConstants.Colors.info : AppConstants.Colors.textSecondary)
                                             .clipShape(Capsule())
                                     }
                                 }
@@ -89,7 +89,7 @@ struct FilterSheetView: View {
                         }
                     }
 
-                    Divider().background(Color(hex: "2A2A2A"))
+                    Divider().background(AppConstants.Colors.secondaryBackground)
 
                     // Date Range
                     VStack(alignment: .leading, spacing: 12) {
@@ -109,8 +109,8 @@ struct FilterSheetView: View {
                                             .fontWeight(.medium)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
-                                            .background(isSelected ? Color(hex: "FF6B35").opacity(0.2) : Color(hex: "2A2A2A"))
-                                            .foregroundStyle(isSelected ? Color(hex: "FF6B35") : Color(hex: "9CA3AF"))
+                                            .background(isSelected ? AppConstants.Colors.accent.opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                            .foregroundStyle(isSelected ? AppConstants.Colors.accent : AppConstants.Colors.textSecondary)
                                             .clipShape(Capsule())
                                     }
                                 }
@@ -118,7 +118,7 @@ struct FilterSheetView: View {
                         }
                     }
 
-                    Divider().background(Color(hex: "2A2A2A"))
+                    Divider().background(AppConstants.Colors.secondaryBackground)
 
                     // Time of Day
                     VStack(alignment: .leading, spacing: 12) {
@@ -137,15 +137,15 @@ struct FilterSheetView: View {
                                         .fontWeight(.medium)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(isSelected ? Color(hex: "A78BFA").opacity(0.2) : Color(hex: "2A2A2A"))
-                                        .foregroundStyle(isSelected ? Color(hex: "A78BFA") : Color(hex: "9CA3AF"))
+                                        .background(isSelected ? AppConstants.Colors.purple.opacity(0.2) : AppConstants.Colors.secondaryBackground)
+                                        .foregroundStyle(isSelected ? AppConstants.Colors.purple : AppConstants.Colors.textSecondary)
                                         .clipShape(Capsule())
                                 }
                             }
                         }
                     }
 
-                    Divider().background(Color(hex: "2A2A2A"))
+                    Divider().background(AppConstants.Colors.secondaryBackground)
 
                     // Distance
                     VStack(alignment: .leading, spacing: 12) {
@@ -156,41 +156,41 @@ struct FilterSheetView: View {
                             Spacer()
                             Text("\(Int(viewModel.maxDistance)) mi")
                                 .font(.subheadline)
-                                .foregroundStyle(Color(hex: "FF6B35"))
+                                .foregroundStyle(AppConstants.Colors.accent)
                         }
 
                         Slider(value: Bindable(viewModel).maxDistance, in: 1...25, step: 1)
-                            .tint(Color(hex: "FF6B35"))
+                            .tint(AppConstants.Colors.accent)
                     }
 
-                    Divider().background(Color(hex: "2A2A2A"))
+                    Divider().background(AppConstants.Colors.secondaryBackground)
 
                     // Toggles
                     VStack(spacing: 16) {
                         Toggle(isOn: Bindable(viewModel).alcoholFreeOnly) {
                             HStack(spacing: 8) {
                                 Image(systemName: "leaf.fill")
-                                    .foregroundStyle(Color(hex: "34D399"))
+                                    .foregroundStyle(AppConstants.Colors.teal)
                                 Text("Alcohol-Free Only")
                                     .foregroundStyle(.white)
                             }
                         }
-                        .tint(Color(hex: "34D399"))
+                        .tint(AppConstants.Colors.teal)
 
                         Toggle(isOn: Bindable(viewModel).freeOnly) {
                             HStack(spacing: 8) {
                                 Image(systemName: "dollarsign.circle")
-                                    .foregroundStyle(Color(hex: "60A5FA"))
+                                    .foregroundStyle(AppConstants.Colors.info)
                                 Text("Free Events Only")
                                     .foregroundStyle(.white)
                             }
                         }
-                        .tint(Color(hex: "60A5FA"))
+                        .tint(AppConstants.Colors.info)
                     }
                 }
                 .padding()
             }
-            .background(Color(hex: "0A0A0A"))
+            .background(AppConstants.Colors.background)
             .navigationTitle("Filters")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -199,7 +199,7 @@ struct FilterSheetView: View {
                     Button("Reset") {
                         viewModel.clearFilters()
                     }
-                    .foregroundStyle(Color(hex: "9CA3AF"))
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Apply") {
@@ -207,7 +207,7 @@ struct FilterSheetView: View {
                         dismiss()
                     }
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color(hex: "FF6B35"))
+                    .foregroundStyle(AppConstants.Colors.accent)
                 }
             }
         }

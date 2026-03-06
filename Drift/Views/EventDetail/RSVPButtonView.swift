@@ -43,14 +43,14 @@ struct RSVPButtonView: View {
                             .fontWeight(.semibold)
                     }
                     .font(.subheadline)
-                    .foregroundStyle(isInterested ? Color(hex: "FFD54F") : AppConstants.Colors.textSecondary)
+                    .foregroundStyle(isInterested ? AppConstants.Colors.interested : AppConstants.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(AppConstants.Colors.secondaryBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(isInterested ? Color(hex: "FFD54F").opacity(0.4) : .clear, lineWidth: 1.5)
+                            .strokeBorder(isInterested ? AppConstants.Colors.interested.opacity(0.4) : .clear, lineWidth: 1.5)
                     )
                 }
             }

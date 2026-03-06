@@ -1,0 +1,43 @@
+import SwiftUI
+
+struct OrganizerLogoView: View {
+    let organizer: Organizer
+    var size: CGFloat = 48
+
+    var body: some View {
+        if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipShape(Circle())
+                default:
+                    placeholder
+                }
+            }
+        } else {
+            placeholder
+        }
+    }
+
+    private var placeholder: some View {
+        Circle()
+            .fill(
+                LinearGradient(
+                    colors: [AppConstants.Colors.accent.opacity(0.3), AppConstants.Colors.accent.opacity(0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: size, height: size)
+            .overlay {
+                Text(String(organizer.name.prefix(1)))
+                    .font(size > 60 ? .title : .headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(AppConstants.Colors.accent)
+            }
+    }
+}

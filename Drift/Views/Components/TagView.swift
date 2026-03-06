@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TagView: View {
     let text: String
-    var color: Color = Color(hex: "FF6B35")
+    var color: Color = AppConstants.Colors.accent
     var style: TagStyle = .filled
 
     enum TagStyle {

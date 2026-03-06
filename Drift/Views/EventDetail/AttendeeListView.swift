@@ -16,16 +16,16 @@ struct AttendeeListView: View {
                             .foregroundStyle(.white)
                         Text("@\(attendee.username)")
                             .font(.caption)
-                            .foregroundStyle(Color(hex: "9CA3AF"))
+                            .foregroundStyle(AppConstants.Colors.textSecondary)
                     }
 
                     Spacer()
                 }
-                .listRowBackground(Color(hex: "1A1A1A"))
+                .listRowBackground(AppConstants.Colors.cardBackground)
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
         .navigationTitle("Attendees")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)

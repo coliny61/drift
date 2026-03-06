@@ -35,9 +35,22 @@ struct DiscoverView: View {
                             Text("Couldn't load events")
                                 .font(.headline)
                                 .foregroundStyle(.white)
-                            Text("Check your connection and pull to refresh")
+                            Text("Check your connection and try again")
                                 .font(.subheadline)
                                 .foregroundStyle(AppConstants.Colors.textSecondary)
+                            Button {
+                                Task { await viewModel.loadEvents() }
+                            } label: {
+                                Text("Retry")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 28)
+                                    .padding(.vertical, 10)
+                                    .background(AppConstants.Colors.accent)
+                                    .clipShape(Capsule())
+                            }
+                            .padding(.top, 4)
                         }
                         .padding(.top, 60)
                     } else if viewModel.filteredEvents.isEmpty {

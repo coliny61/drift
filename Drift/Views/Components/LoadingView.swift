@@ -6,13 +6,13 @@ struct LoadingView: View {
     var body: some View {
         VStack(spacing: 16) {
             ProgressView()
-                .tint(Color(hex: "FF6B35"))
+                .tint(AppConstants.Colors.accent)
                 .scaleEffect(1.2)
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(Color(hex: "9CA3AF"))
+                .foregroundStyle(AppConstants.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(hex: "0A0A0A"))
+        .background(AppConstants.Colors.background)
     }
 }

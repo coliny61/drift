@@ -79,6 +79,8 @@
 		AA0001110001000600010001 /* OrganizerDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000600010001 /* OrganizerDashboardView.swift */; };
 		AA0001110001000700010001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000700010001 /* NotificationService.swift */; };
 		AA0001110001000800010001 /* AppDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000800010001 /* AppDestination.swift */; };
+		AA0001110001000900010001 /* PrimaryButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000900010001 /* PrimaryButtonView.swift */; };
+		AA0001110001001000010001 /* OrganizerLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001000010001 /* OrganizerLogoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -155,6 +157,8 @@
 		AA0001110002000600010001 /* OrganizerDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerDashboardView.swift; sourceTree = "<group>"; };
 		AA0001110002000700010001 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		AA0001110002000800010001 /* AppDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDestination.swift; sourceTree = "<group>"; };
+		AA0001110002000900010001 /* PrimaryButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButtonView.swift; sourceTree = "<group>"; };
+		AA0001110002001000010001 /* OrganizerLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerLogoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -331,6 +335,8 @@
 				8CF61019EBB295FF5644ABAA /* EmptyStateView.swift */,
 				33A6D28FC2DF1769BC8684F1 /* ErrorView.swift */,
 				BFE8F56F2B370544293E496A /* LoadingView.swift */,
+				AA0001110002001000010001 /* OrganizerLogoView.swift */,
+				AA0001110002000900010001 /* PrimaryButtonView.swift */,
 				539E9F30330162F27C973048 /* TagView.swift */,
 			);
 			path = Components;
@@ -537,6 +543,8 @@
 				AA0001110001000600010001 /* OrganizerDashboardView.swift in Sources */,
 				AA0001110001000700010001 /* NotificationService.swift in Sources */,
 				AA0001110001000800010001 /* AppDestination.swift in Sources */,
+				AA0001110001000900010001 /* PrimaryButtonView.swift in Sources */,
+				AA0001110001001000010001 /* OrganizerLogoView.swift in Sources */,
 				AA0001110001000100010001 /* OrganizerService.swift in Sources */,
 				549CA94B5EA7D07662335C40 /* OtherProfileView.swift in Sources */,
 				814579EB801A8E52B61C3586 /* PhotoService.swift in Sources */,

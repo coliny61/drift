@@ -297,7 +297,7 @@ struct EventSubmitView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "clock.badge.checkmark")
                         .font(.title3)
-                        .foregroundStyle(Color(hex: "FBBF24"))
+                        .foregroundStyle(AppConstants.Colors.warning)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Under Review")
                             .font(.subheadline)
@@ -309,19 +309,19 @@ struct EventSubmitView: View {
                     }
                 }
                 .padding(14)
-                .background(Color(hex: "FBBF24").opacity(0.1))
+                .background(AppConstants.Colors.warning.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                 if let error {
                     Text(error)
                         .font(.caption)
-                        .foregroundStyle(Color(hex: "EF5350"))
+                        .foregroundStyle(AppConstants.Colors.error)
                 }
 
                 Spacer(minLength: 40)
                 HStack(spacing: 12) {
                     backButton { step = 2 }
-                    primaryButton(isEditing ? "Save Changes" : "Submit Event") {
+                    PrimaryButtonView(title:isEditing ? "Save Changes" : "Submit Event") {
                         Task { await submitEvent() }
                     }
                     .disabled(isSubmitting)
@@ -351,7 +351,7 @@ struct EventSubmitView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
             Spacer()
-            primaryButton("Done") { dismiss() }
+            PrimaryButtonView(title:"Done") { dismiss() }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 48)
         }
@@ -466,7 +466,7 @@ struct EventSubmitView: View {
     }
 
     private func navButtons(canProceed: Bool, action: @escaping () -> Void) -> some View {
-        primaryButton("Next", action: action)
+        PrimaryButtonView(title:"Next", action: action)
             .disabled(!canProceed)
             .opacity(canProceed ? 1 : 0.4)
     }
@@ -483,15 +483,4 @@ struct EventSubmitView: View {
         }
     }
 
-    private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(AppConstants.Colors.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-        }
-    }
 }

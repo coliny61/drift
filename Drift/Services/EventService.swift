@@ -68,12 +68,29 @@ final class EventService {
         }
     }
 
+    func fetchEventsByIds(_ ids: [UUID]) async -> [Event] {
+        guard !ids.isEmpty else { return [] }
+        do {
+            let idStrings = ids.map { $0.uuidString }
+            let response: [Event] = try await client.from("events")
+                .select()
+                .in("id", values: idStrings)
+                .execute()
+                .value
+            return response
+        } catch {
+            print("Error fetching events by IDs: \(error)")
+            return []
+        }
+    }
+
     func fetchEventsByCategory(_ category: String) async -> [Event] {
         do {
             let response: [Event] = try await client.from("events")
                 .select()
                 .eq("category", value: category)
                 .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
                 .order("start_time", ascending: true)
                 .execute()
                 .value
@@ -90,6 +107,7 @@ final class EventService {
                 .select()
                 .eq("neighborhood", value: neighborhood)
                 .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
                 .order("start_time", ascending: true)
                 .execute()
                 .value
@@ -162,6 +180,7 @@ final class EventService {
                 .select()
                 .or("title.ilike.%\(query)%,description.ilike.%\(query)%,location_name.ilike.%\(query)%")
                 .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
                 .order("start_time", ascending: true)
                 .execute()
                 .value

@@ -8,6 +8,7 @@ final class ChatViewModel {
     var isLoading: Bool { chatService.isLoading }
     var messageText = ""
     var isSubscribed = false
+    var sendError: String?
 
     init(chatService: ChatService) {
         self.chatService = chatService
@@ -21,9 +22,17 @@ final class ChatViewModel {
         let content = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !content.isEmpty else { return }
 
+        let savedText = messageText
         messageText = ""
-        try? await chatService.sendMessage(eventId: eventId, senderId: senderId, content: content)
-        HapticManager.impact(.light)
+        sendError = nil
+        do {
+            try await chatService.sendMessage(eventId: eventId, senderId: senderId, content: content)
+            HapticManager.impact(.light)
+        } catch {
+            messageText = savedText
+            sendError = "Failed to send message. Try again."
+            HapticManager.notification(.error)
+        }
     }
 
     func deleteMessage(messageId: UUID) async {

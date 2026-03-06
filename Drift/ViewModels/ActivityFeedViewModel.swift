@@ -8,6 +8,17 @@ final class ActivityFeedViewModel {
     var feedItems: [ActivityFeedItem] { activityService.feedItems }
     var isLoading: Bool { activityService.isLoading }
 
+    private static let lastViewedKey = "drift_activity_last_viewed"
+
+    var unreadCount: Int {
+        let lastViewed = UserDefaults.standard.object(forKey: Self.lastViewedKey) as? Date ?? .distantPast
+        return feedItems.filter { $0.createdAt > lastViewed }.count
+    }
+
+    func markAsRead() {
+        UserDefaults.standard.set(Date(), forKey: Self.lastViewedKey)
+    }
+
     init(activityService: ActivityService) {
         self.activityService = activityService
     }

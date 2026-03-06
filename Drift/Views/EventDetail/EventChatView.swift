@@ -4,6 +4,7 @@ struct EventChatView: View {
     let eventId: UUID
     @Environment(ChatViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @State private var isSending = false
 
     private var currentUserId: UUID {
         authViewModel.currentProfile?.id ?? authViewModel.localUserId
@@ -14,13 +15,29 @@ struct EventChatView: View {
             // Messages
             ScrollViewReader { proxy in
                 ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(viewModel.messages) { message in
-                            chatBubble(message)
-                                .id(message.id)
+                    if viewModel.messages.isEmpty && !viewModel.isLoading {
+                        VStack(spacing: 12) {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 36, weight: .light))
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                            Text("No messages yet")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                            Text("Be the first to say something!")
+                                .font(.subheadline)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 80)
+                    } else {
+                        LazyVStack(spacing: 12) {
+                            ForEach(viewModel.messages) { message in
+                                chatBubble(message)
+                                    .id(message.id)
+                            }
+                        }
+                        .padding()
                     }
-                    .padding()
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .onChange(of: viewModel.messages.count) { _, _ in
@@ -34,6 +51,19 @@ struct EventChatView: View {
 
             Divider().background(AppConstants.Colors.secondaryBackground)
 
+            // Send error
+            if let sendError = viewModel.sendError {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                    Text(sendError)
+                }
+                .font(.caption)
+                .foregroundStyle(AppConstants.Colors.error)
+                .padding(.horizontal)
+                .padding(.top, 6)
+                .onTapGesture { viewModel.sendError = nil }
+            }
+
             // Input
             HStack(spacing: 12) {
                 TextField("Message...", text: Bindable(viewModel).messageText)
@@ -43,16 +73,26 @@ struct EventChatView: View {
                     .foregroundStyle(.white)
 
                 Button {
-                    Task { await viewModel.sendMessage(eventId: eventId, senderId: currentUserId) }
+                    isSending = true
+                    Task {
+                        await viewModel.sendMessage(eventId: eventId, senderId: currentUserId)
+                        isSending = false
+                    }
                 } label: {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(
-                            viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty
-                            ? AppConstants.Colors.textSecondary : AppConstants.Colors.accent
-                        )
+                    if isSending {
+                        ProgressView()
+                            .tint(AppConstants.Colors.accent)
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(
+                                viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty
+                                ? AppConstants.Colors.textSecondary : AppConstants.Colors.accent
+                            )
+                    }
                 }
-                .disabled(viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled(viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty || isSending)
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
