@@ -31,11 +31,7 @@ struct EventRecapView: View {
                         Button {
                             selectedImage = photo
                         } label: {
-                            AsyncImage(url: URL(string: photo.photoUrl)) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            } placeholder: {
+                            CachedAsyncImage(url: URL(string: photo.photoUrl)) {
                                 Rectangle()
                                     .fill(AppConstants.Colors.secondaryBackground)
                             }
@@ -126,11 +122,7 @@ struct PhotoDetailSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                AsyncImage(url: URL(string: photo.photoUrl)) { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                } placeholder: {
+                CachedAsyncImage(url: URL(string: photo.photoUrl), contentMode: .fit) {
                     Rectangle()
                         .fill(AppConstants.Colors.secondaryBackground)
                         .frame(height: 300)

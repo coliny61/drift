@@ -16,6 +16,7 @@ struct EventDetailView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(OrganizerService.self) private var organizerService
     @Environment(LocationManager.self) private var locationManager
+    @Environment(BookmarkViewModel.self) private var bookmarkViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var organizer: Organizer?
     @State private var showTicketSafari = false
@@ -57,27 +58,11 @@ struct EventDetailView: View {
                     // Hero image
                     ZStack(alignment: .topLeading) {
                         if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 300)
-                                        .clipped()
-                                case .failure:
-                                    heroGradientPlaceholder(event: event)
-                                case .empty:
-                                    heroGradientPlaceholder(event: event)
-                                        .overlay {
-                                            ProgressView()
-                                                .tint(.white.opacity(0.5))
-                                        }
-                                @unknown default:
-                                    heroGradientPlaceholder(event: event)
-                                }
+                            CachedAsyncImage(url: url) {
+                                heroGradientPlaceholder(event: event)
                             }
                             .frame(height: 300)
+                            .clipped()
                             .overlay(
                                 LinearGradient(
                                     colors: [.black.opacity(0.3), .clear, .black.opacity(0.6)],
@@ -467,6 +452,16 @@ struct EventDetailView: View {
         .background(AppConstants.Colors.background)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    bookmarkViewModel.toggle(eventId)
+                } label: {
+                    Image(systemName: bookmarkViewModel.isBookmarked(eventId) ? "bookmark.fill" : "bookmark")
+                        .foregroundStyle(bookmarkViewModel.isBookmarked(eventId) ? AppConstants.Colors.accent : AppConstants.Colors.textSecondary)
+                }
+            }
+        }
         .navigationDestination(for: AppDestination.self) { destination in
             switch destination {
             case .event(let id): EventDetailView(eventId: id)

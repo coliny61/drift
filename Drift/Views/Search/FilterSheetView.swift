@@ -204,6 +204,7 @@ struct FilterSheetView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Apply") {
                         viewModel.applyLocalFilters()
+                        viewModel.saveFilters()
                         dismiss()
                     }
                     .fontWeight(.semibold)

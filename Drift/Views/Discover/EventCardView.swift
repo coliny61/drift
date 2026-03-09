@@ -8,27 +8,11 @@ struct EventCardView: View {
             // Cover image
             ZStack(alignment: .topLeading) {
                 if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 200)
-                                .clipped()
-                        case .failure:
-                            gradientPlaceholder
-                        case .empty:
-                            gradientPlaceholder
-                                .overlay {
-                                    ProgressView()
-                                        .tint(.white.opacity(0.5))
-                                }
-                        @unknown default:
-                            gradientPlaceholder
-                        }
+                    CachedAsyncImage(url: url) {
+                        gradientPlaceholder
                     }
                     .frame(height: 200)
+                    .clipped()
                     .overlay(
                         LinearGradient(
                             colors: [.black.opacity(0.15), .clear, .black.opacity(0.5)],

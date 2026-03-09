@@ -16,9 +16,8 @@ struct SearchView: View {
                         TextField("Search events, places, vibes...", text: Bindable(viewModel).query)
                             .foregroundStyle(.white)
                             .focused($isSearchFocused)
-                            .onSubmit {
-                                Task { await viewModel.search() }
-                            }
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
 
                         if !viewModel.query.isEmpty {
                             Button {

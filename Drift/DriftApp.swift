@@ -27,6 +27,7 @@ struct DriftApp: App {
     @State private var chatViewModel: ChatViewModel
     @State private var activityFeedViewModel: ActivityFeedViewModel
     @State private var settingsViewModel = SettingsViewModel()
+    @State private var bookmarkViewModel = BookmarkViewModel()
 
     init() {
         let client = SupabaseClient(
@@ -88,6 +89,7 @@ struct DriftApp: App {
                 .environment(organizerService)
                 .environment(eventService)
                 .environment(notificationService)
+                .environment(bookmarkViewModel)
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()

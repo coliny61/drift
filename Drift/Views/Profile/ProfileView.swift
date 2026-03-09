@@ -3,8 +3,17 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(ProfileViewModel.self) private var profileViewModel
+    @Environment(BookmarkViewModel.self) private var bookmarkViewModel
+    @Environment(EventService.self) private var eventService
     @State private var showSettings = false
     @State private var showEditProfile = false
+    @State private var eventTab: ProfileEventTab = .upcoming
+    @State private var bookmarkedEvents: [Event] = []
+
+    enum ProfileEventTab: String, CaseIterable {
+        case upcoming = "Upcoming"
+        case saved = "Saved"
+    }
 
     var body: some View {
         NavigationStack {
@@ -132,74 +141,56 @@ struct ProfileView: View {
                         }
                     }
 
-                    // Upcoming Events
+                    // Events tabs
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("UPCOMING EVENTS")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .tracking(1)
-                            .foregroundStyle(AppConstants.Colors.textTertiary)
-                            .padding(.horizontal)
-
-                        if profileViewModel.upcomingEvents.isEmpty {
-                            VStack(spacing: 10) {
-                                Image(systemName: "calendar")
-                                    .font(.system(size: 28, weight: .light))
-                                    .foregroundStyle(AppConstants.Colors.textTertiary)
-                                Text("No upcoming events")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(AppConstants.Colors.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 36)
-                            .background(AppConstants.Colors.cardBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .padding(.horizontal)
-                        } else {
-                            ForEach(profileViewModel.upcomingEvents) { event in
-                                NavigationLink(value: AppDestination.event(event.id)) {
-                                    HStack(spacing: 14) {
-                                        VStack(alignment: .center, spacing: 2) {
-                                            Text(event.startTime.formatted(.dateTime.month(.abbreviated)).uppercased())
-                                                .font(.caption2)
-                                                .fontWeight(.bold)
-                                                .tracking(0.5)
-                                                .foregroundStyle(AppConstants.Colors.accent)
-                                            Text(event.startTime.formatted(.dateTime.day()))
-                                                .font(.title2)
-                                                .fontWeight(.bold)
-                                                .foregroundStyle(.white)
-                                        }
-                                        .frame(width: 48)
-
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(event.title)
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                                .foregroundStyle(.white)
-                                                .lineLimit(1)
-                                            HStack(spacing: 4) {
-                                                Image(systemName: "mappin")
-                                                    .font(.system(size: 9))
-                                                Text(event.locationName)
-                                                    .font(.caption)
-                                            }
-                                            .foregroundStyle(AppConstants.Colors.textSecondary)
-                                            .lineLimit(1)
-                                        }
-
-                                        Spacer()
-
-                                        Image(systemName: "chevron.right")
+                        // Tab picker
+                        HStack(spacing: 0) {
+                            ForEach(ProfileEventTab.allCases, id: \.self) { tab in
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.2)) { eventTab = tab }
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Text(tab.rawValue)
                                             .font(.caption)
-                                            .foregroundStyle(AppConstants.Colors.textTertiary)
+                                            .fontWeight(eventTab == tab ? .bold : .medium)
+                                        if tab == .saved && !bookmarkViewModel.bookmarkedIds.isEmpty {
+                                            Text("\(bookmarkViewModel.bookmarkedIds.count)")
+                                                .font(.system(size: 10, weight: .bold))
+                                                .foregroundStyle(eventTab == tab ? AppConstants.Colors.cardBackground : AppConstants.Colors.textTertiary)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 2)
+                                                .background(eventTab == tab ? AppConstants.Colors.accent : AppConstants.Colors.secondaryBackground)
+                                                .clipShape(Capsule())
+                                        }
                                     }
-                                    .padding(14)
-                                    .background(AppConstants.Colors.cardBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                                    .foregroundStyle(eventTab == tab ? .white : AppConstants.Colors.textSecondary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(eventTab == tab ? AppConstants.Colors.secondaryBackground : .clear)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
-                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(3)
+                        .background(AppConstants.Colors.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(.horizontal)
+
+                        if eventTab == .upcoming {
+                            if profileViewModel.upcomingEvents.isEmpty {
+                                profileEventEmpty(icon: "calendar", text: "No upcoming events")
+                            } else {
+                                ForEach(profileViewModel.upcomingEvents) { event in
+                                    profileEventRow(event)
+                                }
+                            }
+                        } else {
+                            if bookmarkedEvents.isEmpty {
+                                profileEventEmpty(icon: "bookmark", text: "No saved events")
+                            } else {
+                                ForEach(bookmarkedEvents) { event in
+                                    profileEventRow(event)
+                                }
                             }
                         }
                     }
@@ -239,6 +230,8 @@ struct ProfileView: View {
             .task {
                 let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
                 await profileViewModel.loadProfile(userId: userId, currentUserId: userId)
+                let ids = Array(bookmarkViewModel.bookmarkedIds)
+                bookmarkedEvents = await eventService.fetchEventsByIds(ids)
             }
         }
     }
@@ -249,6 +242,68 @@ struct ProfileView: View {
         Rectangle()
             .fill(AppConstants.Colors.secondaryBackground)
             .frame(width: 1, height: 28)
+    }
+
+    private func profileEventRow(_ event: Event) -> some View {
+        NavigationLink(value: AppDestination.event(event.id)) {
+            HStack(spacing: 14) {
+                VStack(alignment: .center, spacing: 2) {
+                    Text(event.startTime.formatted(.dateTime.month(.abbreviated)).uppercased())
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .tracking(0.5)
+                        .foregroundStyle(AppConstants.Colors.accent)
+                    Text(event.startTime.formatted(.dateTime.day()))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 48)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(event.title)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin")
+                            .font(.system(size: 9))
+                        Text(event.locationName)
+                            .font(.caption)
+                    }
+                    .foregroundStyle(AppConstants.Colors.textSecondary)
+                    .lineLimit(1)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(AppConstants.Colors.textTertiary)
+            }
+            .padding(14)
+            .background(AppConstants.Colors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .padding(.horizontal)
+    }
+
+    private func profileEventEmpty(icon: String, text: String) -> some View {
+        VStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 28, weight: .light))
+                .foregroundStyle(AppConstants.Colors.textTertiary)
+            Text(text)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(AppConstants.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 36)
+        .background(AppConstants.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal)
     }
 
     private func statItem(value: String, label: String, accent: Bool = false) -> some View {

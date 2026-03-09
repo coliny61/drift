@@ -81,6 +81,9 @@
 		AA0001110001000800010001 /* AppDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000800010001 /* AppDestination.swift */; };
 		AA0001110001000900010001 /* PrimaryButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002000900010001 /* PrimaryButtonView.swift */; };
 		AA0001110001001000010001 /* OrganizerLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001000010001 /* OrganizerLogoView.swift */; };
+		AA0001110001001100010001 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001100010001 /* CachedAsyncImage.swift */; };
+		AA0001110001001200010001 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001200010001 /* SkeletonView.swift */; };
+		AA0001110001001300010001 /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001300010001 /* BookmarkViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +162,9 @@
 		AA0001110002000800010001 /* AppDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDestination.swift; sourceTree = "<group>"; };
 		AA0001110002000900010001 /* PrimaryButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButtonView.swift; sourceTree = "<group>"; };
 		AA0001110002001000010001 /* OrganizerLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerLogoView.swift; sourceTree = "<group>"; };
+		AA0001110002001100010001 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		AA0001110002001200010001 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
+		AA0001110002001300010001 /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -231,6 +237,7 @@
 			children = (
 				B3E6CCE1E61A54F658818CED /* ActivityFeedViewModel.swift */,
 				EB6E793EEB1021944A3A4F98 /* AuthViewModel.swift */,
+				AA0001110002001300010001 /* BookmarkViewModel.swift */,
 				FB047C526B3FB5AC344957E5 /* ChatViewModel.swift */,
 				D615F8CE63813BC0E52ACDF7 /* DiscoverViewModel.swift */,
 				57A721FC70C784DA5EC17A4F /* EventDetailViewModel.swift */,
@@ -332,11 +339,13 @@
 			isa = PBXGroup;
 			children = (
 				18A9803A8D3B1E0F7EB2B8FA /* AvatarView.swift */,
+				AA0001110002001100010001 /* CachedAsyncImage.swift */,
 				8CF61019EBB295FF5644ABAA /* EmptyStateView.swift */,
 				33A6D28FC2DF1769BC8684F1 /* ErrorView.swift */,
 				BFE8F56F2B370544293E496A /* LoadingView.swift */,
 				AA0001110002001000010001 /* OrganizerLogoView.swift */,
 				AA0001110002000900010001 /* PrimaryButtonView.swift */,
+				AA0001110002001200010001 /* SkeletonView.swift */,
 				539E9F30330162F27C973048 /* TagView.swift */,
 			);
 			path = Components;
@@ -503,6 +512,8 @@
 				BAFFDBAEC08B13156C6D70C0 /* AuthService.swift in Sources */,
 				34893AA11B0E3AD6756D1FC7 /* AuthViewModel.swift in Sources */,
 				2207F9415DE9F881FA34F27B /* AvatarView.swift in Sources */,
+				AA0001110001001300010001 /* BookmarkViewModel.swift in Sources */,
+				AA0001110001001100010001 /* CachedAsyncImage.swift in Sources */,
 				24245DCCD351C64AB010C11B /* Category.swift in Sources */,
 				7FACA0C9CC15AEC3B877D2BF /* CategoryChipView.swift in Sources */,
 				CFE8E39AFD832D589D83835B /* ChatMessage.swift in Sources */,
@@ -558,6 +569,7 @@
 				E650732A8F8715D2A79BEF2F /* SearchView.swift in Sources */,
 				39DB5249E9128E0779D63480 /* SearchViewModel.swift in Sources */,
 				6B4F6F38470BD03D8C308299 /* SeedData.swift in Sources */,
+				AA0001110001001200010001 /* SkeletonView.swift in Sources */,
 				27C1F71FD517406909CC2A4B /* SettingsView.swift in Sources */,
 				65F7FA5C7D1F78BC0D591A17 /* SettingsViewModel.swift in Sources */,
 				F569DA5771CD141733BD8791 /* SignInView.swift in Sources */,

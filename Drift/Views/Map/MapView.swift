@@ -12,18 +12,41 @@ struct DriftMapView: View {
                 // User location
                 UserAnnotation()
 
-                // Event pins
-                ForEach(viewModel.filteredEvents) { event in
-                    Annotation(event.title, coordinate: CLLocationCoordinate2D(
-                        latitude: event.locationLat,
-                        longitude: event.locationLng
-                    )) {
-                        EventPinView(
-                            event: event,
-                            isSelected: viewModel.selectedEvent?.id == event.id
-                        )
-                        .onTapGesture {
-                            viewModel.selectEvent(event)
+                // Clustered event pins
+                ForEach(viewModel.clusters) { cluster in
+                    if cluster.isSingle, let event = cluster.event {
+                        Annotation(event.title, coordinate: CLLocationCoordinate2D(
+                            latitude: event.locationLat,
+                            longitude: event.locationLng
+                        )) {
+                            EventPinView(
+                                event: event,
+                                isSelected: viewModel.selectedEvent?.id == event.id
+                            )
+                            .onTapGesture {
+                                viewModel.selectEvent(event)
+                            }
+                        }
+                    } else {
+                        Annotation("", coordinate: CLLocationCoordinate2D(
+                            latitude: cluster.centerLat,
+                            longitude: cluster.centerLng
+                        )) {
+                            ClusterPinView(count: cluster.count)
+                                .onTapGesture {
+                                    // Zoom into the cluster
+                                    withAnimation {
+                                        viewModel.cameraPosition = .region(
+                                            MKCoordinateRegion(
+                                                center: CLLocationCoordinate2D(latitude: cluster.centerLat, longitude: cluster.centerLng),
+                                                span: MKCoordinateSpan(
+                                                    latitudeDelta: viewModel.region.span.latitudeDelta * 0.4,
+                                                    longitudeDelta: viewModel.region.span.longitudeDelta * 0.4
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
                         }
                     }
                 }
@@ -32,6 +55,9 @@ struct DriftMapView: View {
             .mapControls {
                 MapUserLocationButton()
                 MapCompass()
+            }
+            .onMapCameraChange(frequency: .onEnd) { context in
+                viewModel.updateRegion(context.region)
             }
             .ignoresSafeArea(edges: .bottom)
 

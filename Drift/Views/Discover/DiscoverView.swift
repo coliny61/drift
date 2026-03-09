@@ -24,9 +24,7 @@ struct DiscoverView: View {
                     }
 
                     if viewModel.isLoading && viewModel.events.isEmpty {
-                        ProgressView()
-                            .tint(AppConstants.Colors.accent)
-                            .padding(.top, 60)
+                        SkeletonFeedView()
                     } else if viewModel.error != nil && viewModel.events.isEmpty {
                         VStack(spacing: 14) {
                             Image(systemName: "wifi.slash")
@@ -169,13 +167,8 @@ struct DiscoverView: View {
     private func featuredCard(_ event: Event) -> some View {
         ZStack(alignment: .bottomLeading) {
             if let urlString = event.coverImageUrl, let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFill()
-                    default:
-                        featuredGradient(event)
-                    }
+                CachedAsyncImage(url: url) {
+                    featuredGradient(event)
                 }
             } else {
                 featuredGradient(event)

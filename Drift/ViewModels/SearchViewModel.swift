@@ -1,11 +1,14 @@
 import Foundation
+import Combine
 
 @Observable
 final class SearchViewModel {
     private let eventService: EventService
     private let locationManager: LocationManager
 
-    var query = ""
+    var query = "" {
+        didSet { debouncedSearch() }
+    }
     var results: [Event] = []
     var recentSearches: [String] = []
     var isSearching = false
@@ -22,6 +25,9 @@ final class SearchViewModel {
 
     // Unfiltered results for re-applying filters
     private var unfilteredResults: [Event] = []
+
+    // Debounce
+    private var debounceTask: Task<Void, Never>?
 
     enum DateRange: String, CaseIterable {
         case anytime = "Anytime"
@@ -42,6 +48,22 @@ final class SearchViewModel {
         self.eventService = eventService
         self.locationManager = locationManager
         loadRecentSearches()
+        loadSavedFilters()
+    }
+
+    private func debouncedSearch() {
+        debounceTask?.cancel()
+        let q = query
+        guard !q.trimmingCharacters(in: .whitespaces).isEmpty else {
+            results = []
+            unfilteredResults = []
+            return
+        }
+        debounceTask = Task {
+            try? await Task.sleep(for: .milliseconds(400))
+            guard !Task.isCancelled else { return }
+            await search()
+        }
     }
 
     func search() async {
@@ -139,6 +161,41 @@ final class SearchViewModel {
         timeOfDay = .anytime
         alcoholFreeOnly = false
         freeOnly = false
+        saveFilters()
+    }
+
+    // MARK: - Filter Persistence
+
+    func saveFilters() {
+        let defaults = UserDefaults.standard
+        let categorySlugs = selectedCategories.map(\.slug)
+        defaults.set(categorySlugs, forKey: "drift_filter_categories")
+        defaults.set(selectedCity, forKey: "drift_filter_city")
+        defaults.set(maxDistance, forKey: "drift_filter_distance")
+        defaults.set(dateRange.rawValue, forKey: "drift_filter_date_range")
+        defaults.set(timeOfDay.rawValue, forKey: "drift_filter_time_of_day")
+        defaults.set(alcoholFreeOnly, forKey: "drift_filter_alcohol_free")
+        defaults.set(freeOnly, forKey: "drift_filter_free_only")
+    }
+
+    private func loadSavedFilters() {
+        let defaults = UserDefaults.standard
+        if let slugs = defaults.stringArray(forKey: "drift_filter_categories") {
+            selectedCategories = Set(Category.allCases.filter { slugs.contains($0.slug) })
+        }
+        selectedCity = defaults.string(forKey: "drift_filter_city")
+        let dist = defaults.double(forKey: "drift_filter_distance")
+        if dist > 0 { maxDistance = dist }
+        if let raw = defaults.string(forKey: "drift_filter_date_range"),
+           let dr = DateRange(rawValue: raw) {
+            dateRange = dr
+        }
+        if let raw = defaults.string(forKey: "drift_filter_time_of_day"),
+           let tod = TimeOfDay(rawValue: raw) {
+            timeOfDay = tod
+        }
+        alcoholFreeOnly = defaults.bool(forKey: "drift_filter_alcohol_free")
+        freeOnly = defaults.bool(forKey: "drift_filter_free_only")
     }
 
     private func saveRecentSearch(_ query: String) {

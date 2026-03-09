@@ -6,18 +6,11 @@ struct OrganizerLogoView: View {
 
     var body: some View {
         if let logoUrl = organizer.logoUrl, let url = URL(string: logoUrl) {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: size, height: size)
-                        .clipShape(Circle())
-                default:
-                    placeholder
-                }
+            CachedAsyncImage(url: url) {
+                placeholder
             }
+            .frame(width: size, height: size)
+            .clipShape(Circle())
         } else {
             placeholder
         }

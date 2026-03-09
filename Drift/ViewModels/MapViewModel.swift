@@ -2,6 +2,17 @@ import Foundation
 import MapKit
 import SwiftUI
 
+struct EventCluster: Identifiable {
+    let id = UUID()
+    let events: [Event]
+    let centerLat: Double
+    let centerLng: Double
+
+    var isSingle: Bool { events.count == 1 }
+    var event: Event? { events.first }
+    var count: Int { events.count }
+}
+
 @Observable
 final class MapViewModel {
     private let eventService: EventService
@@ -43,6 +54,45 @@ final class MapViewModel {
         return events
     }
 
+    /// Groups of events that are too close together at the current zoom level
+    var clusters: [EventCluster] {
+        let threshold = clusterThreshold
+        var used = Set<UUID>()
+        var result: [EventCluster] = []
+
+        let evts = filteredEvents
+        for event in evts {
+            guard !used.contains(event.id) else { continue }
+            var group = [event]
+            used.insert(event.id)
+
+            for other in evts where !used.contains(other.id) {
+                let latDiff = abs(event.locationLat - other.locationLat)
+                let lngDiff = abs(event.locationLng - other.locationLng)
+                if latDiff < threshold && lngDiff < threshold {
+                    group.append(other)
+                    used.insert(other.id)
+                }
+            }
+
+            let avgLat = group.map(\.locationLat).reduce(0, +) / Double(group.count)
+            let avgLng = group.map(\.locationLng).reduce(0, +) / Double(group.count)
+            result.append(EventCluster(events: group, centerLat: avgLat, centerLng: avgLng))
+        }
+        return result
+    }
+
+    /// Clustering distance threshold based on current zoom span
+    private var clusterThreshold: Double {
+        // When zoomed out (large span), cluster more aggressively
+        switch region.span.latitudeDelta {
+        case 0..<0.02: return 0.001   // Very zoomed in — almost no clustering
+        case 0.02..<0.05: return 0.005
+        case 0.05..<0.15: return 0.01
+        default: return 0.02           // Zoomed out — cluster within ~1 mile
+        }
+    }
+
     func loadEvents() async {
         await eventService.fetchEvents()
         events = eventService.events
@@ -66,6 +116,10 @@ final class MapViewModel {
                 )
             }
         }
+    }
+
+    func updateRegion(_ region: MKCoordinateRegion) {
+        self.region = region
     }
 
     func centerOnUser(location: CLLocation?) {

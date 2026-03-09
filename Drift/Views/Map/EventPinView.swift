@@ -30,6 +30,24 @@ struct EventPinView: View {
     }
 }
 
+struct ClusterPinView: View {
+    let count: Int
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(AppConstants.Colors.accent)
+                .frame(width: 40, height: 40)
+                .shadow(color: AppConstants.Colors.accent.opacity(0.4), radius: 6)
+
+            Text("\(count)")
+                .font(.subheadline)
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+        }
+    }
+}
+
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
         Path { path in
