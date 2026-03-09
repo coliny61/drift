@@ -118,32 +118,16 @@ struct DiscoverView: View {
     // MARK: - Feed Mode Picker
 
     private var feedModePicker: some View {
-        HStack(spacing: 0) {
+        Picker("Feed", selection: Bindable(viewModel).feedMode) {
             ForEach(DiscoverViewModel.FeedMode.allCases, id: \.self) { mode in
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        viewModel.setFeedMode(mode)
-                    }
-                    HapticManager.selection()
-                } label: {
-                    Text(mode.rawValue)
-                        .font(.subheadline)
-                        .fontWeight(viewModel.feedMode == mode ? .bold : .medium)
-                        .foregroundStyle(viewModel.feedMode == mode ? .white : AppConstants.Colors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            viewModel.feedMode == mode
-                                ? AppConstants.Colors.secondaryBackground
-                                : .clear
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .accessibilityAddTraits(viewModel.feedMode == mode ? .isSelected : [])
+                Text(mode.rawValue).tag(mode)
             }
         }
-        .background(AppConstants.Colors.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .pickerStyle(.segmented)
+        .onChange(of: viewModel.feedMode) { _, newMode in
+            viewModel.setFeedMode(newMode)
+            HapticManager.selection()
+        }
     }
 
     // MARK: - Featured Carousel

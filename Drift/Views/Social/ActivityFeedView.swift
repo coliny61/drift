@@ -11,31 +11,29 @@ struct ActivityFeedView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
+            Group {
                 if visibleItems.isEmpty {
-                    EmptyStateView(
-                        icon: "bell",
-                        title: "No Activity Yet",
-                        message: "Follow friends and organizers to see their activity here"
+                    ContentUnavailableView(
+                        "No Activity Yet",
+                        systemImage: "bell",
+                        description: Text("Follow friends and organizers to see their activity here")
                     )
-                    .padding(.top, 60)
                 } else {
-                    LazyVStack(spacing: 0) {
+                    List {
                         ForEach(visibleItems) { item in
                             if let eventId = item.targetEventId {
                                 NavigationLink(value: AppDestination.event(eventId)) {
                                     ActivityItemView(item: item)
                                 }
-                                .buttonStyle(.plain)
                             } else {
                                 ActivityItemView(item: item)
                             }
-                            Rectangle()
-                                .fill(AppConstants.Colors.divider)
-                                .frame(height: 0.5)
-                                .padding(.leading, 72)
                         }
+                        .listRowBackground(AppConstants.Colors.background)
+                        .listRowSeparatorTint(AppConstants.Colors.divider)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .background(AppConstants.Colors.background)

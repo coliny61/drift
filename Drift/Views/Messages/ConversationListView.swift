@@ -6,33 +6,39 @@ struct ConversationListView: View {
     @Environment(BlockService.self) private var blockService
 
     var body: some View {
-        ScrollView {
+        Group {
             if dmService.isLoading && dmService.conversations.isEmpty {
                 ProgressView()
                     .tint(AppConstants.Colors.accent)
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 60)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if visibleConversations.isEmpty {
-                EmptyStateView(
-                    icon: "bubble.left.and.bubble.right",
-                    title: "No Messages Yet",
-                    message: "Visit someone's profile to start a conversation"
+                ContentUnavailableView(
+                    "No Messages Yet",
+                    systemImage: "bubble.left.and.bubble.right",
+                    description: Text("Visit someone's profile to start a conversation")
                 )
-                .padding(.top, 60)
             } else {
-                LazyVStack(spacing: 0) {
+                List {
                     ForEach(visibleConversations) { conversation in
                         NavigationLink(value: AppDestination.conversation(conversation.id)) {
                             conversationRow(conversation)
                         }
-                        .buttonStyle(.plain)
-
-                        Rectangle()
-                            .fill(AppConstants.Colors.divider)
-                            .frame(height: 0.5)
-                            .padding(.leading, 72)
+                        .listRowBackground(AppConstants.Colors.background)
+                        .listRowSeparatorTint(AppConstants.Colors.divider)
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                Task {
+                                    let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                                    await blockService.blockUser(blockerId: userId, blockedId: conversation.id)
+                                }
+                            } label: {
+                                Label("Block", systemImage: "slash.circle")
+                            }
+                        }
                     }
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
         }
         .background(AppConstants.Colors.background)
@@ -103,7 +109,5 @@ struct ConversationListView: View {
                 }
             }
         }
-        .padding(.horizontal)
-        .padding(.vertical, 12)
     }
 }

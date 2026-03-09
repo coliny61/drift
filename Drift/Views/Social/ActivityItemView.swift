@@ -27,8 +27,6 @@ struct ActivityItemView: View {
                 .background(actionColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .padding(.horizontal)
-        .padding(.vertical, 14)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(activityText.description), \(item.createdAt.relativeDescription)")
     }

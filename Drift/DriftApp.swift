@@ -32,6 +32,13 @@ struct DriftApp: App {
     @State private var bookmarkViewModel = BookmarkViewModel()
 
     init() {
+        // Native segmented control styling for dark theme
+        let segmented = UISegmentedControl.appearance()
+        segmented.selectedSegmentTintColor = UIColor(AppConstants.Colors.secondaryBackground)
+        segmented.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        segmented.setTitleTextAttributes([.foregroundColor: UIColor(AppConstants.Colors.textSecondary)], for: .normal)
+        segmented.backgroundColor = UIColor(AppConstants.Colors.cardBackground)
+
         let client = SupabaseClient(
             supabaseURL: SupabaseConfig.url,
             supabaseKey: SupabaseConfig.anonKey

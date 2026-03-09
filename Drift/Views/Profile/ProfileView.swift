@@ -183,37 +183,15 @@ struct ProfileView: View {
                     // Events tabs
                     VStack(alignment: .leading, spacing: 14) {
                         // Tab picker
-                        HStack(spacing: 0) {
+                        Picker("Events", selection: $eventTab) {
                             ForEach(ProfileEventTab.allCases, id: \.self) { tab in
-                                Button {
-                                    withAnimation(.easeInOut(duration: 0.2)) { eventTab = tab }
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        Text(tab.rawValue)
-                                            .font(.caption)
-                                            .fontWeight(eventTab == tab ? .bold : .medium)
-                                        if tab == .saved && !bookmarkViewModel.bookmarkedIds.isEmpty {
-                                            Text("\(bookmarkViewModel.bookmarkedIds.count)")
-                                                .font(.system(size: 10, weight: .bold))
-                                                .foregroundStyle(eventTab == tab ? AppConstants.Colors.cardBackground : AppConstants.Colors.textTertiary)
-                                                .padding(.horizontal, 5)
-                                                .padding(.vertical, 2)
-                                                .background(eventTab == tab ? AppConstants.Colors.accent : AppConstants.Colors.secondaryBackground)
-                                                .clipShape(Capsule())
-                                        }
-                                    }
-                                    .foregroundStyle(eventTab == tab ? .white : AppConstants.Colors.textSecondary)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(eventTab == tab ? AppConstants.Colors.secondaryBackground : .clear)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                }
-                                .accessibilityAddTraits(eventTab == tab ? .isSelected : [])
+                                Text(tab == .saved && !bookmarkViewModel.bookmarkedIds.isEmpty
+                                     ? "\(tab.rawValue) (\(bookmarkViewModel.bookmarkedIds.count))"
+                                     : tab.rawValue)
+                                    .tag(tab)
                             }
                         }
-                        .padding(3)
-                        .background(AppConstants.Colors.cardBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .pickerStyle(.segmented)
                         .padding(.horizontal)
 
                         if eventTab == .upcoming {

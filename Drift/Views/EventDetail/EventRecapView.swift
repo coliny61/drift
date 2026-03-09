@@ -19,12 +19,11 @@ struct EventRecapView: View {
     var body: some View {
         ScrollView {
             if photoService.photos.isEmpty && !isUploading {
-                EmptyStateView(
-                    icon: "photo.on.rectangle.angled",
-                    title: "No Photos Yet",
-                    message: "Be the first to share a photo from this event"
+                ContentUnavailableView(
+                    "No Photos Yet",
+                    systemImage: "photo.on.rectangle.angled",
+                    description: Text("Be the first to share a photo from this event")
                 )
-                .padding(.top, 60)
             } else {
                 LazyVGrid(columns: columns, spacing: 2) {
                     ForEach(photoService.photos) { photo in
