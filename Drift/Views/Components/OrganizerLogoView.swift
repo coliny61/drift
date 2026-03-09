@@ -11,8 +11,12 @@ struct OrganizerLogoView: View {
             }
             .frame(width: size, height: size)
             .clipShape(Circle())
+            .accessibilityLabel("Logo of \(organizer.name)")
+            .accessibilityAddTraits(.isImage)
         } else {
             placeholder
+                .accessibilityLabel("Logo of \(organizer.name)")
+                .accessibilityAddTraits(.isImage)
         }
     }
 

@@ -13,7 +13,7 @@ struct SignInView: View {
                 .foregroundStyle(AppConstants.Colors.accent)
 
             Text("Drift")
-                .font(.system(size: 40, weight: .bold))
+                .font(.largeTitle.weight(.bold))
                 .foregroundStyle(.white)
 
             Text("Welcome back")

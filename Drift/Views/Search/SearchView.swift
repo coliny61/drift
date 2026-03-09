@@ -28,6 +28,7 @@ struct SearchView: View {
                                     .font(.system(size: 16))
                                     .foregroundStyle(AppConstants.Colors.textTertiary)
                             }
+                            .accessibilityLabel("Clear search")
                         }
                     }
                     .padding(13)
@@ -49,6 +50,8 @@ struct SearchView: View {
                                     .strokeBorder(hasActiveFilters ? AppConstants.Colors.accent.opacity(0.3) : .clear, lineWidth: 1.5)
                             )
                     }
+                    .accessibilityLabel("Filters")
+                    .accessibilityHint(hasActiveFilters ? "Filters active" : "No filters applied")
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -119,6 +122,17 @@ struct SearchView: View {
                                     EventCardView(event: event)
                                 }
                                 .buttonStyle(.plain)
+                                .onAppear {
+                                    if event.id == viewModel.results.suffix(5).first?.id {
+                                        Task { await viewModel.loadMoreResults() }
+                                    }
+                                }
+                            }
+
+                            if viewModel.isLoadingMore {
+                                ProgressView()
+                                    .tint(AppConstants.Colors.accent)
+                                    .padding(.vertical, 16)
                             }
                         }
                         .padding(.horizontal)

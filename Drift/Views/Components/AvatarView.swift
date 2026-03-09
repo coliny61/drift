@@ -21,6 +21,8 @@ struct AvatarView: View {
             Circle()
                 .strokeBorder(.white.opacity(0.08), lineWidth: 1)
         )
+        .accessibilityLabel("Profile photo")
+        .accessibilityAddTraits(.isImage)
     }
 
     private var initialsView: some View {
@@ -66,5 +68,7 @@ struct AvatarStackView: View {
                     .overlay(Circle().strokeBorder(AppConstants.Colors.cardBackground, lineWidth: 2))
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(totalCount) attendees")
     }
 }

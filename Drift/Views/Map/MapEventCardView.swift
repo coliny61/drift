@@ -63,6 +63,8 @@ struct MapEventCardView: View {
         .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(event.title), \(event.startTime.relativeDescription), \(event.locationName), \(event.rsvpCount) going")
     }
 
     private var categoryColor: Color {

@@ -33,6 +33,8 @@ struct RSVPButtonView: View {
                         radius: 8, x: 0, y: 4
                     )
                 }
+                .accessibilityLabel(isGoing ? "Going" : "RSVP as going")
+                .accessibilityAddTraits(isGoing ? .isSelected : [])
 
                 // Interested button
                 Button(action: onInterested) {
@@ -53,6 +55,8 @@ struct RSVPButtonView: View {
                             .strokeBorder(isInterested ? AppConstants.Colors.interested.opacity(0.4) : .clear, lineWidth: 1.5)
                     )
                 }
+                .accessibilityLabel(isInterested ? "Interested" : "Mark as interested")
+                .accessibilityAddTraits(isInterested ? .isSelected : [])
             }
 
             if attendeeCount > 0 {
@@ -64,6 +68,8 @@ struct RSVPButtonView: View {
                         .fontWeight(.medium)
                 }
                 .foregroundStyle(AppConstants.Colors.textSecondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(attendeeCount) people going")
             }
         }
     }

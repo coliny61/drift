@@ -47,6 +47,8 @@ struct OnboardingView: View {
                     .animation(.spring(duration: 0.3), value: viewModel.onboardingStep)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Step \(viewModel.onboardingStep.rawValue + 1) of \(totalSteps)")
     }
 
     // MARK: - Welcome
@@ -76,7 +78,7 @@ struct OnboardingView: View {
                         .symbolEffect(.pulse, options: .repeating)
 
                     Text("Drift")
-                        .font(.system(size: 56, weight: .bold, design: .default))
+                        .font(.largeTitle.weight(.bold))
                         .foregroundStyle(.white)
 
                     Text("Discover your flow")
@@ -172,6 +174,8 @@ struct OnboardingView: View {
                                     .strokeBorder(isSelected ? catColor.opacity(0.4) : .clear, lineWidth: 1.5)
                             )
                         }
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        .accessibilityHint(isSelected ? "Tap to deselect" : "Tap to select")
                     }
                 }
                 .padding(.horizontal)
@@ -249,6 +253,7 @@ struct OnboardingView: View {
                                     .strokeBorder(isSelected ? AppConstants.Colors.info.opacity(0.4) : .clear, lineWidth: 1.5)
                             )
                         }
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
                     }
                 }
                 .padding(.horizontal)

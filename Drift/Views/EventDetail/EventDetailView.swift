@@ -140,6 +140,8 @@ struct EventDetailView: View {
                         }
                     }
                     .frame(height: 300)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("\(event.title), \(event.categoryEnum?.displayName ?? event.category), \(event.isFree ? "Free" : event.priceFormatted)")
 
                     // Content
                     VStack(alignment: .leading, spacing: 24) {
@@ -225,6 +227,7 @@ struct EventDetailView: View {
                         .frame(height: 160)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                         .allowsHitTesting(false)
+                        .accessibilityLabel("Map showing \(event.locationName)")
 
                         // Price & Attendees row
                         HStack {
@@ -460,6 +463,7 @@ struct EventDetailView: View {
                     Image(systemName: bookmarkViewModel.isBookmarked(eventId) ? "bookmark.fill" : "bookmark")
                         .foregroundStyle(bookmarkViewModel.isBookmarked(eventId) ? AppConstants.Colors.accent : AppConstants.Colors.textSecondary)
                 }
+                .accessibilityLabel(bookmarkViewModel.isBookmarked(eventId) ? "Remove bookmark" : "Bookmark this event")
             }
         }
         .navigationDestination(for: AppDestination.self) { destination in

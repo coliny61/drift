@@ -12,6 +12,11 @@ final class SearchViewModel {
     var results: [Event] = []
     var recentSearches: [String] = []
     var isSearching = false
+    var isLoadingMore = false
+    var hasMoreResults = true
+
+    private let pageSize = 20
+    private var currentSearchOffset = 0
 
     // Filters
     var selectedCategories: Set<Category> = []
@@ -74,10 +79,30 @@ final class SearchViewModel {
         }
 
         isSearching = true
-        unfilteredResults = await eventService.searchEvents(query: query)
+        currentSearchOffset = 0
+        hasMoreResults = true
+
+        let page = await eventService.searchEventsPage(query: query, offset: 0, limit: pageSize)
+        unfilteredResults = page
+        hasMoreResults = page.count >= pageSize
+        currentSearchOffset = page.count
+
         applyLocalFilters()
         saveRecentSearch(query)
         isSearching = false
+    }
+
+    func loadMoreResults() async {
+        guard !isLoadingMore, hasMoreResults, !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        isLoadingMore = true
+
+        let page = await eventService.searchEventsPage(query: query, offset: currentSearchOffset, limit: pageSize)
+        unfilteredResults.append(contentsOf: page)
+        hasMoreResults = page.count >= pageSize
+        currentSearchOffset += page.count
+        applyLocalFilters()
+
+        isLoadingMore = false
     }
 
     func applyLocalFilters() {

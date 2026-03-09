@@ -29,6 +29,8 @@ struct ActivityItemView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 14)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(activityText.description), \(item.createdAt.relativeDescription)")
     }
 
     private var activityText: AttributedString {

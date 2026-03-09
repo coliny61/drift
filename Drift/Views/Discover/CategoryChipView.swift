@@ -33,5 +33,7 @@ struct CategoryChipView: View {
                     .strokeBorder(isSelected ? color.opacity(0.4) : .clear, lineWidth: 1.5)
             )
         }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityHint(isSelected ? "Tap to remove filter" : "Tap to filter by \(title)")
     }
 }

@@ -72,6 +72,17 @@ struct DiscoverView: View {
                                     EventCardView(event: event)
                                 }
                                 .buttonStyle(.plain)
+                                .onAppear {
+                                    if event.id == viewModel.filteredEvents.suffix(5).first?.id {
+                                        Task { await viewModel.loadMoreEvents() }
+                                    }
+                                }
+                            }
+
+                            if viewModel.isLoadingMore {
+                                ProgressView()
+                                    .tint(AppConstants.Colors.accent)
+                                    .padding(.vertical, 16)
                             }
                         }
                         .padding(.horizontal)
@@ -127,6 +138,7 @@ struct DiscoverView: View {
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
+                .accessibilityAddTraits(viewModel.feedMode == mode ? .isSelected : [])
             }
         }
         .background(AppConstants.Colors.cardBackground)
@@ -229,6 +241,8 @@ struct DiscoverView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Featured: \(event.title), \(event.startTime.relativeDescription)\(event.rsvpCount > 0 ? ", \(event.rsvpCount) going" : "")")
     }
 
     private func featuredGradient(_ event: Event) -> some View {

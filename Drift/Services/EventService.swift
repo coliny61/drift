@@ -164,6 +164,61 @@ final class EventService {
             .execute()
     }
 
+    func fetchEventsPage(offset: Int, limit: Int = 20) async -> [Event] {
+        if Self.useSeedData {
+            let end = min(offset + limit, SeedData.events.count)
+            guard offset < SeedData.events.count else { return [] }
+            return Array(SeedData.events[offset..<end])
+        }
+        do {
+            let response: [Event] = try await client.from("events")
+                .select()
+                .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
+                .order("start_time", ascending: true)
+                .range(from: offset, to: offset + limit - 1)
+                .execute()
+                .value
+            return response
+        } catch {
+            print("Error fetching events page: \(error)")
+            let end = min(offset + limit, SeedData.events.count)
+            guard offset < SeedData.events.count else { return [] }
+            return Array(SeedData.events[offset..<end])
+        }
+    }
+
+    func searchEventsPage(query: String, offset: Int, limit: Int = 20) async -> [Event] {
+        if Self.useSeedData {
+            let q = query.lowercased()
+            let all = SeedData.events.filter {
+                $0.title.lowercased().contains(q) ||
+                $0.description.lowercased().contains(q) ||
+                $0.locationName.lowercased().contains(q) ||
+                $0.neighborhood.lowercased().contains(q) ||
+                $0.category.lowercased().contains(q)
+            }
+            let end = min(offset + limit, all.count)
+            guard offset < all.count else { return [] }
+            return Array(all[offset..<end])
+        }
+        do {
+            let response: [Event] = try await client.from("events")
+                .select()
+                .or("title.ilike.%\(query)%,description.ilike.%\(query)%,location_name.ilike.%\(query)%")
+                .eq("status", value: "upcoming")
+                .eq("approval_status", value: "approved")
+                .order("start_time", ascending: true)
+                .range(from: offset, to: offset + limit - 1)
+                .execute()
+                .value
+            return response
+        } catch {
+            print("Error searching events page: \(error)")
+            return []
+        }
+    }
+
     func searchEvents(query: String) async -> [Event] {
         if Self.useSeedData {
             let q = query.lowercased()

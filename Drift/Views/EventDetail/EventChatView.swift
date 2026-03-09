@@ -92,6 +92,7 @@ struct EventChatView: View {
                             )
                     }
                 }
+                .accessibilityLabel("Send message")
                 .disabled(viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty || isSending)
             }
             .padding(.horizontal)
@@ -146,5 +147,8 @@ struct EventChatView: View {
 
             if !isOwn { Spacer() }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(isOwn ? "You" : (message.sender?.displayName ?? "User")): \(message.content), \(message.createdAt.timeOnly)")
+        .accessibilityHint(isOwn ? "Long press to delete" : "")
     }
 }

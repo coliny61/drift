@@ -65,6 +65,8 @@ struct ProfileView: View {
                     .background(AppConstants.Colors.cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .padding(.horizontal)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("\(authViewModel.currentProfile?.eventsAttended ?? 0) events, \(profileViewModel.followingCount) following, \(profileViewModel.followerCount) followers, \(authViewModel.currentProfile?.streakCount ?? 0) day streak")
 
                     // Edit Profile button
                     Button {
@@ -169,6 +171,7 @@ struct ProfileView: View {
                                     .background(eventTab == tab ? AppConstants.Colors.secondaryBackground : .clear)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                 }
+                                .accessibilityAddTraits(eventTab == tab ? .isSelected : [])
                             }
                         }
                         .padding(3)

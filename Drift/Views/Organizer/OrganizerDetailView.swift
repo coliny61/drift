@@ -137,6 +137,7 @@ struct OrganizerDetailView: View {
                     Image(systemName: "checkmark.seal.fill")
                         .foregroundStyle(AppConstants.Colors.info)
                         .font(.body)
+                        .accessibilityLabel("Verified organizer")
                 }
             }
 
@@ -200,6 +201,8 @@ struct OrganizerDetailView: View {
                     )
                 }
                 .disabled(isFollowLoading)
+                .accessibilityLabel(isFollowing ? "Following" : "Follow")
+                .accessibilityAddTraits(isFollowing ? .isSelected : [])
             }
         }
         .frame(maxWidth: .infinity)
@@ -227,6 +230,8 @@ struct OrganizerDetailView: View {
         .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .padding(.horizontal, 20)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(followerCount) followers, \(events.count) events\(organizer.isVerifiedOrganizer ? ", Verified" : "")")
     }
 
     private func statItem(value: String, label: String, color: Color = .white) -> some View {

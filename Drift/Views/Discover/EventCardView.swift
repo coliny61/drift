@@ -151,6 +151,20 @@ struct EventCardView: View {
         .background(AppConstants.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityCardLabel)
+    }
+
+    private var accessibilityCardLabel: String {
+        var parts = [event.title]
+        if let cat = event.categoryEnum { parts.append(cat.displayName) }
+        parts.append(event.startTime.relativeDescription)
+        parts.append(event.locationName)
+        if !event.neighborhood.isEmpty { parts.append(event.neighborhood) }
+        parts.append(event.isFree ? "Free" : event.priceFormatted)
+        if event.isAlcoholFree { parts.append("Alcohol free") }
+        if event.rsvpCount > 0 { parts.append("\(event.rsvpCount) going") }
+        return parts.joined(separator: ", ")
     }
 
     private var gradientPlaceholder: some View {

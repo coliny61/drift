@@ -14,7 +14,12 @@ final class DiscoverViewModel {
     var selectedCategory: Category?
     var feedMode: FeedMode = .all
     var isLoading = false
+    var isLoadingMore = false
+    var hasMoreEvents = true
     var error: Error?
+
+    private let pageSize = 20
+    private var currentOffset = 0
 
     // User context for scoring
     var userInterests: [String] = []
@@ -38,14 +43,37 @@ final class DiscoverViewModel {
     func loadEvents() async {
         isLoading = true
         error = nil
+        currentOffset = 0
+        hasMoreEvents = true
+
+        // Featured events — small set, fetch all
         await eventService.fetchEvents()
-        events = eventService.events
         featuredEvents = eventService.featuredEvents
+
+        // First page
+        let page = await eventService.fetchEventsPage(offset: 0, limit: pageSize)
+        events = page
+        hasMoreEvents = page.count >= pageSize
+        currentOffset = page.count
+
         if events.isEmpty && eventService.error != nil {
             error = eventService.error
         }
         applyFilters()
         isLoading = false
+    }
+
+    func loadMoreEvents() async {
+        guard !isLoadingMore, hasMoreEvents else { return }
+        isLoadingMore = true
+
+        let page = await eventService.fetchEventsPage(offset: currentOffset, limit: pageSize)
+        events.append(contentsOf: page)
+        hasMoreEvents = page.count >= pageSize
+        currentOffset += page.count
+        applyFilters()
+
+        isLoadingMore = false
     }
 
     /// Populate user context for For You scoring. Call after auth/onboarding is ready.

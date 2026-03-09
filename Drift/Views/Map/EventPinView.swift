@@ -23,6 +23,7 @@ struct EventPinView: View {
                 .frame(width: 12, height: 6)
         }
         .animation(.spring(duration: 0.2), value: isSelected)
+        .accessibilityLabel("\(event.categoryEnum?.displayName ?? event.category) event: \(event.title)")
     }
 
     private var categoryColor: Color {
@@ -45,6 +46,7 @@ struct ClusterPinView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
         }
+        .accessibilityLabel("\(count) events in this area")
     }
 }
 
