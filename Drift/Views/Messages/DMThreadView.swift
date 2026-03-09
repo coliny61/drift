@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct EventChatView: View {
-    let eventId: UUID
-    @Environment(ChatViewModel.self) private var viewModel
+struct DMThreadView: View {
+    let otherUserId: UUID
+    @Environment(DirectMessageService.self) private var dmService
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(BlockService.self) private var blockService
     @State private var isSending = false
@@ -16,7 +16,7 @@ struct EventChatView: View {
             // Messages
             ScrollViewReader { proxy in
                 ScrollView {
-                    if viewModel.messages.isEmpty && !viewModel.isLoading {
+                    if dmService.messages.isEmpty && !dmService.isLoading {
                         VStack(spacing: 12) {
                             Image(systemName: "bubble.left.and.bubble.right")
                                 .font(.system(size: 36, weight: .light))
@@ -24,7 +24,7 @@ struct EventChatView: View {
                             Text("No messages yet")
                                 .font(.headline)
                                 .foregroundStyle(.white)
-                            Text("Be the first to say something!")
+                            Text("Say hello!")
                                 .font(.subheadline)
                                 .foregroundStyle(AppConstants.Colors.textSecondary)
                         }
@@ -32,8 +32,8 @@ struct EventChatView: View {
                         .padding(.top, 80)
                     } else {
                         LazyVStack(spacing: 12) {
-                            ForEach(viewModel.messages.filter { !blockService.isBlocked($0.senderId) }) { message in
-                                chatBubble(message)
+                            ForEach(dmService.messages) { message in
+                                messageBubble(message)
                                     .id(message.id)
                             }
                         }
@@ -41,8 +41,8 @@ struct EventChatView: View {
                     }
                 }
                 .scrollDismissesKeyboard(.interactively)
-                .onChange(of: viewModel.messages.count) { _, _ in
-                    if let last = viewModel.messages.last {
+                .onChange(of: dmService.messages.count) { _, _ in
+                    if let last = dmService.messages.last {
                         withAnimation(.easeOut(duration: 0.2)) {
                             proxy.scrollTo(last.id, anchor: .bottom)
                         }
@@ -53,7 +53,7 @@ struct EventChatView: View {
             Divider().background(AppConstants.Colors.secondaryBackground)
 
             // Send error
-            if let sendError = viewModel.sendError {
+            if let sendError = dmService.sendError {
                 HStack(spacing: 6) {
                     Image(systemName: "exclamationmark.circle.fill")
                     Text(sendError)
@@ -62,68 +62,66 @@ struct EventChatView: View {
                 .foregroundStyle(AppConstants.Colors.error)
                 .padding(.horizontal)
                 .padding(.top, 6)
-                .onTapGesture { viewModel.sendError = nil }
+                .onTapGesture { dmService.sendError = nil }
             }
 
-            // Input
-            HStack(spacing: 12) {
-                TextField("Message...", text: Bindable(viewModel).messageText)
-                    .padding(12)
-                    .background(AppConstants.Colors.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .foregroundStyle(.white)
+            // Input — hidden if blocked
+            if !blockService.isBlocked(otherUserId) {
+                HStack(spacing: 12) {
+                    TextField("Message...", text: Bindable(dmService).messageText)
+                        .padding(12)
+                        .background(AppConstants.Colors.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .foregroundStyle(.white)
 
-                Button {
-                    isSending = true
-                    Task {
-                        await viewModel.sendMessage(eventId: eventId, senderId: currentUserId)
-                        isSending = false
+                    Button {
+                        isSending = true
+                        Task {
+                            await dmService.sendMessage(senderId: currentUserId, recipientId: otherUserId)
+                            await dmService.fetchThread(userId: currentUserId, otherUserId: otherUserId)
+                            isSending = false
+                        }
+                    } label: {
+                        if isSending {
+                            ProgressView()
+                                .tint(AppConstants.Colors.accent)
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(
+                                    dmService.messageText.trimmingCharacters(in: .whitespaces).isEmpty
+                                    ? AppConstants.Colors.textSecondary : AppConstants.Colors.accent
+                                )
+                        }
                     }
-                } label: {
-                    if isSending {
-                        ProgressView()
-                            .tint(AppConstants.Colors.accent)
-                            .scaleEffect(0.8)
-                    } else {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(
-                                viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty
-                                ? AppConstants.Colors.textSecondary : AppConstants.Colors.accent
-                            )
-                    }
+                    .accessibilityLabel("Send message")
+                    .disabled(dmService.messageText.trimmingCharacters(in: .whitespaces).isEmpty || isSending)
                 }
-                .accessibilityLabel("Send message")
-                .disabled(viewModel.messageText.trimmingCharacters(in: .whitespaces).isEmpty || isSending)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(AppConstants.Colors.background)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(AppConstants.Colors.background)
         }
         .background(AppConstants.Colors.background)
-        .navigationTitle("Chat")
+        .navigationTitle("Message")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            await viewModel.loadMessages(eventId: eventId)
-            await viewModel.subscribe(eventId: eventId)
+            await dmService.fetchThread(userId: currentUserId, otherUserId: otherUserId)
+            await dmService.subscribe(userId: currentUserId, otherUserId: otherUserId)
         }
         .onDisappear {
-            Task { await viewModel.unsubscribe() }
+            Task { await dmService.unsubscribe() }
         }
     }
 
-    private func chatBubble(_ message: ChatMessage) -> some View {
+    private func messageBubble(_ message: DirectMessage) -> some View {
         let isOwn = message.senderId == currentUserId
         return HStack {
             if isOwn { Spacer() }
 
             VStack(alignment: isOwn ? .trailing : .leading, spacing: 4) {
-                if !isOwn {
-                    Text(message.sender?.displayName ?? "User")
-                        .font(.caption)
-                        .foregroundStyle(AppConstants.Colors.accent)
-                }
                 Text(message.content)
                     .font(.body)
                     .foregroundStyle(.white)
@@ -132,13 +130,7 @@ struct EventChatView: View {
                     .background(isOwn ? AppConstants.Colors.accent : AppConstants.Colors.secondaryBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .contextMenu {
-                        if isOwn {
-                            Button(role: .destructive) {
-                                Task { await viewModel.deleteMessage(messageId: message.id) }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        } else {
+                        if !isOwn {
                             Button(role: .destructive) {
                                 Task { await blockService.blockUser(blockerId: currentUserId, blockedId: message.senderId) }
                             } label: {
@@ -155,7 +147,6 @@ struct EventChatView: View {
             if !isOwn { Spacer() }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(isOwn ? "You" : (message.sender?.displayName ?? "User")): \(message.content), \(message.createdAt.timeOnly)")
-        .accessibilityHint(isOwn ? "Long press to delete" : "")
+        .accessibilityLabel("\(isOwn ? "You" : "Them"): \(message.content), \(message.createdAt.timeOnly)")
     }
 }

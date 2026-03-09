@@ -48,6 +48,7 @@ struct MyOrganizersView: View {
             switch destination {
             case .event(let id): EventDetailView(eventId: id)
             case .organizer(let id): OrganizerDetailView(organizerId: id)
+            case .conversation(let id): DMThreadView(otherUserId: id)
             }
         }
         .sheet(isPresented: $showRegistration) {

@@ -5,6 +5,7 @@ struct ProfileView: View {
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(BookmarkViewModel.self) private var bookmarkViewModel
     @Environment(EventService.self) private var eventService
+    @Environment(DirectMessageService.self) private var dmService
     @State private var showSettings = false
     @State private var showEditProfile = false
     @State private var eventTab: ProfileEventTab = .upcoming
@@ -80,6 +81,42 @@ struct ProfileView: View {
                             .padding(.vertical, 13)
                             .background(AppConstants.Colors.secondaryBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal)
+
+                    // Messages
+                    NavigationLink {
+                        ConversationListView()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(Color.blue)
+                                .frame(width: 34, height: 34)
+                                .background(Color.blue.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 9))
+                            Text("Messages")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                            Spacer()
+                            if dmService.unreadCount > 0 {
+                                Text("\(dmService.unreadCount)")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 3)
+                                    .background(AppConstants.Colors.accent)
+                                    .clipShape(Capsule())
+                            }
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(AppConstants.Colors.textTertiary)
+                        }
+                        .padding(14)
+                        .background(AppConstants.Colors.cardBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
                     .padding(.horizontal)
 
@@ -218,6 +255,7 @@ struct ProfileView: View {
                 switch destination {
                 case .event(let id): EventDetailView(eventId: id)
                 case .organizer(let id): OrganizerDetailView(organizerId: id)
+                case .conversation(let id): DMThreadView(otherUserId: id)
                 }
             }
             .sheet(isPresented: $showSettings) {

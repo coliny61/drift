@@ -46,6 +46,13 @@ final class DiscoverViewModel {
         currentOffset = 0
         hasMoreEvents = true
 
+        // Show cached data instantly while network loads
+        if events.isEmpty, let cached = EventCacheService.load() {
+            events = cached
+            featuredEvents = cached.filter { $0.isCurrentlyFeatured }
+            applyFilters()
+        }
+
         // Featured events — small set, fetch all
         await eventService.fetchEvents()
         featuredEvents = eventService.featuredEvents

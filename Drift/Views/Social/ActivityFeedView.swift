@@ -3,11 +3,16 @@ import SwiftUI
 struct ActivityFeedView: View {
     @Environment(ActivityFeedViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(BlockService.self) private var blockService
+
+    private var visibleItems: [ActivityFeedItem] {
+        viewModel.feedItems.filter { !blockService.isBlocked($0.actorId) }
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                if viewModel.feedItems.isEmpty {
+                if visibleItems.isEmpty {
                     EmptyStateView(
                         icon: "bell",
                         title: "No Activity Yet",
@@ -16,7 +21,7 @@ struct ActivityFeedView: View {
                     .padding(.top, 60)
                 } else {
                     LazyVStack(spacing: 0) {
-                        ForEach(viewModel.feedItems) { item in
+                        ForEach(visibleItems) { item in
                             if let eventId = item.targetEventId {
                                 NavigationLink(value: AppDestination.event(eventId)) {
                                     ActivityItemView(item: item)
@@ -41,6 +46,7 @@ struct ActivityFeedView: View {
                 switch destination {
                 case .event(let id): EventDetailView(eventId: id)
                 case .organizer(let id): OrganizerDetailView(organizerId: id)
+                case .conversation(let id): DMThreadView(otherUserId: id)
                 }
             }
             .refreshable {

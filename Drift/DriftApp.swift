@@ -16,6 +16,8 @@ struct DriftApp: App {
     @State private var photoService: PhotoService
     @State private var organizerService: OrganizerService
     @State private var notificationService: NotificationService
+    @State private var blockService: BlockService
+    @State private var dmService: DirectMessageService
 
     // MARK: - ViewModels
     @State private var authViewModel: AuthViewModel
@@ -55,6 +57,8 @@ struct DriftApp: App {
         _activityService = State(initialValue: activity)
         _photoService = State(initialValue: photos)
         _organizerService = State(initialValue: organizers)
+        _blockService = State(initialValue: BlockService(client: client))
+        _dmService = State(initialValue: DirectMessageService(client: client))
         _locationManager = State(initialValue: location)
 
         let notifications = NotificationService()
@@ -90,9 +94,13 @@ struct DriftApp: App {
                 .environment(eventService)
                 .environment(notificationService)
                 .environment(bookmarkViewModel)
+                .environment(blockService)
+                .environment(dmService)
                 .preferredColorScheme(settingsViewModel.colorScheme)
                 .task {
                     await authViewModel.initialize()
+                    let userId = authViewModel.currentProfile?.id ?? authViewModel.localUserId
+                    await blockService.loadBlockedUsers(userId: userId)
                 }
         }
     }

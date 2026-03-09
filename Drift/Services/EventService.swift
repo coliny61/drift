@@ -40,11 +40,16 @@ final class EventService {
                 .value
             events = response
             featuredEvents = response.filter { $0.isCurrentlyFeatured }
+            EventCacheService.save(response)
         } catch let fetchError {
             error = fetchError
             print("Error fetching events: \(fetchError)")
-            // Fallback to seed data
-            events = SeedData.events
+            // Fallback to cache, then seed data
+            if let cached = EventCacheService.load() {
+                events = cached
+            } else {
+                events = SeedData.events
+            }
             featuredEvents = events.filter { $0.isCurrentlyFeatured }
         }
         isLoading = false
@@ -182,9 +187,10 @@ final class EventService {
             return response
         } catch {
             print("Error fetching events page: \(error)")
-            let end = min(offset + limit, SeedData.events.count)
-            guard offset < SeedData.events.count else { return [] }
-            return Array(SeedData.events[offset..<end])
+            let fallback = EventCacheService.load() ?? SeedData.events
+            let end = min(offset + limit, fallback.count)
+            guard offset < fallback.count else { return [] }
+            return Array(fallback[offset..<end])
         }
     }
 

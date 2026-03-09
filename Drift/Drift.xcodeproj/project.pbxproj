@@ -84,6 +84,14 @@
 		AA0001110001001100010001 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001100010001 /* CachedAsyncImage.swift */; };
 		AA0001110001001200010001 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001200010001 /* SkeletonView.swift */; };
 		AA0001110001001300010001 /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001300010001 /* BookmarkViewModel.swift */; };
+		AA0001110001001400010001 /* EventCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001400010001 /* EventCacheService.swift */; };
+		AA0001110001001500010001 /* EditOrganizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001500010001 /* EditOrganizerView.swift */; };
+		AA0001110001001600010001 /* UserBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001600010001 /* UserBlock.swift */; };
+		AA0001110001001700010001 /* BlockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001700010001 /* BlockService.swift */; };
+		AA0001110001001800010001 /* DirectMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001800010001 /* DirectMessage.swift */; };
+		AA0001110001001900010001 /* DirectMessageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002001900010001 /* DirectMessageService.swift */; };
+		AA0001110001002000010001 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002002000010001 /* ConversationListView.swift */; };
+		AA0001110001002100010001 /* DMThreadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001110002002100010001 /* DMThreadView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -165,6 +173,14 @@
 		AA0001110002001100010001 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		AA0001110002001200010001 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 		AA0001110002001300010001 /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
+		AA0001110002001400010001 /* EventCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCacheService.swift; sourceTree = "<group>"; };
+		AA0001110002001500010001 /* EditOrganizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditOrganizerView.swift; sourceTree = "<group>"; };
+		AA0001110002001600010001 /* UserBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBlock.swift; sourceTree = "<group>"; };
+		AA0001110002001700010001 /* BlockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockService.swift; sourceTree = "<group>"; };
+		AA0001110002001800010001 /* DirectMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectMessage.swift; sourceTree = "<group>"; };
+		AA0001110002001900010001 /* DirectMessageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectMessageService.swift; sourceTree = "<group>"; };
+		AA0001110002002000010001 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
+		AA0001110002002100010001 /* DMThreadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMThreadView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,6 +273,7 @@
 				32CFFE8376C996223F7BD34A /* EventDetail */,
 				7327D66620324DE852E5549F /* Launch */,
 				84EDFE723A025741E05A8ABC /* Map */,
+				AA0001110003000300010001 /* Messages */,
 				AA0001110003000100010001 /* Organizer */,
 				1146D4ED8E06C68A78FBCC1F /* Profile */,
 				7BA9B12011A121769BCC7F2B /* Search */,
@@ -269,11 +286,12 @@
 		AA0001110003000100010001 /* Organizer */ = {
 			isa = PBXGroup;
 			children = (
+				AA0001110002001500010001 /* EditOrganizerView.swift */,
+				AA0001110002000500010001 /* EventSubmitView.swift */,
 				AA0001110002000400010001 /* MyOrganizersView.swift */,
+				AA0001110002000600010001 /* OrganizerDashboardView.swift */,
 				AA0001110002000200010001 /* OrganizerDetailView.swift */,
 				AA0001110002000300010001 /* OrganizerRegistrationView.swift */,
-				AA0001110002000500010001 /* EventSubmitView.swift */,
-				AA0001110002000600010001 /* OrganizerDashboardView.swift */,
 			);
 			path = Organizer;
 			sourceTree = "<group>";
@@ -366,12 +384,14 @@
 				DC47FF7E37EF1717E7F9C487 /* ActivityFeedItem.swift */,
 				8B8FFBB875DA213EBD07EECB /* Category.swift */,
 				20C2A6E7B886881B2B80F7D4 /* ChatMessage.swift */,
+				AA0001110002001800010001 /* DirectMessage.swift */,
 				26C1AC65B01F698C26C0F56D /* Event.swift */,
 				A313E05D533F991E5DA944C1 /* EventPhoto.swift */,
 				5959BAFCFC6264A00E0F6218 /* Organizer.swift */,
 				53BC0A26E060D21A47D2A989 /* Profile.swift */,
 				503A44056A3A5D6E533EEEAD /* RSVP.swift */,
 				349F53F0BCF15B17114F5D2C /* SeedData.swift */,
+				AA0001110002001600010001 /* UserBlock.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -416,7 +436,10 @@
 			children = (
 				165EEB214254FC1A183F48BA /* ActivityService.swift */,
 				8D9D26356703C407477DBAE0 /* AuthService.swift */,
+				AA0001110002001700010001 /* BlockService.swift */,
 				E08674FE101E328DB9021169 /* ChatService.swift */,
+				AA0001110002001900010001 /* DirectMessageService.swift */,
+				AA0001110002001400010001 /* EventCacheService.swift */,
 				BF7F11A39BA623CB8AE606CE /* EventService.swift */,
 				AA0001110002000700010001 /* NotificationService.swift */,
 				AA0001110002000100010001 /* OrganizerService.swift */,
@@ -435,6 +458,15 @@
 				B1BD7137BD3A409B0D106EF7 /* SettingsView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		AA0001110003000300010001 /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				AA0001110002002000010001 /* ConversationListView.swift */,
+				AA0001110002002100010001 /* DMThreadView.swift */,
+			);
+			path = Messages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -570,6 +602,14 @@
 				39DB5249E9128E0779D63480 /* SearchViewModel.swift in Sources */,
 				6B4F6F38470BD03D8C308299 /* SeedData.swift in Sources */,
 				AA0001110001001200010001 /* SkeletonView.swift in Sources */,
+				AA0001110001001400010001 /* EventCacheService.swift in Sources */,
+				AA0001110001001500010001 /* EditOrganizerView.swift in Sources */,
+				AA0001110001001600010001 /* UserBlock.swift in Sources */,
+				AA0001110001001700010001 /* BlockService.swift in Sources */,
+				AA0001110001001800010001 /* DirectMessage.swift in Sources */,
+				AA0001110001001900010001 /* DirectMessageService.swift in Sources */,
+				AA0001110001002000010001 /* ConversationListView.swift in Sources */,
+				AA0001110001002100010001 /* DMThreadView.swift in Sources */,
 				27C1F71FD517406909CC2A4B /* SettingsView.swift in Sources */,
 				65F7FA5C7D1F78BC0D591A17 /* SettingsViewModel.swift in Sources */,
 				F569DA5771CD141733BD8791 /* SignInView.swift in Sources */,

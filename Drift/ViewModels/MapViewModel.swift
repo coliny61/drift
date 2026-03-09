@@ -94,6 +94,10 @@ final class MapViewModel {
     }
 
     func loadEvents() async {
+        // Show cached pins instantly
+        if events.isEmpty, let cached = EventCacheService.load() {
+            events = cached
+        }
         await eventService.fetchEvents()
         events = eventService.events
     }

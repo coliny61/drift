@@ -11,6 +11,7 @@ struct OrganizerDashboardView: View {
     @State private var showEventSubmit = false
     @State private var editingEvent: Event?
     @State private var cancellingEvent: Event?
+    @State private var showEditOrganizer = false
 
     private var totalRSVPs: Int {
         events.reduce(0) { $0 + $1.rsvpCount }
@@ -27,6 +28,32 @@ struct OrganizerDashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                // Edit Profile row
+                Button {
+                    showEditOrganizer = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(AppConstants.Colors.accent)
+                            .frame(width: 34, height: 34)
+                            .background(AppConstants.Colors.accent.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 9))
+                        Text("Edit Organization Profile")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(AppConstants.Colors.textTertiary)
+                    }
+                    .padding(14)
+                    .background(AppConstants.Colors.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
+                .padding(.horizontal)
+
                 // Analytics cards
                 analyticsSection
 
@@ -60,6 +87,11 @@ struct OrganizerDashboardView: View {
         }
         .sheet(item: $editingEvent) { event in
             EventSubmitView(organizer: organizer, editingEvent: event)
+        }
+        .sheet(isPresented: $showEditOrganizer) {
+            Task { await loadData() }
+        } content: {
+            EditOrganizerView(organizer: organizer)
         }
         .onChange(of: showEventSubmit) { _, showing in
             if !showing { Task { await loadData() } }

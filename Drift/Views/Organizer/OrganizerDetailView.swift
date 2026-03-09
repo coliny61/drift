@@ -12,6 +12,7 @@ struct OrganizerDetailView: View {
     @State private var isLoading = true
     @State private var isFollowLoading = false
     @State private var showEventSubmit = false
+    @State private var showEditOrganizer = false
 
     private var isOwnOrganizer: Bool {
         guard let organizer else { return false }
@@ -89,21 +90,32 @@ struct OrganizerDetailView: View {
             switch destination {
             case .event(let id): EventDetailView(eventId: id)
             case .organizer(let id): OrganizerDetailView(organizerId: id)
+            case .conversation(let id): DMThreadView(otherUserId: id)
             }
         }
         .toolbar {
             if isOwnOrganizer {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showEventSubmit = true
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "plus")
-                            Text("Event")
+                    HStack(spacing: 12) {
+                        Button {
+                            showEditOrganizer = true
+                        } label: {
+                            Image(systemName: "pencil")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(AppConstants.Colors.textSecondary)
                         }
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(AppConstants.Colors.accent)
+                        Button {
+                            showEventSubmit = true
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus")
+                                Text("Event")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(AppConstants.Colors.accent)
+                        }
                     }
                 }
             }
@@ -111,6 +123,13 @@ struct OrganizerDetailView: View {
         .sheet(isPresented: $showEventSubmit) {
             if let organizer {
                 EventSubmitView(organizer: organizer)
+            }
+        }
+        .sheet(isPresented: $showEditOrganizer) {
+            Task { await loadData() }
+        } content: {
+            if let organizer {
+                EditOrganizerView(organizer: organizer)
             }
         }
         .task {
